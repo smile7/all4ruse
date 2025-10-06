@@ -1,7 +1,0 @@
-{
-  "/favicon.ico/route": "app/favicon.ico/route.js",
-  "/events/page": "app/events/page.js",
-  "/events/create/page": "app/events/create/page.js",
-  "/page": "app/page.js",
-  "/about/page": "app/about/page.js"
-}
