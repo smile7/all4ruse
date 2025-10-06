@@ -8,11 +8,11 @@ import type { Event } from "@/lib/api";
 
 const FALLBACK_IMAGE = "/logo.png";
 
-export function EventsClient({
-  initial,
+export function Events({
+  events,
   errorMessage,
 }: {
-  initial: Event[];
+  events: Event[];
   errorMessage?: string | null;
 }) {
   const [query, setQuery] = useState("");
@@ -23,7 +23,7 @@ export function EventsClient({
     const q = query.trim().toLocaleLowerCase();
     const fromTs = fromDate ? Date.parse(fromDate) : null;
     const toTs = toDate ? Date.parse(toDate + "T23:59:59") : null;
-    return initial.filter((e) => {
+    return events.filter((e) => {
       if (q) {
         const title = (e.title ?? "").toLocaleLowerCase();
         if (!title.includes(q)) return false;
@@ -35,7 +35,7 @@ export function EventsClient({
       }
       return true;
     });
-  }, [initial, query, fromDate, toDate]);
+  }, [events, query, fromDate, toDate]);
 
   const upcoming = useMemo(
     () =>

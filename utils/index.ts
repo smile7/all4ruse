@@ -3,17 +3,15 @@ import { format, isValid, parseISO } from "date-fns";
 import { bg } from "date-fns/locale";
 import { twMerge } from "tailwind-merge";
 
+import { BREAKPOINTS, ScreenSize } from "./constants";
+
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-type ScreenSize = "sm" | "md" | "lg" | "xl" | "2xl";
 export function getMinWidth(name: `--breakpoint-${ScreenSize}`) {
-  return `(min-width: ${getCssVar(name)})`;
-}
-
-export function getCssVar(name: string) {
-  return getComputedStyle(document.documentElement).getPropertyValue(name);
+  const key = name.replace("--breakpoint-", "") as ScreenSize;
+  return `(min-width: ${BREAKPOINTS[key]})`;
 }
 
 export function formatDate(dt: string | null) {
