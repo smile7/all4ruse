@@ -12,8 +12,8 @@ import { cva, VariantProps } from "class-variance-authority";
 import { PanelLeftIcon } from "lucide-react";
 import { Slot } from "@radix-ui/react-slot";
 
-import { useIsMobile } from "@/hooks/use-mobile";
-import { cn } from "@/utils";
+import { useMediaQuery } from "@/hooks";
+import { cn, getMinWidth } from "@/utils";
 
 import {
   Button,
@@ -72,7 +72,7 @@ function SidebarProvider({
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
 }) {
-  const isMobile = useIsMobile();
+  const isLargerThanMd = useMediaQuery(getMinWidth("--breakpoint-md"));
   const [openMobile, setOpenMobile] = useState(false);
 
   // This is the internal state of the sidebar.
@@ -96,8 +96,10 @@ function SidebarProvider({
 
   // Helper to toggle the sidebar.
   const toggleSidebar = useCallback(() => {
-    return isMobile ? setOpenMobile((open) => !open) : setOpen((open) => !open);
-  }, [isMobile, setOpen, setOpenMobile]);
+    return !isLargerThanMd
+      ? setOpenMobile((open) => !open)
+      : setOpen((open) => !open);
+  }, [isLargerThanMd, setOpen, setOpenMobile]);
 
   // Adds a keyboard shortcut to toggle the sidebar.
   useEffect(() => {
@@ -124,12 +126,20 @@ function SidebarProvider({
       state,
       open,
       setOpen,
-      isMobile,
+      isMobile: !isLargerThanMd,
       openMobile,
       setOpenMobile,
       toggleSidebar,
     }),
-    [state, open, setOpen, isMobile, openMobile, setOpenMobile, toggleSidebar]
+    [
+      state,
+      open,
+      setOpen,
+      isLargerThanMd,
+      openMobile,
+      setOpenMobile,
+      toggleSidebar,
+    ]
   );
 
   return (
