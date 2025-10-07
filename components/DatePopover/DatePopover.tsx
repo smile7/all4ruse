@@ -1,8 +1,8 @@
 import { useMemo, useState } from "react";
-import { format, formatISO9075, isValid, parseISO } from "date-fns";
+import { formatISO9075, isValid, parseISO } from "date-fns";
 import { CalendarIcon, XIcon } from "lucide-react";
 
-import { cn } from "@/utils";
+import { cn, formatDate } from "@/utils";
 
 import {
   Button,
@@ -49,7 +49,7 @@ export function DatePopover({
           >
             <CalendarIcon className="pointer-events-none shrink-0 opacity-50" />
             <span className={cn("truncate", !date && "opacity-60")}>
-              {date ? format(date, "dd MMM yyyy") : "Pick a date"}
+              {value ? formatDate(value) : "Избери дата"}
             </span>
           </Button>
         </PopoverTrigger>
