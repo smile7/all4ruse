@@ -6,8 +6,8 @@ import {
   CardHeader,
   CardTitle,
   Input,
+  Textarea,
 } from "@/components/ui";
-import { Textarea } from "@/components/ui/textarea";
 
 export default function CreateEventPage() {
   return (

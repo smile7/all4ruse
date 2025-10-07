@@ -50,7 +50,10 @@ export function Small(props: React.HTMLAttributes<HTMLElement>) {
   return (
     <small
       {...props}
-      className={cn("text-sm leading-none font-medium", props.className)}
+      className={cn(
+        "text-sm leading-none font-medium text-muted-foreground",
+        props.className
+      )}
     />
   );
 }
