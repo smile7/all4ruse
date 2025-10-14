@@ -1,8 +1,10 @@
 "use server";
 
+import { redirect } from "next/navigation";
+
 import { deleteEvent, type EventUpdate, updateEvent } from "@/lib/api";
 import { createClient } from "@/lib/supabase/server";
-import { getString } from "@/utils";
+import { getString } from "@/lib/utils";
 
 import { uploadImage } from "./common";
 
@@ -36,7 +38,9 @@ export async function createEventAction(formData: FormData) {
     .maybeSingle();
 
   if (error) throw new Error(error.message);
-  return data;
+  console.log(data);
+
+  redirect("/");
 }
 
 export async function updateEventAction(id: number, formData: FormData) {

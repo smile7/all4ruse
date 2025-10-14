@@ -12,7 +12,7 @@ import {
 } from "react-hook-form";
 import { Label as LabelPrimitive, Slot as SlotPrimitive } from "radix-ui";
 
-import { cn } from "@/utils";
+import { cn } from "@/lib/utils";
 
 import { Label } from ".";
 

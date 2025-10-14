@@ -4,7 +4,7 @@ import { Typography } from "@/components/Typography";
 import { getEvents } from "@/lib/api";
 import { createClient } from "@/lib/supabase/server";
 
-import { Events } from "./components";
+import { Events } from "./_components";
 
 export default async function EventsPage() {
   const supabase = await createClient();

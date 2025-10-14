@@ -1,6 +1,6 @@
 import type { Config } from "tailwindcss";
 
-import { BREAKPOINTS } from "./utils/constants";
+import { BREAKPOINTS } from "./constants";
 
 const config: Config = {
   content: [

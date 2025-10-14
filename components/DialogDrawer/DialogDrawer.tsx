@@ -1,7 +1,7 @@
 import { createContext, useContext, useState } from "react";
 
 import { useMediaQuery } from "@/hooks";
-import { cn, getMinWidth } from "@/utils";
+import { cn, getMinWidth } from "@/lib/utils";
 
 import {
   Button,

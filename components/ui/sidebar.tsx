@@ -13,7 +13,7 @@ import { PanelLeftIcon } from "lucide-react";
 import { Slot } from "@radix-ui/react-slot";
 
 import { useMediaQuery } from "@/hooks";
-import { cn, getMinWidth } from "@/utils";
+import { cn, getMinWidth } from "@/lib/utils";
 
 import {
   Button,

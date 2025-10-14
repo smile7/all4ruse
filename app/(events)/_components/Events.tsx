@@ -8,10 +8,10 @@ import Link from "next/link";
 import { AspectRatio } from "@/components/AspectRatio";
 import { Typography } from "@/components/Typography";
 import { Button, Card, CardContent, ErrorAlert } from "@/components/ui";
+import { DEBOUNCE_MS, FALLBACK_IMAGE } from "@/constants";
 import { useDebounce, useEventFilters } from "@/hooks";
 import type { Event } from "@/lib/api";
-import { formatDateTime, toTimestamp } from "@/utils";
-import { DEBOUNCE_MS, FALLBACK_IMAGE } from "@/utils/constants";
+import { formatDateTime, toTimestamp } from "@/lib/utils";
 
 import { EventsFilters } from "./Filters";
 

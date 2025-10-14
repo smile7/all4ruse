@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { formatISO9075, isValid, parseISO } from "date-fns";
 import { CalendarIcon, XIcon } from "lucide-react";
 
-import { cn, formatDate } from "@/utils";
+import { cn, formatDate } from "@/lib/utils";
 
 import {
   Button,
