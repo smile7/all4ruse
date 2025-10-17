@@ -8,10 +8,10 @@ import Link from "next/link";
 import { AspectRatio } from "@/components/AspectRatio";
 import { Typography } from "@/components/Typography";
 import { Button, Card, CardContent, ErrorAlert } from "@/components/ui";
+import { DEBOUNCE_MS, FALLBACK_IMAGE } from "@/constants";
 import { useDebounce, useEventFilters } from "@/hooks";
 import type { Event } from "@/lib/api";
-import { formatDateTime, toTimestamp } from "@/utils";
-import { DEBOUNCE_MS, FALLBACK_IMAGE } from "@/utils/constants";
+import { formatDateTime, toTimestamp } from "@/lib/utils";
 
 import { EventsFilters } from "./Filters";
 
@@ -38,15 +38,15 @@ export function Events({
           if (!t.includes(query)) return false;
         }
         if (fromTs || toTs) {
-          const start = toTimestamp(e.startDateTime);
+          const start = toTimestamp(e.startDate);
           if (fromTs && start && start < fromTs) return false;
           if (toTs && start && start > toTs) return false;
         }
         return true;
       })
       .sort((a, b) => {
-        const aT = toTimestamp(a.startDateTime);
-        const bT = toTimestamp(b.startDateTime);
+        const aT = toTimestamp(a.startDate);
+        const bT = toTimestamp(b.startDate);
         if (aT === bT) return 0;
         if (aT === null) return 1;
         if (bT === null) return -1;
@@ -110,9 +110,7 @@ function EventsGrid({ events }: { events: Event[] }) {
 
               <div className="flex items-center gap-2 text-xs text-muted-foreground">
                 <Calendar className="size-4 opacity-70" />
-                <span className="truncate">
-                  {formatDateTime(e.startDateTime)}
-                </span>
+                <span className="truncate">{formatDateTime(e.startDate)}</span>
               </div>
 
               <Typography.P className="clamp-3 reserve-body-3 text-xs leading-[var(--lh-body)] text-muted-foreground">

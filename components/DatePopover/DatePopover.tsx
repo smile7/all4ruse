@@ -1,8 +1,9 @@
 import { useMemo, useState } from "react";
 import { formatISO9075, isValid, parseISO } from "date-fns";
+import { bg } from "date-fns/locale";
 import { CalendarIcon, XIcon } from "lucide-react";
 
-import { cn, formatDate } from "@/utils";
+import { cn, formatDate } from "@/lib/utils";
 
 import {
   Button,
@@ -49,7 +50,7 @@ export function DatePopover({
           >
             <CalendarIcon className="pointer-events-none shrink-0 opacity-50" />
             <span className={cn("truncate", !date && "opacity-60")}>
-              {value ? formatDate(value) : "Избери дата"}
+              {value ? formatDate(value) : "Изберете дата"}
             </span>
           </Button>
         </PopoverTrigger>
@@ -79,6 +80,7 @@ export function DatePopover({
           className="max-h-(--radix-popover-content-available-height) overflow-auto"
           selected={date}
           defaultMonth={date}
+          locale={bg}
           onSelect={(v) => {
             const formattedDate = v
               ? formatISO9075(new Date(v), { representation: "date" })

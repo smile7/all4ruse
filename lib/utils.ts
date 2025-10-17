@@ -3,7 +3,7 @@ import { format, isValid, parseISO } from "date-fns";
 import { bg } from "date-fns/locale";
 import { twMerge } from "tailwind-merge";
 
-import { BREAKPOINTS, EMPTY_DISPLAY, ScreenSize } from "./constants";
+import { BREAKPOINTS, EMPTY_DISPLAY, ScreenSize } from "@/constants";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));

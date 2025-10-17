@@ -12,14 +12,13 @@ type ServiceResult<T> = {
 };
 
 // MARK: Events
-
 export async function getEvents(
   client: SupabaseClient
 ): Promise<ServiceResult<Event[]>> {
   const { data, error } = await client
     .from("events")
     .select("*")
-    .order("startDateTime", { ascending: true });
+    .order("startDate", { ascending: true });
   return { data: data ?? [], error };
 }
 

@@ -8,7 +8,7 @@ import {
   ChevronRightIcon,
 } from "lucide-react";
 
-import { cn } from "@/utils";
+import { cn } from "@/lib/utils";
 
 import { Button, buttonVariants } from ".";
 

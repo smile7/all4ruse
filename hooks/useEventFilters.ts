@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
-import { DEBOUNCE_MS } from "@/utils/constants";
+import { DEBOUNCE_MS } from "@/constants";
 
 import { useDebounce } from "./useDebounce";
 
