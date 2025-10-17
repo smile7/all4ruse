@@ -1,74 +1,71 @@
 "use server";
 
+import { isRedirectError } from "next/dist/client/components/redirect-error";
 import { redirect } from "next/navigation";
+import { SupabaseClient } from "@supabase/supabase-js";
 
-import { deleteEvent, type EventUpdate, updateEvent } from "@/lib/api";
+import { createEventSchema } from "@/lib/schema";
 import { createClient } from "@/lib/supabase/server";
-import { getString } from "@/lib/utils";
 
-import { uploadImage } from "./common";
+import { uploadImage } from ".";
 
-export async function createEventAction(formData: FormData) {
-  const supabase = await createClient();
+export type CreateEventActionState = { error: string | null };
 
-  const title = formData.get("title");
-  const description = formData.get("description");
-  const startDateTime = formData.get("startDateTime");
-  const endDateTime = formData.get("endDateTime");
+export async function createEventAction(
+  _prev: CreateEventActionState,
+  formData: FormData
+): Promise<CreateEventActionState> {
+  try {
+    const supabase = await createClient();
 
-  let image: string | null = null;
-  const file = formData.get("image") as File | null;
+    const raw: Record<string, unknown> = {};
+    for (const [k, v] of formData.entries()) raw[k] = v;
+    if (!raw.isFree) raw.isFree = false;
 
-  if (file && file.size > 0) {
-    const uploaded = await uploadImage(supabase, file);
-    2;
-    image = uploaded.url;
+    const parsed = createEventSchema.safeParse(raw);
+    if (!parsed.success) {
+      return {
+        error: parsed.error.issues[0]?.message || "Невалидни данни",
+      };
+    }
+
+    const file = formData.get("image") as File | null;
+    const image = await validateAndUploadEventImage(supabase, file);
+
+    const { error } = await supabase.from("events").insert({
+      ...parsed.data,
+      image: image,
+    });
+
+    if (error) return { error: error.message };
+
+    redirect("/");
+    return { error: null };
+  } catch (err) {
+    if (isRedirectError(err)) throw err;
+    return {
+      error:
+        err instanceof Error
+          ? err.message
+          : "Възникна неочаквана грешка. Опитайте отново.",
+    };
   }
-
-  const { data, error } = await supabase
-    .from("events")
-    .insert({
-      title,
-      description,
-      startDateTime,
-      endDateTime,
-      image,
-    })
-    .select("*")
-    .maybeSingle();
-
-  if (error) throw new Error(error.message);
-  console.log(data);
-
-  redirect("/");
 }
 
-export async function updateEventAction(id: number, formData: FormData) {
-  const supabase = await createClient();
+const ALLOWED_MIME = ["image/png", "image/jpeg", "image/webp", "image/gif"];
+const MAX_BYTES = 10 * 1024 * 1024; // 10MB
 
-  let image: string | undefined;
-  const file = formData.get("image") as File | null;
-  if (file && file.size > 0) {
-    const uploaded = await uploadImage(supabase, file);
-    image = uploaded.url;
-  }
+export async function validateAndUploadEventImage(
+  supabase: SupabaseClient,
+  file: File | null
+): Promise<string | undefined> {
+  if (!file || file.size === 0) return;
 
-  const patch: EventUpdate = {
-    title: getString(formData, "title"),
-    startDateTime: getString(formData, "startDateTime"),
-    endDateTime: getString(formData, "endDateTime"),
-    description: getString(formData, "description"),
-    ...(image ? { image } : {}),
-  };
+  if (file.size > MAX_BYTES)
+    throw new Error("Файлът е твърде голям (макс. 10MB).");
+  if (!ALLOWED_MIME.includes(file.type))
+    throw new Error("Неподдържан тип изображение.");
 
-  const { data, error } = await updateEvent(supabase, id, patch);
-  if (error) throw new Error(error.message);
-  return data;
-}
-
-export async function deleteEventAction(id: number) {
-  const supabase = await createClient();
-  const { data, error } = await deleteEvent(supabase, id);
-  if (error) throw new Error(error.message);
-  return data;
+  const uploaded = await uploadImage(supabase, file);
+  return uploaded.url;
 }

@@ -1,78 +1,131 @@
-import { createEventAction } from "@/actions";
-import { SubmitButton } from "@/components/SubmitButton";
-import { Input, Textarea } from "@/components/ui";
+"use client";
 
+import { useActionState, useState } from "react";
+
+import { createEventAction } from "@/actions/events";
+import { DatePopover } from "@/components/DatePopover/DatePopover";
+import { SubmitButton } from "@/components/SubmitButton";
+import { TimePopover } from "@/components/TimePopover/TimePopover";
+import { Typography } from "@/components/Typography";
+import { ErrorAlert, Input, Label, Textarea } from "@/components/ui";
+
+type CreateEventActionState = { error: string | null };
+const initialState: CreateEventActionState = { error: null };
+
+// TODO: apply react hook form!
 export default function CreateEventPage() {
+  const [state, formAction] = useActionState(createEventAction, initialState);
+
+  const [startDate, setStartDate] = useState<string>("");
+  const [endDate, setEndDate] = useState<string>("");
+  const [startTime, setStartTime] = useState<string>("");
+  const [endTime, setEndTime] = useState<string>("");
+
   return (
     <div className="flex flex-col gap-6">
-      <form
-        action={createEventAction}
-        className="space-y-6"
-        encType="multipart/form-data"
-      >
-        <div className="w-full">
-          <label htmlFor="title" className="text-sm font-medium">
-            Event Title
-          </label>
-          <Input
-            id="title"
-            name="title"
-            placeholder="Enter the event title"
-            required
-          />
+      <Typography.H1>Създай Събитие</Typography.H1>
+      <form action={formAction} className="space-y-6">
+        <div className="space-y-2">
+          <label className="font-medium">Заглавие *</label>
+          <Input name="title" required placeholder="Въведете заглавие" />
         </div>
 
-        <div className="w-full">
-          <label htmlFor="description" className="text-sm font-medium">
-            Description
-          </label>
+        <div className="space-y-2">
+          <Label className="font-medium">Описание *</Label>
           <Textarea
-            id="description"
             name="description"
-            placeholder="Describe your event"
             required
+            placeholder="Опишете събитието"
           />
         </div>
 
-        <div className="flex flex-col gap-6 xl:flex-row xl:gap-2">
+        <div className="grid gap-6 md:grid-cols-2">
           <div className="space-y-2">
-            <label htmlFor="startDateTime" className="text-sm font-medium">
-              Start Date & Time
-            </label>
+            <Label className="font-medium">Адрес *</Label>
+            <Input name="address" required placeholder="Въведете точен адрес" />
+          </div>
+          <div className="space-y-2">
+            <Label className="font-medium">Населено място *</Label>
+            <Input name="town" required placeholder="Въведете населено място" />
+          </div>
+        </div>
+
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+          <div className="space-y-2">
+            <Label className="font-medium">Начална дата *</Label>
+            <DatePopover
+              id="startDate"
+              value={startDate || null}
+              onChange={(v) => setStartDate(v ?? "")}
+              onClear={() => setStartDate("")}
+            />
+            <input type="hidden" name="startDate" value={startDate} />
+          </div>
+          <div className="space-y-2">
+            <Label className="font-medium">Начален час *</Label>
+            <TimePopover
+              id="startTime"
+              value={startTime || null}
+              onChange={(v) => setStartTime(v ?? "")}
+            />
+            <input type="hidden" name="startTime" value={startTime} />
+          </div>
+          <div className="space-y-2">
+            <Label className="font-medium">Крайна дата *</Label>
+            <DatePopover
+              id="endDate"
+              value={endDate || null}
+              onChange={(v) => setEndDate(v ?? "")}
+              onClear={() => setEndDate("")}
+            />
+            <input type="hidden" name="endDate" value={endDate} />
+          </div>
+          <div className="space-y-2">
+            <Label className="font-medium">Краен час *</Label>
+            <TimePopover
+              id="endTime"
+              value={endTime || null}
+              onChange={(v) => setEndTime(v ?? "")}
+            />
+            <input type="hidden" name="endTime" value={endTime} />
+          </div>
+        </div>
+
+        <div className="grid gap-6 md:grid-cols-2">
+          <div className="space-y-2">
+            <Label>Организатор *</Label>
             <Input
-              id="startDateTime"
-              name="startDateTime"
-              type="datetime-local"
+              name="organizer"
               required
+              placeholder="Въведете организатор"
             />
           </div>
-
           <div className="space-y-2">
-            <label htmlFor="endDateTime" className="text-sm font-medium">
-              End Date & Time
-            </label>
+            <Label>Картинка *</Label>
             <Input
-              id="endDateTime"
-              name="endDateTime"
-              type="datetime-local"
-              required
-            />
-          </div>
-
-          <div className="space-y-2">
-            <label htmlFor="image" className="text-sm font-medium">
-              Event Image *
-            </label>
-            <Input
-              id="image"
               name="image"
               type="file"
               accept="image/png,image/jpeg,image/webp,image/gif"
+              required
             />
           </div>
         </div>
 
-        <SubmitButton />
+        <Label className="inline-flex items-center gap-2 rounded-lg border border-input bg-background px-4 py-3">
+          <input
+            type="checkbox"
+            name="isFree"
+            value="on"
+            className="size-4 accent-primary"
+          />
+          <span className="font-medium">Безплатно събитие</span>
+        </Label>
+
+        {state.error && <ErrorAlert error={state.error} className="mt-4" />}
+
+        <div className="flex justify-end">
+          <SubmitButton>Създай събитие</SubmitButton>
+        </div>
       </form>
     </div>
   );

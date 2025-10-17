@@ -1,19 +1,31 @@
 "use client";
+import type * as React from "react";
 import { useFormStatus } from "react-dom";
 
 import { Button } from "@/components/ui";
+import { cn } from "@/lib/utils";
 
-export function SubmitButton() {
+type SubmitButtonProps = React.ComponentProps<typeof Button> & {
+  children?: React.ReactNode;
+};
+
+export function SubmitButton({
+  children = "Създай",
+  className,
+  disabled,
+  ...props
+}: SubmitButtonProps) {
   const { pending } = useFormStatus();
 
   return (
     <Button
       type="submit"
-      className="w-full"
       isLoading={pending}
-      disabled={pending}
+      disabled={pending || disabled}
+      className={cn(className)}
+      {...props}
     >
-      Create Event
+      {children}
     </Button>
   );
 }

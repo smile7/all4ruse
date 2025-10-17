@@ -1,51 +1,62 @@
 import { z } from "zod";
 
-const dateTimeString = z
-  .string()
-  .min(1, "Field is required")
-  .refine((v) => !Number.isNaN(Date.parse(v)), "Invalid date/time");
+import type { TablesInsert } from "./database.types";
 
-const baseEvent = z.object({
-  title: z.string().min(1, "Title required").max(200),
-  description: z.string().max(5000).optional().nullable(),
-  startDateTime: dateTimeString,
-  endDateTime: dateTimeString,
-  image: z.string().url().optional().nullable(),
-  createdBy: z.string().uuid().optional().nullable(),
-});
+type EventInsert = TablesInsert<"events">;
 
-type HasDateRange = {
-  startDateTime?: string | null;
-  endDateTime?: string | null;
-};
+export const eventFields = [
+  "title",
+  "description",
+  "address",
+  "organizer",
+  "town",
+  "startDate",
+  "startTime",
+  "endDate",
+  "endTime",
+] as const satisfies readonly (keyof EventInsert)[];
 
-function ensureEndAfterStart<T extends z.ZodType<HasDateRange>>(schema: T): T {
-  return schema.refine(
-    (v) => {
-      if (!v.startDateTime || !v.endDateTime) return true;
-      const start = Date.parse(v.startDateTime);
-      const end = Date.parse(v.endDateTime);
-      if (Number.isNaN(start) || Number.isNaN(end)) return true;
-      return end >= start;
-    },
-    {
-      path: ["endDateTime"],
-      message: "End must be after start",
-    }
-  ) as T;
-}
+export type EventField = (typeof eventFields)[number];
 
-export const createEventSchema = ensureEndAfterStart(baseEvent);
-
-export const updateEventSchema = ensureEndAfterStart(baseEvent.partial());
-
-export const eventSchema = ensureEndAfterStart(
-  baseEvent.extend({
-    id: z.number().int(),
-    created_at: z.string(), // stored timestamp string
-  })
+const baseEventSchema = z.object(
+  Object.fromEntries(
+    eventFields.map((k) => [k, z.string().min(1, "Задължително поле")])
+  ) as { [K in EventField]: z.ZodString }
 );
 
-export type Event = z.infer<typeof eventSchema>;
+export const createEventSchema = baseEventSchema
+  .extend({
+    image: z.union([z.instanceof(File), z.string().url()]).optional(),
+    isFree: z.preprocess(
+      (val) => val === "on" || val === true || val === "true",
+      z.boolean()
+    ),
+  })
+  .superRefine((data, ctx) => {
+    const { startDate, startTime, endDate, endTime } = data;
+
+    if (endDate < startDate) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["endDate"],
+        message: "Крайната дата трябва да е след началната.",
+      });
+      return;
+    }
+
+    if (endDate === startDate && endTime <= startTime) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["endTime"],
+        message: "Крайният час трябва да е след началния.",
+      });
+    }
+  });
+
 export type CreateEventSchemaType = z.infer<typeof createEventSchema>;
-export type UpdateEventSchemaType = z.infer<typeof updateEventSchema>;
+
+export const defaultEventValues: Record<EventField, string> =
+  Object.fromEntries(eventFields.map((k) => [k, ""])) as Record<
+    EventField,
+    string
+  >;
