@@ -2,12 +2,13 @@
 
 import { useActionState, useState } from "react";
 
-import { createEventAction } from "@/actions/events";
 import { DatePopover } from "@/components/DatePopover/DatePopover";
 import { SubmitButton } from "@/components/SubmitButton";
 import { TimePopover } from "@/components/TimePopover/TimePopover";
 import { Typography } from "@/components/Typography";
 import { ErrorAlert, Input, Label, Textarea } from "@/components/ui";
+
+import { createEventAction } from "../actions";
 
 type CreateEventActionState = { error: string | null };
 const initialState: CreateEventActionState = { error: null };

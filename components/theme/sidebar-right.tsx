@@ -26,7 +26,7 @@ const data = {
       items: ["Personal", "Work", "Family"],
     },
     {
-      name: "Favorites",
+      name: "Запазени",
       items: ["Holidays", "Birthdays"],
     },
     {
