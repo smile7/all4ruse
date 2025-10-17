@@ -16,13 +16,7 @@ import {
 
 import { Sidebar, SidebarContent, SidebarHeader, SidebarRail } from "../ui";
 
-import {
-  NavFavorites,
-  NavMain,
-  NavSecondary,
-  NavWorkspaces,
-  TeamSwitcher,
-} from ".";
+import { NavFavorites } from ".";
 
 // This is sample data.
 const data = {
@@ -96,54 +90,14 @@ const data = {
   ],
   favorites: [
     {
-      name: "Project Management & Task Tracking",
+      name: "Откриване на All4Ruse",
       url: "#",
-      emoji: "📊",
+      emoji: "⭐️",
     },
     {
-      name: "Family Recipe Collection & Meal Planning",
+      name: "Орлин Горанов и Акага",
       url: "#",
-      emoji: "🍳",
-    },
-    {
-      name: "Fitness Tracker & Workout Routines",
-      url: "#",
-      emoji: "💪",
-    },
-    {
-      name: "Book Notes & Reading List",
-      url: "#",
-      emoji: "📚",
-    },
-    {
-      name: "Sustainable Gardening Tips & Plant Care",
-      url: "#",
-      emoji: "🌱",
-    },
-    {
-      name: "Language Learning Progress & Resources",
-      url: "#",
-      emoji: "🗣️",
-    },
-    {
-      name: "Home Renovation Ideas & Budget Tracker",
-      url: "#",
-      emoji: "🏠",
-    },
-    {
-      name: "Personal Finance & Investment Portfolio",
-      url: "#",
-      emoji: "💰",
-    },
-    {
-      name: "Movie & TV Show Watchlist with Reviews",
-      url: "#",
-      emoji: "🎬",
-    },
-    {
-      name: "Daily Habit Tracker & Goal Setting",
-      url: "#",
-      emoji: "✅",
+      emoji: "⭐️",
     },
   ],
   workspaces: [
@@ -260,14 +214,9 @@ export function SidebarLeft({
 }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar className="border-r-0" {...props}>
-      <SidebarHeader>
-        <TeamSwitcher teams={data.teams} />
-        <NavMain items={data.navMain} />
-      </SidebarHeader>
+      <SidebarHeader>Logo</SidebarHeader>
       <SidebarContent>
         <NavFavorites favorites={data.favorites} />
-        <NavWorkspaces workspaces={data.workspaces} />
-        <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
       <SidebarRail />
     </Sidebar>

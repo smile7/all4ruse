@@ -1,4 +1,4 @@
-import { SidebarLeft, SidebarRight, ThemeToggle } from "@/components/theme";
+import { SidebarLeft, ThemeToggle } from "@/components/theme";
 import {
   Separator,
   SidebarInset,
@@ -30,7 +30,7 @@ export default function EventsLayout({
           </div>
         </div>
       </SidebarInset>
-      <SidebarRight />
+      {/* <SidebarRight /> */}
     </SidebarProvider>
   );
 }
