@@ -65,7 +65,7 @@ export function NavFavorites({
                 <DropdownMenuSeparator />
                 <DropdownMenuItem>
                   <Link className="text-muted-foreground" />
-                  <span>Копирай</span>
+                  <span>Копирай линка</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
                   <ArrowUpRight className="text-muted-foreground" />
@@ -80,12 +80,6 @@ export function NavFavorites({
             </DropdownMenu>
           </SidebarMenuItem>
         ))}
-        <SidebarMenuItem>
-          <SidebarMenuButton className="text-sidebar-foreground/70">
-            <MoreHorizontal />
-            <span>Още</span>
-          </SidebarMenuButton>
-        </SidebarMenuItem>
       </SidebarMenu>
     </SidebarGroup>
   );

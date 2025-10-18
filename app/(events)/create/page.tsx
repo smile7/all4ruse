@@ -1,12 +1,14 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 import { DatePopover } from "@/components/DatePopover/DatePopover";
 import { SubmitButton } from "@/components/SubmitButton";
 import { TimePopover } from "@/components/TimePopover/TimePopover";
 import { Typography } from "@/components/Typography";
 import { ErrorAlert, Input, Label, Textarea } from "@/components/ui";
+import { createClient } from "@/lib/supabase/client";
 
 import { createEventAction } from "../actions";
 
@@ -21,6 +23,21 @@ export default function CreateEventPage() {
   const [endDate, setEndDate] = useState<string>("");
   const [startTime, setStartTime] = useState<string>("");
   const [endTime, setEndTime] = useState<string>("");
+  const [authChecked, setAuthChecked] = useState(false);
+  const router = useRouter();
+
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.auth.getUser().then(({ data }) => {
+      if (!data.user) {
+        router.replace("/auth/login");
+      } else {
+        setAuthChecked(true);
+      }
+    });
+  }, [router]);
+
+  if (!authChecked) return <div>Зареждане...</div>;
 
   return (
     <div className="flex flex-col gap-6">
