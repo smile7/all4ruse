@@ -16,12 +16,12 @@ import { NavFavorites } from ".";
 
 const favorites = [
   {
-    name: "Откриване на All4Ruse",
+    name: "Арт Ателие с Ема Йорданова",
     url: "#",
     emoji: "⭐️",
   },
   {
-    name: "Орлин Горанов и Акага",
+    name: "Best of Гошо и Джовани",
     url: "#",
     emoji: "⭐️",
   },
