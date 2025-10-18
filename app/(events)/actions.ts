@@ -16,6 +16,11 @@ export async function createEventAction(
   try {
     const supabase = await createClient();
 
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) return { error: "Моля влезте в профила си." };
+
     const raw: Record<string, unknown> = {};
     for (const [k, v] of formData.entries()) raw[k] = v;
     if (!raw.isFree) raw.isFree = false;
@@ -38,7 +43,6 @@ export async function createEventAction(
     if (error) return { error: error.message };
 
     redirect("/");
-    return { error: null };
   } catch (err) {
     if (isRedirectError(err)) throw err;
     return {

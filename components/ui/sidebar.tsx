@@ -72,8 +72,14 @@ function SidebarProvider({
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
 }) {
+  const [mounted, setMounted] = useState(false);
+
   const isLargerThanMd = useMediaQuery(getMinWidth("--breakpoint-md"));
   const [openMobile, setOpenMobile] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // This is the internal state of the sidebar.
   // We use openProp and setOpenProp for control from outside the component.
@@ -160,7 +166,7 @@ function SidebarProvider({
           )}
           {...props}
         >
-          {children}
+          {mounted ? children : null}
         </div>
       </TooltipProvider>
     </SidebarContext.Provider>
