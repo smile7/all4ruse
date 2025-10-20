@@ -20,6 +20,11 @@ export function toTimestamp(value?: string | null): number | null {
   return isValid(d) ? d.getTime() : null;
 }
 
+export function formatTimeTZ(timetz: string | null) {
+  if (!timetz) return "";
+  return timetz.slice(0, 5); // "HH:MM"
+}
+
 export function formatDateTime(value?: string | null) {
   if (!value) return EMPTY_DISPLAY;
   const d = parseISO(value);

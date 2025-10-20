@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { Calendar, Sparkles } from "lucide-react";
+import { Calendar1Icon, MapPinIcon, Sparkles } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -11,7 +11,7 @@ import { Button, Card, CardContent, ErrorAlert } from "@/components/ui";
 import { DEBOUNCE_MS, FALLBACK_IMAGE } from "@/constants";
 import { useDebounce, useEventFilters } from "@/hooks";
 import type { Event } from "@/lib/api";
-import { formatDateTime, toTimestamp } from "@/lib/utils";
+import { formatShortDate, formatTimeTZ, toTimestamp } from "@/lib/utils";
 
 import { EventsFilters } from "./Filters";
 
@@ -80,7 +80,13 @@ function EventsGrid({ events }: { events: Event[] }) {
           aria-label={`Отвори събитие: ${e.title}`}
           className="group"
         >
-          <Card className="flex flex-col h-full p-0 overflow-hidden border-border/60 transition-all duration-300 hover:shadow-lg">
+          <Card
+            className="
+              flex flex-col h-full p-0 overflow-hidden border-border/60 transition-all duration-300 hover:shadow-lg
+              relative border-2
+              after:content-[''] after:block after:w-full after:h-[15px] after:bg-[hsl(var(--sidebar-background))] after:absolute after:bottom-0 after:left-0 
+            "
+          >
             <AspectRatio ratio={16 / 9}>
               <div className="absolute inset-0 overflow-hidden">
                 <div className="absolute inset-0 transform-gpu will-change-transform transition-transform duration-500 ease-out group-hover:scale-[1.05]">
@@ -93,9 +99,7 @@ function EventsGrid({ events }: { events: Event[] }) {
                     draggable={false}
                   />
                 </div>
-                {/* shadow */}
                 <div className="pointer-events-none absolute inset-0 z-10 bg-gradient-to-t from-black/70 via-black/25 to-transparent transition-opacity duration-300 group-hover:from-black/80" />
-                {/* badge */}
                 {e.isFree && (
                   <div className="absolute left-3 top-3 rounded-md bg-black/60 p-2 text-[11px] uppercase text-white backdrop-blur-sm">
                     безплатно
@@ -103,19 +107,21 @@ function EventsGrid({ events }: { events: Event[] }) {
                 )}
               </div>
             </AspectRatio>
-            <CardContent className="flex flex-col gap-2 p-4 pt-0">
-              <Typography.Lead className="clamp-2 reserve-heading-2 leading-[var(--lh-heading)]">
+            <CardContent className="flex flex-col gap-2 p-4 pt-0 pb-8">
+              <Typography.Lead className="leading-tight mb-2">
                 {e.title}
               </Typography.Lead>
 
-              <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                <Calendar className="size-4 opacity-70" />
-                <span className="truncate">{formatDateTime(e.startDate)}</span>
+              <div className="flex items-center gap-2 text-xs opacity-80">
+                <Calendar1Icon className="size-4 opacity-70" />
+                {formatShortDate(e.startDate)} от {formatTimeTZ(e.startTime)}
               </div>
 
-              <Typography.P className="clamp-3 reserve-body-3 text-xs leading-[var(--lh-body)] text-muted-foreground">
-                {e.description}
-              </Typography.P>
+              <div className="flex items-center gap-2 text-xs opacity-80">
+                <MapPinIcon className="size-4 opacity-70" />
+                {e.address}, {e.town}
+              </div>
+
               <span className="sr-only">{e.title}</span>
             </CardContent>
           </Card>
