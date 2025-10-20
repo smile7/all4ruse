@@ -22,14 +22,14 @@ export async function getEvents(
   return { data: data ?? [], error };
 }
 
-export async function getEvent(
+export async function getEventBySlug(
   client: SupabaseClient,
-  id: number
+  slug: string
 ): Promise<ServiceResult<Event | null>> {
   const { data, error } = await client
     .from("events")
     .select("*")
-    .eq("id", id)
+    .eq("slug", slug)
     .maybeSingle();
   return { data: data ?? null, error };
 }

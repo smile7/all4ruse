@@ -76,7 +76,7 @@ function EventsGrid({ events }: { events: Event[] }) {
       {events.map((e) => (
         <Link
           key={e.id}
-          href={`/events/${e.id}`}
+          href={`/${e.slug}`}
           aria-label={`Отвори събитие: ${e.title}`}
           className="group"
         >
@@ -84,7 +84,7 @@ function EventsGrid({ events }: { events: Event[] }) {
             className="
               flex flex-col h-full p-0 overflow-hidden border-border/60 transition-all duration-300 hover:shadow-lg
               relative border-2
-              after:content-[''] after:block after:w-full after:h-[15px] after:bg-[hsl(var(--sidebar-background))] after:absolute after:bottom-0 after:left-0 
+              after:content-[''] after:block after:w-full after:h-[10px] after:bg-[hsl(var(--sidebar-background))] after:absolute after:bottom-0 after:left-0 
             "
           >
             <AspectRatio ratio={16 / 9}>

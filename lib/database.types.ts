@@ -16,52 +16,55 @@ export type Database = {
     Tables: {
       events: {
         Row: {
-          address: string | null
+          address: string
           created_at: string
           createdBy: string | null
-          description: string | null
-          endDate: string | null
-          endTime: string | null
+          description: string
+          endDate: string
+          endTime: string
           id: number
           image: string | null
-          isFree: boolean | null
-          organizer: string | null
-          startDate: string | null
-          startTime: string | null
-          title: string | null
-          town: string | null
+          isFree: boolean
+          organizer: string
+          slug: string | null
+          startDate: string
+          startTime: string
+          title: string
+          town: string
         }
         Insert: {
-          address?: string | null
+          address: string
           created_at?: string
           createdBy?: string | null
-          description?: string | null
-          endDate?: string | null
-          endTime?: string | null
+          description: string
+          endDate: string
+          endTime: string
           id?: number
           image?: string | null
-          isFree?: boolean | null
-          organizer?: string | null
-          startDate?: string | null
-          startTime?: string | null
-          title?: string | null
-          town?: string | null
+          isFree: boolean
+          organizer: string
+          slug?: string | null
+          startDate: string
+          startTime: string
+          title: string
+          town: string
         }
         Update: {
-          address?: string | null
+          address?: string
           created_at?: string
           createdBy?: string | null
-          description?: string | null
-          endDate?: string | null
-          endTime?: string | null
+          description?: string
+          endDate?: string
+          endTime?: string
           id?: number
           image?: string | null
-          isFree?: boolean | null
-          organizer?: string | null
-          startDate?: string | null
-          startTime?: string | null
-          title?: string | null
-          town?: string | null
+          isFree?: boolean
+          organizer?: string
+          slug?: string | null
+          startDate?: string
+          startTime?: string
+          title?: string
+          town?: string
         }
         Relationships: []
       }
@@ -89,6 +92,78 @@ export type Database = {
           updated_at?: string | null
           username?: string | null
           website?: string | null
+        }
+        Relationships: []
+      }
+      tags: {
+        Row: {
+          art: boolean | null
+          club: boolean | null
+          comedy: boolean | null
+          competition: boolean | null
+          concert: boolean | null
+          course: boolean | null
+          created_at: string
+          dances: boolean | null
+          dinner: boolean | null
+          english: boolean | null
+          fun: boolean | null
+          hike: boolean | null
+          id: number
+          kids: boolean | null
+          marketing: boolean | null
+          music: boolean | null
+          party: boolean | null
+          sports: boolean | null
+          theatre: boolean | null
+          therapy: boolean | null
+          tour: boolean | null
+        }
+        Insert: {
+          art?: boolean | null
+          club?: boolean | null
+          comedy?: boolean | null
+          competition?: boolean | null
+          concert?: boolean | null
+          course?: boolean | null
+          created_at?: string
+          dances?: boolean | null
+          dinner?: boolean | null
+          english?: boolean | null
+          fun?: boolean | null
+          hike?: boolean | null
+          id?: number
+          kids?: boolean | null
+          marketing?: boolean | null
+          music?: boolean | null
+          party?: boolean | null
+          sports?: boolean | null
+          theatre?: boolean | null
+          therapy?: boolean | null
+          tour?: boolean | null
+        }
+        Update: {
+          art?: boolean | null
+          club?: boolean | null
+          comedy?: boolean | null
+          competition?: boolean | null
+          concert?: boolean | null
+          course?: boolean | null
+          created_at?: string
+          dances?: boolean | null
+          dinner?: boolean | null
+          english?: boolean | null
+          fun?: boolean | null
+          hike?: boolean | null
+          id?: number
+          kids?: boolean | null
+          marketing?: boolean | null
+          music?: boolean | null
+          party?: boolean | null
+          sports?: boolean | null
+          theatre?: boolean | null
+          therapy?: boolean | null
+          tour?: boolean | null
         }
         Relationships: []
       }

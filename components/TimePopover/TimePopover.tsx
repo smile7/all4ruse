@@ -6,8 +6,8 @@ import { Input } from "@/components/ui";
 import { cn } from "@/lib/utils";
 
 type TimePickerProps = {
-  value: string | null;
-  onChange: (value: string | null) => void;
+  value: string;
+  onChange: (value: string) => void;
   id?: string;
   stepSeconds?: number;
   className?: string;
@@ -28,7 +28,7 @@ export function TimePopover({
       step={stepSeconds}
       onChange={(e) => {
         const v = e.target.value;
-        onChange(v ? v : null);
+        onChange(v ? v : "");
       }}
       className={cn(
         "bg-background appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-clear-button]:hidden",

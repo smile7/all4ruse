@@ -14,8 +14,8 @@ import {
 } from "../ui";
 
 type DatePopoverProps = {
-  value: string | null | undefined;
-  onChange: (value: string | null) => void;
+  value: string;
+  onChange: (value: string) => void;
   onClear?: () => void;
   id?: string;
 };
@@ -61,7 +61,7 @@ export function DatePopover({
             variant="ghost"
             className="absolute right-0 bottom-0 rounded-l-none"
             onClick={() => {
-              onChange(null);
+              onChange("");
               onClear?.();
             }}
           >
@@ -84,7 +84,7 @@ export function DatePopover({
           onSelect={(v) => {
             const formattedDate = v
               ? formatISO9075(new Date(v), { representation: "date" })
-              : null;
+              : "";
             onChange(formattedDate);
             if (v) setOpen(false);
           }}

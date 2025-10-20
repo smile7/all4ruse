@@ -6,6 +6,7 @@ import { SupabaseClient } from "@supabase/supabase-js";
 
 import { createEventSchema } from "@/lib/schema";
 import { createClient } from "@/lib/supabase/server";
+import { slugify } from "@/lib/utils";
 
 export type CreateEventActionState = { error: string | null };
 
@@ -35,9 +36,12 @@ export async function createEventAction(
     const file = formData.get("image") as File | null;
     const image = await validateAndUploadEventImage(supabase, file);
 
+    const slug = slugify(parsed.data.title);
+
     const { error } = await supabase.from("events").insert({
       ...parsed.data,
       image: image,
+      slug,
     });
 
     if (error) return { error: error.message };
