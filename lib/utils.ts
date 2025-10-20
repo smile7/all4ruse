@@ -2,6 +2,7 @@ import { type ClassValue, clsx } from "clsx";
 import { format, isValid, parseISO } from "date-fns";
 import { bg } from "date-fns/locale";
 import { twMerge } from "tailwind-merge";
+import { slugify as transliterate } from "transliteration";
 
 import { BREAKPOINTS, EMPTY_DISPLAY, ScreenSize } from "@/constants";
 
@@ -57,4 +58,15 @@ export function normalizeError(error: unknown): string | string[] {
   if (error instanceof Error) return error.message;
   if (typeof error === "string") return error;
   return "An error occurred.";
+}
+
+export function slugify(title: string): string {
+  const custom = title
+    .replace(/ъ/g, "y")
+    .replace(/Ъ/g, "Y")
+    .replace(/ьо/g, "yo");
+  return transliterate(custom)
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
 }

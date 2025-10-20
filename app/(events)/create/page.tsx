@@ -90,7 +90,7 @@ export default function CreateEventPage() {
             <Label className="font-medium">Начална дата *</Label>
             <DatePopover
               id="startDate"
-              value={startDate || null}
+              value={startDate}
               onChange={(v) => setStartDate(v ?? "")}
               onClear={() => setStartDate("")}
             />
@@ -100,7 +100,7 @@ export default function CreateEventPage() {
             <Label className="font-medium">Начален час *</Label>
             <TimePopover
               id="startTime"
-              value={startTime || null}
+              value={startTime}
               onChange={(v) => setStartTime(v ?? "")}
             />
             <input type="hidden" name="startTime" value={startTime} />
@@ -109,7 +109,7 @@ export default function CreateEventPage() {
             <Label className="font-medium">Крайна дата *</Label>
             <DatePopover
               id="endDate"
-              value={endDate || null}
+              value={endDate}
               onChange={(v) => setEndDate(v ?? "")}
               onClear={() => setEndDate("")}
             />
@@ -119,7 +119,7 @@ export default function CreateEventPage() {
             <Label className="font-medium">Краен час *</Label>
             <TimePopover
               id="endTime"
-              value={endTime || null}
+              value={endTime}
               onChange={(v) => setEndTime(v ?? "")}
             />
             <input type="hidden" name="endTime" value={endTime} />
