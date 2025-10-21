@@ -1,3 +1,4 @@
+import LanguageSwitcher from "@/components/LanguageSwitcher/LanguageSwitcher";
 import { SidebarLeft, ThemeToggle } from "@/components/theme";
 import {
   Separator,
@@ -22,6 +23,7 @@ export default function EventsLayout({
             className="data-[orientation=vertical]:h-6"
           />
           <ThemeToggle />
+          <LanguageSwitcher />
         </header>
 
         <div className="p-6 pt-0">

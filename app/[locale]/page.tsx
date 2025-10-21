@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server"; // <-- use this
 
 import { Typography } from "@/components/Typography";
 import { getEvents } from "@/lib/api";
@@ -7,6 +8,8 @@ import { createClient } from "@/lib/supabase/server";
 import { Events } from "./_components";
 
 export default async function EventsPage() {
+  const t = await getTranslations("HomePage");
+
   const supabase = await createClient();
   const { data: events, error } = await getEvents(supabase);
   const {
@@ -16,7 +19,7 @@ export default async function EventsPage() {
   return (
     <div className="mx-auto w-full flex flex-col gap-6">
       <div className="flex flex-row items-end justify-between">
-        <Typography.H1>Събития в Русе</Typography.H1>
+        <Typography.H1>{t("title")}</Typography.H1>
         {user && (
           <Link
             href="/create"

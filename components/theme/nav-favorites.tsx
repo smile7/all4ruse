@@ -35,7 +35,7 @@ export function NavFavorites({
   const { isMobile } = useSidebar();
 
   return (
-    <SidebarGroup className="group-data-[collapsible=icon]:hidden">
+    <SidebarGroup className="group-data-[collapsible=icon]:hidden mt-8">
       <SidebarGroupLabel>Запазени</SidebarGroupLabel>
       <SidebarMenu>
         {favorites.map((item) => (

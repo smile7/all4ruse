@@ -2,6 +2,7 @@
 
 import { useActionState, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 import { DatePopover } from "@/components/DatePopover/DatePopover";
 import {
@@ -25,6 +26,8 @@ const initialState: CreateEventActionState = { error: null };
 
 // TODO: apply react hook form!
 export default function CreateEventPage() {
+  const t = useTranslations("HomePage");
+
   const [state, formAction] = useActionState(createEventAction, initialState);
 
   const [startDate, setStartDate] = useState<string>("");
@@ -58,7 +61,7 @@ export default function CreateEventPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <Typography.H1>Създай Събитие</Typography.H1>
+      <Typography.H1>{t("createEvent")}</Typography.H1>
       <form action={formAction} className="space-y-6">
         <div className="space-y-2">
           <label className="font-medium">Заглавие *</label>
