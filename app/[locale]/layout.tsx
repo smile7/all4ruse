@@ -16,14 +16,18 @@ export default function EventsLayout({
     <SidebarProvider>
       <SidebarLeft />
       <SidebarInset>
-        <header className="bg-background sticky top-0 flex h-14 shrink-0 items-center gap-2 px-2 mb-6">
-          <SidebarTrigger className="-ml-1" />
-          <Separator
-            orientation="vertical"
-            className="data-[orientation=vertical]:h-6"
-          />
-          <ThemeToggle />
-          <LanguageSwitcher />
+        <header className="bg-background sticky top-0 flex h-14 shrink-0 z-100 items-center justify-between px-2 mb-6">
+          <div className="flex items-center gap-2">
+            <SidebarTrigger className="-ml-1" />
+            <Separator
+              orientation="vertical"
+              className="data-[orientation=vertical]:h-6"
+            />
+          </div>
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+            <LanguageSwitcher />
+          </div>
         </header>
 
         <div className="p-6 pt-0">

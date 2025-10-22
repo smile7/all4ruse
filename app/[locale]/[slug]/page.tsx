@@ -5,11 +5,14 @@ import { Typography } from "@/components/Typography";
 import { getEventBySlug } from "@/lib/api";
 import { createClient } from "@/lib/supabase/server";
 
-export default async function EventPage(props: { params: { slug: string } }) {
+export default async function EventPage(props: {
+  params: Promise<{ slug: string }>;
+}) {
   const { params } = props;
   const t = await getTranslations("HomePage");
   const supabase = await createClient();
-  const { data: event, error } = await getEventBySlug(supabase, params.slug);
+  const { slug } = await params;
+  const { data: event, error } = await getEventBySlug(supabase, slug);
 
   if (error || !event)
     return <div>Възникна грешка. Моля опитайте отново по-късно.</div>;

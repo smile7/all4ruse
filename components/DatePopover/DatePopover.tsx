@@ -14,7 +14,7 @@ import {
 } from "../ui";
 
 type DatePopoverProps = {
-  value: string;
+  value: string | null;
   onChange: (value: string) => void;
   onClear?: () => void;
   id?: string;
