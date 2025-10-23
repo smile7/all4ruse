@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { LogOutIcon, MoreVerticalIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 import { createClient } from "@/lib/supabase/client";
 
@@ -22,6 +23,8 @@ export function SidebarUserMenu({
 }: {
   initialEmail: string | null;
 }) {
+  const t = useTranslations("HomePage");
+
   const router = useRouter();
   const supabase = createClient();
   const [email, setEmail] = useState<string | null>(initialEmail);
@@ -59,7 +62,7 @@ export function SidebarUserMenu({
             </AvatarFallback>
           </Avatar>
           <span className="inline-flex flex-col gap-1 truncate">
-            <span className="truncate">{email || "Гост"}</span>
+            <span className="truncate">{email || t("guest")}</span>
             {email && (
               <div className="flex items-center gap-2">
                 <Badge className="uppercase" variant="default">
@@ -75,11 +78,11 @@ export function SidebarUserMenu({
         {email ? (
           <DropdownMenuItem onClick={handleLogout}>
             <LogOutIcon className="mr-2" />
-            Изход
+            {t("logout")}
           </DropdownMenuItem>
         ) : (
           <DropdownMenuItem onClick={() => router.push("/auth/login")}>
-            Вход / Регистрация
+            {t("loginSignup")}
           </DropdownMenuItem>
         )}
       </DropdownMenuContent>

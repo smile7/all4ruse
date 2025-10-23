@@ -1,12 +1,7 @@
 "use client";
 
-import {
-  ArrowUpRight,
-  Link,
-  MoreHorizontal,
-  StarOff,
-  Trash2,
-} from "lucide-react";
+import { ArrowUpRight, Link, MoreHorizontal, Trash2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import {
   DropdownMenu,
@@ -32,11 +27,12 @@ export function NavFavorites({
     emoji: string;
   }[];
 }) {
+  const t = useTranslations("HomePage");
   const { isMobile } = useSidebar();
 
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden mt-8">
-      <SidebarGroupLabel>Запазени</SidebarGroupLabel>
+      <SidebarGroupLabel>{t("favorites")}</SidebarGroupLabel>
       <SidebarMenu>
         {favorites.map((item) => (
           <SidebarMenuItem key={item.name}>
@@ -59,22 +55,17 @@ export function NavFavorites({
                 align={isMobile ? "end" : "start"}
               >
                 <DropdownMenuItem>
-                  <StarOff className="text-muted-foreground" />
-                  <span>Премахни от любими</span>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>
                   <Link className="text-muted-foreground" />
-                  <span>Копирай линка</span>
+                  <span>{t("copyLink")}</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
                   <ArrowUpRight className="text-muted-foreground" />
-                  <span>Отвори в нов таб</span>
+                  <span>{t("openNewTab")}</span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem>
                   <Trash2 className="text-muted-foreground" />
-                  <span>Изтрий</span>
+                  <span>{t("removeFavorites")}</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

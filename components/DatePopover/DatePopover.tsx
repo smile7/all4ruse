@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { formatISO9075, isValid, parseISO } from "date-fns";
 import { bg } from "date-fns/locale";
 import { CalendarIcon, XIcon } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import { cn, formatDate } from "@/lib/utils";
 
@@ -39,6 +40,8 @@ export function DatePopover({
     }
   }, [value]);
 
+  const t = useTranslations("HomePage");
+
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <div className="relative w-full">
@@ -50,7 +53,7 @@ export function DatePopover({
           >
             <CalendarIcon className="pointer-events-none shrink-0 opacity-50" />
             <span className={cn("truncate", !date && "opacity-60")}>
-              {value ? formatDate(value) : "Изберете дата"}
+              {value ? formatDate(value) : t("pickDate")}
             </span>
           </Button>
         </PopoverTrigger>

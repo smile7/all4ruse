@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
 
+import BackButton from "@/components/BackButton/BackButton";
 import LanguageSwitcher from "@/components/LanguageSwitcher/LanguageSwitcher";
 import { SidebarLeft, ThemeToggle } from "@/components/theme";
 import {
@@ -42,6 +43,7 @@ export default async function EventsLayout({
                 orientation="vertical"
                 className="data-[orientation=vertical]:h-6"
               />
+              <BackButton />
             </div>
             <div className="flex items-center gap-2">
               <ThemeToggle />
