@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { getTranslations } from "next-intl/server"; // <-- use this
+import { Locale } from "next-intl";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 
 import { Typography } from "@/components/Typography";
 import { getEvents } from "@/lib/api";
@@ -7,7 +8,15 @@ import { createClient } from "@/lib/supabase/server";
 
 import { Events } from "./_components";
 
-export default async function EventsPage() {
+export default async function EventsPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+
+  setRequestLocale(locale as Locale);
+
   const t = await getTranslations("HomePage");
 
   const supabase = await createClient();

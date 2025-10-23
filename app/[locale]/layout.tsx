@@ -1,3 +1,7 @@
+import { notFound } from "next/navigation";
+import { hasLocale, NextIntlClientProvider } from "next-intl";
+import { setRequestLocale } from "next-intl/server";
+
 import LanguageSwitcher from "@/components/LanguageSwitcher/LanguageSwitcher";
 import { SidebarLeft, ThemeToggle } from "@/components/theme";
 import {
@@ -6,37 +10,52 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui";
+import { routing } from "@/i18n/routing";
 
-export default function EventsLayout({
+export function generateStaticParams() {
+  return routing.locales.map((locale) => ({ locale }));
+}
+
+export default async function EventsLayout({
   children,
+  params,
 }: {
   children: React.ReactNode;
+  params: Promise<{ locale: string }>;
 }) {
-  return (
-    <SidebarProvider>
-      <SidebarLeft />
-      <SidebarInset>
-        <header className="bg-background sticky top-0 flex h-14 shrink-0 z-100 items-center justify-between px-2 mb-6">
-          <div className="flex items-center gap-2">
-            <SidebarTrigger className="-ml-1" />
-            <Separator
-              orientation="vertical"
-              className="data-[orientation=vertical]:h-6"
-            />
-          </div>
-          <div className="flex items-center gap-2">
-            <ThemeToggle />
-            <LanguageSwitcher />
-          </div>
-        </header>
+  const { locale } = await params;
+  if (!hasLocale(routing.locales, locale)) {
+    notFound();
+  }
+  setRequestLocale(locale);
 
-        <div className="p-6 pt-0">
-          <div className="mx-auto w-full max-w-(--breakpoint-xl) pb-16">
-            {children}
+  return (
+    <NextIntlClientProvider>
+      <SidebarProvider>
+        <SidebarLeft />
+        <SidebarInset>
+          <header className="bg-background sticky top-0 flex h-14 shrink-0 z-100 items-center justify-between px-2 mb-6">
+            <div className="flex items-center gap-2">
+              <SidebarTrigger className="-ml-1" />
+              <Separator
+                orientation="vertical"
+                className="data-[orientation=vertical]:h-6"
+              />
+            </div>
+            <div className="flex items-center gap-2">
+              <ThemeToggle />
+              <LanguageSwitcher />
+            </div>
+          </header>
+
+          <div className="p-6 pt-0">
+            <div className="mx-auto w-full max-w-(--breakpoint-xl) pb-16">
+              {children}
+            </div>
           </div>
-        </div>
-      </SidebarInset>
-      {/* <SidebarRight /> */}
-    </SidebarProvider>
+        </SidebarInset>
+        {/* <SidebarRight /> */}
+      </SidebarProvider>
+    </NextIntlClientProvider>
   );
 }

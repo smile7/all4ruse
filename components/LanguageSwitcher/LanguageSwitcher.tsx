@@ -1,8 +1,9 @@
 "use client";
 
 import Image from "next/image";
-import { usePathname, useRouter } from "next/navigation";
 import { useLocale } from "next-intl";
+
+import { usePathname, useRouter } from "@/i18n/navigation";
 
 import {
   Select,
@@ -19,18 +20,15 @@ const locales = [
 
 export default function LanguageSwitcher() {
   const router = useRouter();
-  const pathname = usePathname();
+  const pathName = usePathname();
   const currentLocale = useLocale();
 
   const handleChange = (value: string) => {
-    const segments = pathname.split("/");
-    segments[1] = value;
-    document.cookie = `locale=${value};path=/;max-age=31536000`;
-    router.push(segments.join("/"));
+    router.replace(pathName, { locale: value });
   };
 
   const currentFlag =
-    locales.find((l) => l.code === currentLocale)?.flag || "/flags/en.svg";
+    locales.find((l) => l.code === currentLocale)?.flag || "/flags/bg.svg";
 
   return (
     <Select value={currentLocale} onValueChange={handleChange}>
