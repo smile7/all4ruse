@@ -24,7 +24,9 @@
     "organizer": "Организатор",
     "eventImages": "Снимки за събитието",
     "freeEvent": "Безплатно",
-    "pastEvent": "Минало събитие"
+    "pastEvent": "Минало събитие",
+    "english": "Английски",
+    "bulgarian": "Български"
   },
   "CreateEvent": {
     "createEventTitle": "Създай Ново Събитие",

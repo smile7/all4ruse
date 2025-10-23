@@ -42,8 +42,8 @@ export function NavFavorites({
                 <span>{item.name}</span>
               </a>
             </SidebarMenuButton>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
+            <DropdownMenu modal={false}>
+              <DropdownMenuTrigger asChild className="cursor-pointer">
                 <SidebarMenuAction showOnHover>
                   <MoreHorizontal />
                   <span className="sr-only">Още</span>

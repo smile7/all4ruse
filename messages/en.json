@@ -1,6 +1,6 @@
 {
   "HomePage": {
-    "createEvent": "Create Event",
+    "createEvent": "Create an Event",
     "pageTitle": "Events in Ruse",
     "pageDescription": "All cultural and non-cultural events in Ruse",
     "filters": "Filters",
@@ -24,7 +24,9 @@
     "organizer": "Organizer",
     "eventImages": "Picture Image",
     "freeEvent": "Free",
-    "pastEvent": "Past Event"
+    "pastEvent": "Past Event",
+    "english": "English",
+    "bulgarian": "Bulgarian"
   },
   "CreateEvent": {
     "createEventTitle": "Create New Event",
