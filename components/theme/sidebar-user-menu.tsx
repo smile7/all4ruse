@@ -44,7 +44,7 @@ export function SidebarUserMenu({
   };
 
   return (
-    <DropdownMenu>
+    <DropdownMenu modal={false}>
       <DropdownMenuTrigger asChild>
         <SidebarMenuButton className="ring-primary h-auto flex gap-2 items-center justify-center cursor-pointer">
           <Avatar>
