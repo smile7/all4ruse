@@ -4,6 +4,7 @@ import { setRequestLocale } from "next-intl/server";
 
 import BackButton from "@/components/BackButton/BackButton";
 import LanguageSwitcher from "@/components/LanguageSwitcher/LanguageSwitcher";
+import { MobileLogo } from "@/components/MobileLogo";
 import { SidebarLeft, ThemeToggle } from "@/components/theme";
 import {
   Separator,
@@ -36,7 +37,7 @@ export default async function EventsLayout({
       <SidebarProvider>
         <SidebarLeft />
         <SidebarInset>
-          <header className="bg-background sticky top-0 flex h-14 shrink-0 z-100 items-center justify-between px-2 mb-6">
+          <header className="bg-background sticky top-0 flex h-18 shrink-0 z-100 items-center justify-between px-2 mb-6">
             <div className="flex items-center gap-2">
               <SidebarTrigger className="-ml-1" />
               <Separator
@@ -45,6 +46,7 @@ export default async function EventsLayout({
               />
               <BackButton />
             </div>
+            <MobileLogo />
             <div className="flex items-center gap-2">
               <ThemeToggle />
               <LanguageSwitcher />

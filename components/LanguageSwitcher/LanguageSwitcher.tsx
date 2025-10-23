@@ -46,7 +46,7 @@ export default function LanguageSwitcher() {
           </span>
         </SelectValue>
       </SelectTrigger>
-      <SelectContent>
+      <SelectContent className="z-100">
         {locales.map((l) => (
           <SelectItem key={l.code} value={l.code}>
             <span className="flex cursor-pointer items-center gap-2">

@@ -2,6 +2,7 @@
   "HomePage": {
     "createEvent": "Create Event",
     "pageTitle": "Events in Ruse",
+    "pageDescription": "All cultural and non-cultural events in Ruse",
     "filters": "Filters",
     "noEvents": "No events found.",
     "fromDate": "From Date",

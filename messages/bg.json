@@ -2,6 +2,7 @@
   "HomePage": {
     "createEvent": "Създай Събитие",
     "pageTitle": "Събития в Русе",
+    "pageDescription": "Всички културни и некултурни събития в Русе",
     "filters": "Филтри",
     "noEvents": "Няма намерени събития.",
     "fromDate": "От дата",

@@ -5,6 +5,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { useTheme } from "next-themes";
 
+import { cn } from "@/lib/utils";
+
 import {
   Sidebar,
   SidebarContent,
@@ -50,7 +52,7 @@ export function SidebarLeft({ еmail }: { еmail?: string | null }) {
           <Link
             href="/"
             aria-label="All4Ruse Home"
-            className="flex items-center justify-center mt-4"
+            className={cn("hidden md:flex items-center justify-center mt-4")}
           >
             {mounted ? (
               <Image
@@ -63,7 +65,7 @@ export function SidebarLeft({ еmail }: { еmail?: string | null }) {
             ) : null}
           </Link>
         </SidebarHeader>
-        <SidebarContent>
+        <SidebarContent className="mt-8 md:mt-0">
           <NavFavorites favorites={favorites} />
         </SidebarContent>
         <SidebarFooter>

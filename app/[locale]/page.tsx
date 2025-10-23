@@ -1,8 +1,8 @@
 import Link from "next/link";
-import { Locale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
 import { Typography } from "@/components/Typography";
+import { Button } from "@/components/ui";
 import { getEvents } from "@/lib/api";
 import { createClient } from "@/lib/supabase/server";
 
@@ -14,9 +14,7 @@ export default async function EventsPage({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
-
-  setRequestLocale(locale as Locale);
-
+  setRequestLocale(locale);
   const t = await getTranslations("HomePage");
 
   const supabase = await createClient();
@@ -27,16 +25,19 @@ export default async function EventsPage({
 
   return (
     <div className="mx-auto w-full flex flex-col gap-6">
-      <div className="flex flex-row items-end justify-between">
-        <Typography.H1>{t("pageTitle")}</Typography.H1>
+      <div className="flex flex-col md:flex-row w-full gap-4 md:items-center md:justify-between items-center text-center md:text-left">
         {user && (
-          <Link
-            href={`/${locale}/create`}
-            className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary/50"
+          <Button
+            asChild
+            className="order-1 md:order-2 self-end md:self-center md:ml-auto"
           >
-            {t("createEvent")}
-          </Link>
+            <Link href={`/${locale}/create`}>{t("createEvent")}</Link>
+          </Button>
         )}
+        <div className="flex flex-col md:gap-2 order-2 md:order-1">
+          <Typography.H1>{t("pageTitle")}</Typography.H1>
+          <Typography.Small>{t("pageDescription")}</Typography.Small>
+        </div>
       </div>
       <Events events={events} errorMessage={error?.message} />
     </div>
