@@ -1,6 +1,7 @@
 "use client";
 
 import { FilterIcon, XIcon } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import { DatePopover } from "@/components/DatePopover";
 import {
@@ -27,6 +28,8 @@ export function EventsFilters() {
     clear,
   } = useEventFilters();
 
+  const t = useTranslations("HomePage");
+
   return (
     <Accordion
       type="single"
@@ -38,7 +41,8 @@ export function EventsFilters() {
         <AccordionTrigger className="p-4 hover:cursor-pointer">
           <span className="inline-flex items-center gap-2">
             <FilterIcon className="size-4" />
-            Филтри{appliedFiltersCount ? ` (${appliedFiltersCount})` : ""}
+            {t("filters")}{" "}
+            {appliedFiltersCount ? ` (${appliedFiltersCount})` : ""}
           </span>
         </AccordionTrigger>
         <AccordionContent className="grid border-t p-4">
@@ -48,11 +52,11 @@ export function EventsFilters() {
                 htmlFor="events-title"
                 className="text-xs text-muted-foreground"
               >
-                Заглавие
+                {t("title")}
               </Label>
               <Input
                 id="events-title"
-                placeholder="Търси по заглавие"
+                placeholder={t("searchTitle")}
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 className="pr-10"
@@ -76,7 +80,7 @@ export function EventsFilters() {
                 htmlFor="events-from"
                 className="text-xs text-muted-foreground"
               >
-                От дата
+                {t("fromDate")}
               </Label>
               <DatePopover
                 id="events-from"
@@ -91,7 +95,7 @@ export function EventsFilters() {
                 htmlFor="events-to"
                 className="text-xs text-muted-foreground"
               >
-                До дата
+                {t("toDate")}
               </Label>
               <DatePopover
                 id="events-to"
@@ -109,7 +113,7 @@ export function EventsFilters() {
                 disabled={!hasFilters}
                 onClick={clear}
               >
-                Изчисти
+                {t("clearFilters")}
               </Button>
             </div>
           </div>

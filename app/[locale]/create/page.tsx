@@ -26,7 +26,7 @@ const initialState: CreateEventActionState = { error: null };
 
 // TODO: apply react hook form!
 export default function CreateEventPage() {
-  const t = useTranslations("HomePage");
+  const t = useTranslations("CreateEvent");
 
   const [state, formAction] = useActionState(createEventAction, initialState);
 
@@ -57,40 +57,40 @@ export default function CreateEventPage() {
     });
   }, [router]);
 
-  if (!authChecked) return <div>Зареждане...</div>;
+  if (!authChecked) return <div>...</div>;
 
   return (
     <div className="flex flex-col gap-6">
-      <Typography.H1>{t("createEvent")}</Typography.H1>
+      <Typography.H1>{t("createEventTitle")}</Typography.H1>
       <form action={formAction} className="space-y-6">
         <div className="space-y-2">
-          <label className="font-medium">Заглавие *</label>
-          <Input name="title" required placeholder="Въведете заглавие" />
+          <label className="font-medium">{t("title")} *</label>
+          <Input name="title" required placeholder={t("enterTitle")} />
         </div>
 
         <div className="space-y-2">
-          <Label className="font-medium">Описание *</Label>
+          <Label className="font-medium">{t("description")} *</Label>
           <Textarea
             name="description"
             required
-            placeholder="Опишете събитието"
+            placeholder={t("enterDescription")}
           />
         </div>
 
         <div className="grid gap-6 md:grid-cols-2">
           <div className="space-y-2">
-            <Label className="font-medium">Адрес *</Label>
-            <Input name="address" required placeholder="Въведете точен адрес" />
+            <Label className="font-medium">{t("address")} *</Label>
+            <Input name="address" required placeholder={t("enterAddress")} />
           </div>
           <div className="space-y-2">
-            <Label className="font-medium">Населено място *</Label>
+            <Label className="font-medium">{t("town")} *</Label>
             <Input name="town" required value="Русе" />
           </div>
         </div>
 
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
           <div className="space-y-2">
-            <Label className="font-medium">Начална дата *</Label>
+            <Label className="font-medium">{t("fromDate")} *</Label>
             <DatePopover
               id="startDate"
               value={startDate}
@@ -100,7 +100,7 @@ export default function CreateEventPage() {
             <input type="hidden" name="startDate" value={startDate} />
           </div>
           <div className="space-y-2">
-            <Label className="font-medium">Начален час *</Label>
+            <Label className="font-medium">{t("fromTime")} *</Label>
             <TimePopover
               id="startTime"
               value={startTime}
@@ -109,7 +109,7 @@ export default function CreateEventPage() {
             <input type="hidden" name="startTime" value={startTime} />
           </div>
           <div className="space-y-2">
-            <Label className="font-medium">Крайна дата *</Label>
+            <Label className="font-medium">{t("toDate")} *</Label>
             <DatePopover
               id="endDate"
               value={endDate}
@@ -119,7 +119,7 @@ export default function CreateEventPage() {
             <input type="hidden" name="endDate" value={endDate} />
           </div>
           <div className="space-y-2">
-            <Label className="font-medium">Краен час *</Label>
+            <Label className="font-medium">{t("toTime")} *</Label>
             <TimePopover
               id="endTime"
               value={endTime}
@@ -130,11 +130,11 @@ export default function CreateEventPage() {
         </div>
 
         <div className="space-y-2">
-          <Label>Организатор *</Label>
-          <Input name="organizer" required placeholder="Въведете организатор" />
+          <Label>{t("organizers")} *</Label>
+          <Input name="organizer" required placeholder={t("enterOrganizers")} />
         </div>
         <div className="space-y-2">
-          <Label>Снимки за събитието *</Label>
+          <Label>{t("images")} *</Label>
           <Dropzone {...upload} className="my-2">
             <DropzoneEmptyState />
             <DropzoneContent />
@@ -155,13 +155,13 @@ export default function CreateEventPage() {
             value="on"
             className="size-4 accent-primary"
           />
-          <span className="font-medium">Безплатно събитие</span>
+          <span className="font-medium">{t("freeEvent")}</span>
         </Label>
 
         {state.error && <ErrorAlert error={state.error} className="mt-4" />}
 
         <div className="flex justify-end">
-          <SubmitButton>Създай събитие</SubmitButton>
+          <SubmitButton>{t("submitButton")}</SubmitButton>
         </div>
       </form>
     </div>
