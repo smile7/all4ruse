@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useTheme } from "next-themes";
@@ -31,9 +32,16 @@ const favorites = [
 ];
 
 export function SidebarLeft({ еmail }: { еmail?: string | null }) {
-  const { theme } = useTheme();
+  const { theme, systemTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
 
-  const logoSrc = theme === "dark" ? "/logo_white.png" : "/logo_black.png";
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const currentTheme = theme === "system" ? systemTheme : theme;
+  const logoSrc =
+    currentTheme === "dark" ? "/logo_white.png" : "/logo_black.png";
 
   return (
     <aside aria-label="Primary" className="h-screen">
@@ -44,13 +52,15 @@ export function SidebarLeft({ еmail }: { еmail?: string | null }) {
             aria-label="All4Ruse Home"
             className="flex items-center justify-center mt-4"
           >
-            <Image
-              src={logoSrc}
-              alt="All4Ruse logo"
-              width={70}
-              height={30}
-              priority
-            />
+            {mounted ? (
+              <Image
+                src={logoSrc}
+                alt="All4Ruse logo"
+                width={70}
+                height={30}
+                priority
+              />
+            ) : null}
           </Link>
         </SidebarHeader>
         <SidebarContent>
