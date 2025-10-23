@@ -1,5 +1,8 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
+import { useTheme } from "next-themes";
 
 import {
   Sidebar,
@@ -28,6 +31,10 @@ const favorites = [
 ];
 
 export function SidebarLeft({ еmail }: { еmail?: string | null }) {
+  const { theme } = useTheme();
+
+  const logoSrc = theme === "dark" ? "/logo_white.png" : "/logo_black.png";
+
   return (
     <aside aria-label="Primary" className="h-screen">
       <Sidebar className="border-r h-full">
@@ -35,13 +42,13 @@ export function SidebarLeft({ еmail }: { еmail?: string | null }) {
           <Link
             href="/"
             aria-label="All4Ruse Home"
-            className="flex items-center mt-4"
+            className="flex items-center justify-center mt-4"
           >
             <Image
-              src="/all4ruse.svg"
+              src={logoSrc}
               alt="All4Ruse logo"
-              width={120}
-              height={32}
+              width={70}
+              height={30}
               priority
             />
           </Link>

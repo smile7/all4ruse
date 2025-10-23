@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { Locale } from "next-intl";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 
 import { Typography } from "@/components/Typography";
 import { getEvents } from "@/lib/api";
@@ -6,7 +8,17 @@ import { createClient } from "@/lib/supabase/server";
 
 import { Events } from "./_components";
 
-export default async function EventsPage() {
+export default async function EventsPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+
+  setRequestLocale(locale as Locale);
+
+  const t = await getTranslations("HomePage");
+
   const supabase = await createClient();
   const { data: events, error } = await getEvents(supabase);
   const {
@@ -16,7 +28,7 @@ export default async function EventsPage() {
   return (
     <div className="mx-auto w-full flex flex-col gap-6">
       <div className="flex flex-row items-end justify-between">
-        <Typography.H1>Събития в Русе</Typography.H1>
+        <Typography.H1>{t("title")}</Typography.H1>
         {user && (
           <Link
             href="/create"

@@ -4,6 +4,7 @@ import { useMemo } from "react";
 import { Calendar1Icon, MapPinIcon, Sparkles } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useLocale } from "next-intl";
 
 import { AspectRatio } from "@/components/AspectRatio";
 import { Typography } from "@/components/Typography";
@@ -68,6 +69,8 @@ export function Events({
 }
 
 function EventsGrid({ events }: { events: Event[] }) {
+  const locale = useLocale();
+
   return (
     <div
       className="grid gap-6 [grid-template-columns:repeat(auto-fill,minmax(min(100%,18rem),1fr))]"
@@ -76,15 +79,15 @@ function EventsGrid({ events }: { events: Event[] }) {
       {events.map((e) => (
         <Link
           key={e.id}
-          href={`/${e.slug}`}
+          href={`/${locale}/${e.slug}`}
           aria-label={`Отвори събитие: ${e.title}`}
           className="group"
         >
           <Card
             className="
               flex flex-col h-full p-0 overflow-hidden border-border/60 transition-all duration-300 hover:shadow-lg
-              relative border-2
-              after:content-[''] after:block after:w-full after:h-[10px] after:bg-[hsl(var(--sidebar-background))] after:absolute after:bottom-0 after:left-0 
+              relative border-2 hover:border-secondary
+              after:content-[''] after:block after:w-full after:h-[10px] after:bg-[hsl(var(--secondary))] after:absolute after:bottom-0 after:left-0 
             "
           >
             <AspectRatio ratio={16 / 9}>
@@ -101,7 +104,7 @@ function EventsGrid({ events }: { events: Event[] }) {
                 </div>
                 <div className="pointer-events-none absolute inset-0 z-10 bg-gradient-to-t from-black/70 via-black/25 to-transparent transition-opacity duration-300 group-hover:from-black/80" />
                 {e.isFree && (
-                  <div className="absolute left-3 top-3 rounded-md bg-black/60 p-2 text-[11px] uppercase text-white backdrop-blur-sm">
+                  <div className="absolute left-3 top-3 rounded-md bg-primary p-2 text-[11px] uppercase text-primary-foreground backdrop-blur-sm">
                     безплатно
                   </div>
                 )}

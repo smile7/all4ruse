@@ -1,0 +1,12 @@
+{
+  "HomePage": {
+    "createEvent": "Create Event",
+    "title": "Events in Ruse",
+    "description": "Description",
+    "address": "Address",
+    "town": "Place",
+    "organizer": "Organizer",
+    "eventImages": "Picture Image",
+    "freeEvent": "Free Entrance"
+  }
+}
