@@ -7,6 +7,7 @@ import { useTheme } from "next-themes";
 
 import { cn } from "@/lib/utils";
 
+import { SidebarCustomMenu } from "../SidebarCustomMenu";
 import {
   Sidebar,
   SidebarContent,
@@ -66,6 +67,7 @@ export function SidebarLeft({ еmail }: { еmail?: string | null }) {
           </Link>
         </SidebarHeader>
         <SidebarContent className="mt-8 md:mt-0">
+          <SidebarCustomMenu />
           <NavFavorites favorites={favorites} />
         </SidebarContent>
         <SidebarFooter>
