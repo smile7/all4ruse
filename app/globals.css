@@ -343,3 +343,9 @@
     @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50;
   }
 }
+
+.minimal-tiptap-editor .ProseMirror a {
+  color: var(--mt-accent-bold-blue, #05c);
+  text-decoration: underline;
+  cursor: pointer;
+}
