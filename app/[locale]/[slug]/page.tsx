@@ -5,6 +5,8 @@ import { Typography } from "@/components/Typography";
 import { getEventBySlug } from "@/lib/api";
 import { createClient } from "@/lib/supabase/server";
 
+import "@/components/ui/minimal-tiptap/styles/index.css";
+
 export default async function EventPage(props: {
   params: Promise<{ slug: string }>;
 }) {
@@ -35,8 +37,12 @@ export default async function EventPage(props: {
                 />
               </div>
             )}
-
-            <div className="prose prose-lg max-w-none">{event.description}</div>
+            <div className="minimal-tiptap-editor">
+              <div
+                className="ProseMirror"
+                dangerouslySetInnerHTML={{ __html: event.description }}
+              />
+            </div>{" "}
           </article>
         </div>
       </div>

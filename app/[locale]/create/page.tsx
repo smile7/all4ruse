@@ -3,6 +3,8 @@
 import { useActionState, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { Content } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
 
 import { DatePopover } from "@/components/DatePopover/DatePopover";
 import {
@@ -13,7 +15,8 @@ import {
 import { SubmitButton } from "@/components/SubmitButton";
 import { TimePopover } from "@/components/TimePopover/TimePopover";
 import { Typography } from "@/components/Typography";
-import { ErrorAlert, Input, Label, Textarea } from "@/components/ui";
+import { ErrorAlert, Input, Label } from "@/components/ui";
+import { MinimalTiptapEditor } from "@/components/ui/minimal-tiptap";
 import { useSupabaseUpload } from "@/hooks";
 import { createClient } from "@/lib/supabase/client";
 
@@ -35,6 +38,7 @@ export default function CreateEventPage() {
   const [startTime, setStartTime] = useState<string>("");
   const [endTime, setEndTime] = useState<string>("");
   const [authChecked, setAuthChecked] = useState(false);
+  const [description, setDescription] = useState<Content>("");
   const router = useRouter();
 
   const upload = useSupabaseUpload({
@@ -70,10 +74,23 @@ export default function CreateEventPage() {
 
         <div className="space-y-2">
           <Label className="font-medium">{t("description")} *</Label>
-          <Textarea
-            name="description"
-            required
+          <MinimalTiptapEditor
+            value={description}
+            onChange={setDescription}
+            className="w-full"
+            editorContentClassName="p-5"
+            output="html"
             placeholder={t("enterDescription")}
+            autofocus={true}
+            editable={true}
+            editorClassName="focus:outline-hidden h-80 overflow-auto"
+            extensions={[StarterKit]}
+          />
+          <input
+            type="hidden"
+            name="description"
+            value={String(description)}
+            required
           />
         </div>
 
@@ -97,7 +114,7 @@ export default function CreateEventPage() {
               onChange={(v) => setStartDate(v ?? "")}
               onClear={() => setStartDate("")}
             />
-            <input type="hidden" name="startDate" value={startDate} />
+            <input type="hidden" name="startDate" value={startDate} required />
           </div>
           <div className="space-y-2">
             <Label className="font-medium">{t("fromTime")} *</Label>
@@ -106,7 +123,7 @@ export default function CreateEventPage() {
               value={startTime}
               onChange={(v) => setStartTime(v ?? "")}
             />
-            <input type="hidden" name="startTime" value={startTime} />
+            <input type="hidden" name="startTime" value={startTime} required />
           </div>
           <div className="space-y-2">
             <Label className="font-medium">{t("toDate")} *</Label>
@@ -116,7 +133,7 @@ export default function CreateEventPage() {
               onChange={(v) => setEndDate(v ?? "")}
               onClear={() => setEndDate("")}
             />
-            <input type="hidden" name="endDate" value={endDate} />
+            <input type="hidden" name="endDate" value={endDate} required />
           </div>
           <div className="space-y-2">
             <Label className="font-medium">{t("toTime")} *</Label>
@@ -125,7 +142,7 @@ export default function CreateEventPage() {
               value={endTime}
               onChange={(v) => setEndTime(v ?? "")}
             />
-            <input type="hidden" name="endTime" value={endTime} />
+            <input type="hidden" name="endTime" value={endTime} required />
           </div>
         </div>
 
@@ -143,6 +160,7 @@ export default function CreateEventPage() {
             <input
               type="hidden"
               name="image"
+              required
               value={`https://${process.env.NEXT_PUBLIC_SUPABASE_PROJECT_REF}.supabase.co/storage/v1/object/public/${process.env.NEXT_PUBLIC_SUPABASE_BUCKET_NAME}/${IMAGE_PATH}/${upload.successes[0]}`}
             />
           )}
