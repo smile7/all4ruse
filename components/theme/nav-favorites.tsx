@@ -31,7 +31,7 @@ export function NavFavorites({
   const { isMobile } = useSidebar();
 
   return (
-    <SidebarGroup className="group-data-[collapsible=icon]:hidden mt-8">
+    <SidebarGroup className="group-data-[collapsible=icon]:hidden">
       <SidebarGroupLabel>{t("favorites")}</SidebarGroupLabel>
       <SidebarMenu>
         {favorites.map((item) => (
@@ -46,7 +46,7 @@ export function NavFavorites({
               <DropdownMenuTrigger asChild className="cursor-pointer">
                 <SidebarMenuAction showOnHover>
                   <MoreHorizontal />
-                  <span className="sr-only">Още</span>
+                  <span className="sr-only">{t("more")}</span>
                 </SidebarMenuAction>
               </DropdownMenuTrigger>
               <DropdownMenuContent

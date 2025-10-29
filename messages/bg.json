@@ -2,7 +2,7 @@
   "HomePage": {
     "createEvent": "Създай Събитие",
     "pageTitle": "Събития в Русе",
-    "pageDescription": "Всички културни и некултурни събития в Русе",
+    "pageDescription": "Всички културни и некултурни събития в Русе и околността",
     "filters": "Филтри",
     "noEvents": "Няма намерени събития.",
     "fromDate": "От дата",
@@ -26,7 +26,10 @@
     "freeEvent": "Безплатно",
     "pastEvent": "Минало събитие",
     "english": "Английски",
-    "bulgarian": "Български"
+    "bulgarian": "Български",
+    "menuEvents": "Събития",
+    "menuPastEvents": "Минали Събития",
+    "more": "Още"
   },
   "CreateEvent": {
     "createEventTitle": "Създай Ново Събитие",
@@ -46,5 +49,10 @@
     "images": "Снимки за събитието",
     "freeEvent": "Безплатно събитие",
     "submitButton": "Създай"
+  },
+  "PastEvents": {
+    "createEvent": "Създай Събитие",
+    "pageTitle": "Минали събития в Русе",
+    "pageDescription": "Всички минали културни и некултурни събития в Русе и околността"
   }
 }

@@ -1,6 +1,5 @@
 "use client";
 
-import { useMemo } from "react";
 import { Calendar1Icon, MapPinIcon, Sparkles } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -9,8 +8,8 @@ import { useLocale, useTranslations } from "next-intl";
 import { AspectRatio } from "@/components/AspectRatio";
 import { Typography } from "@/components/Typography";
 import { Button, Card, CardContent, ErrorAlert } from "@/components/ui";
-import { DEBOUNCE_MS, FALLBACK_IMAGE } from "@/constants";
-import { useDebounce, useEventFilters } from "@/hooks";
+import { FALLBACK_IMAGE } from "@/constants";
+import { useFilteredEvents } from "@/hooks";
 import type { Event } from "@/lib/api";
 import { formatShortDate, formatTimeTZ, toTimestamp } from "@/lib/utils";
 
@@ -19,50 +18,23 @@ import { EventsFilters } from "./Filters";
 export function Events({
   events,
   errorMessage,
+  isPastEvents = false,
 }: {
   events: Event[];
   errorMessage?: string | null;
+  isPastEvents?: boolean;
 }) {
-  const { title, from, to, clear } = useEventFilters();
-  const debouncedQuery = useDebounce(title, DEBOUNCE_MS);
-  const effectiveQuery = title === "" ? "" : debouncedQuery;
-
-  const filteredAndSorted = useMemo(() => {
-    const query = effectiveQuery.trim().toLowerCase();
-    const fromTs = toTimestamp(from || undefined);
-    const toTs = to ? toTimestamp(to + "T23:59:59") : null;
-
-    return events
-      .filter((e) => {
-        if (query) {
-          const t = (e.title ?? "").toLowerCase();
-          if (!t.includes(query)) return false;
-        }
-        if (fromTs || toTs) {
-          const start = toTimestamp(e.startDate);
-          if (fromTs && start && start < fromTs) return false;
-          if (toTs && start && start > toTs) return false;
-        }
-        return true;
-      })
-      .sort((a, b) => {
-        const aT = toTimestamp(a.startDate);
-        const bT = toTimestamp(b.startDate);
-        if (aT === bT) return 0;
-        if (aT === null) return 1;
-        if (bT === null) return -1;
-        return aT - bT;
-      });
-  }, [events, effectiveQuery, from, to]);
+  const filteredByTime = events.filter((e) => isPastEvent(e) === isPastEvents);
+  const { filteredEvents, filters } = useFilteredEvents(filteredByTime);
 
   return (
     <div className="flex flex-col gap-6">
       <EventsFilters />
       {errorMessage && <ErrorAlert error={errorMessage} className="mt-4" />}
-      {filteredAndSorted.length === 0 ? (
-        <EmptyState onReset={clear} />
+      {filteredEvents.length === 0 ? (
+        <EmptyState onReset={filters.clear} />
       ) : (
-        <EventsGrid events={filteredAndSorted} />
+        <EventsGrid events={filteredEvents} />
       )}
     </div>
   );
