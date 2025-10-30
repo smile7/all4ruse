@@ -22,7 +22,7 @@ export default async function EventPage(props: {
   return (
     <div className="bg-background min-h-screen">
       <div className="mx-auto max-w-4xl px-6 py-12">
-        <Typography.H1>{t("title")}</Typography.H1>
+        <Typography.H1>{event.title}</Typography.H1>
 
         <div className="mt-16">
           <article className="space-y-8">

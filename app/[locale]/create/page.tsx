@@ -1,28 +1,22 @@
 "use client";
 
-import { useActionState, useEffect, useState } from "react";
+import { useActionState, useCallback, useEffect, useState } from "react";
+import { useDropzone } from "react-dropzone";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Content } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 
 import { DatePopover } from "@/components/DatePopover/DatePopover";
-import {
-  Dropzone,
-  DropzoneContent,
-  DropzoneEmptyState,
-} from "@/components/dropzone";
 import { SubmitButton } from "@/components/SubmitButton";
 import { TimePopover } from "@/components/TimePopover/TimePopover";
 import { Typography } from "@/components/Typography";
 import { ErrorAlert, Input, Label } from "@/components/ui";
 import { MinimalTiptapEditor } from "@/components/ui/minimal-tiptap";
-import { useSupabaseUpload } from "@/hooks";
 import { createClient } from "@/lib/supabase/client";
 
 import { createEventAction } from "../actions";
-
-const IMAGE_PATH = "event-images";
 
 type CreateEventActionState = { error: string | null };
 const initialState: CreateEventActionState = { error: null };
@@ -41,13 +35,30 @@ export default function CreateEventPage() {
   const [description, setDescription] = useState<Content>("");
   const router = useRouter();
 
-  const upload = useSupabaseUpload({
-    bucketName: process.env.NEXT_PUBLIC_SUPABASE_BUCKET_NAME!,
-    allowedMimeTypes: ["image/png", "image/jpeg", "image/webp", "image/gif"],
-    maxFiles: 10,
-    maxFileSize: 1 * 1024 * 1024, // 1MB
-    path: IMAGE_PATH,
-    upsert: true,
+  // const upload = useSupabaseUpload({
+  //   bucketName: process.env.NEXT_PUBLIC_SUPABASE_BUCKET_NAME!,
+  //   allowedMimeTypes: ["image/png", "image/jpeg", "image/webp", "image/gif"],
+  //   maxFiles: 10,
+  //   maxFileSize: 1 * 1024 * 1024, // 1MB
+  //   path: BUCKET,
+  //   upsert: true,
+  // });
+  const [files, setFiles] = useState<File[]>([]);
+
+  const onDrop = useCallback((acceptedFiles: File[]) => {
+    setFiles(acceptedFiles);
+  }, []);
+
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop,
+    accept: {
+      "image/png": [],
+      "image/jpeg": [],
+      "image/webp": [],
+      "image/gif": [],
+    },
+    maxSize: 1 * 1024 * 1024,
+    multiple: true,
   });
 
   useEffect(() => {
@@ -150,7 +161,48 @@ export default function CreateEventPage() {
           <Label>{t("organizers")} *</Label>
           <Input name="organizer" required placeholder={t("enterOrganizers")} />
         </div>
+        {/* Image Upload */}
         <div className="space-y-2">
+          <Label>Image *</Label>
+          <div
+            {...getRootProps({
+              className:
+                "border-2 border-dashed rounded-lg p-6 cursor-pointer text-center " +
+                (isDragActive
+                  ? "bg-gray-100 border-blue-500"
+                  : "border-gray-300"),
+            })}
+          >
+            <input
+              {...getInputProps({
+                name: "image", // important: name must match server action `formData.get("image")`
+              })}
+            />
+            {isDragActive ? (
+              <p>Drop the file here ...</p>
+            ) : (
+              <p>Drag and drop an image here, or click to select</p>
+            )}
+          </div>
+
+          {/* Preview */}
+          {files.length > 0 && (
+            <div className="mt-2">
+              <p className="text-sm font-medium">Preview:</p>
+              {files.map((file) => (
+                <Image
+                  key={file.name}
+                  width={400}
+                  height={300}
+                  src={URL.createObjectURL(file)}
+                  alt="Preview"
+                  className="mt-1 max-h-48 rounded-lg"
+                />
+              ))}
+            </div>
+          )}
+        </div>
+        {/* <div className="space-y-2">
           <Label>{t("images")} *</Label>
           <Dropzone {...upload} className="my-2">
             <DropzoneEmptyState />
@@ -161,10 +213,10 @@ export default function CreateEventPage() {
               type="hidden"
               name="image"
               required
-              value={`https://${process.env.NEXT_PUBLIC_SUPABASE_PROJECT_REF}.supabase.co/storage/v1/object/public/${process.env.NEXT_PUBLIC_SUPABASE_BUCKET_NAME}/${IMAGE_PATH}/${upload.successes[0]}`}
+              value={`https://${process.env.NEXT_PUBLIC_SUPABASE_PROJECT_REF}.supabase.co/storage/v1/object/public/${process.env.NEXT_PUBLIC_SUPABASE_BUCKET_NAME}/${BUCKET}/${upload.successes[0]}`}
             />
           )}
-        </div>
+        </div> */}
 
         <Label className="inline-flex items-center gap-2 rounded-lg border border-input bg-background px-4 py-3">
           <input

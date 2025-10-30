@@ -349,3 +349,7 @@
   text-decoration: underline;
   cursor: pointer;
 }
+
+.minimal-tiptap-editor .ProseMirror p {
+  min-height: 0.5rem;
+}

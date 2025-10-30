@@ -4,6 +4,7 @@ import { isRedirectError } from "next/dist/client/components/redirect-error";
 import { redirect } from "next/navigation";
 import { SupabaseClient } from "@supabase/supabase-js";
 
+import { BUCKET } from "@/constants";
 import { createEventSchema } from "@/lib/schema";
 import { createClient } from "@/lib/supabase/server";
 import { slugify } from "@/lib/utils";
@@ -80,7 +81,7 @@ export async function uploadImage(
   supabase: SupabaseClient,
   file: File,
   folder = "events",
-  bucket = "event-images"
+  bucket = BUCKET
 ) {
   const ext = file.name.split(".").pop() || "bin";
   const path = `${folder}/${Date.now()}-${Math.random()
