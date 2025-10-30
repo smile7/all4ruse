@@ -98,7 +98,7 @@ function EventsGrid({ events }: { events: Event[] }) {
                     />
                   </div>
                   <div className="pointer-events-none absolute inset-0 z-10 bg-gradient-to-t from-black/70 via-black/25 to-transparent transition-opacity duration-300 group-hover:from-black/80" />
-                  {e.isFree && (
+                  {e.price === "0" && (
                     <div className="absolute left-3 top-3 rounded-md bg-primary p-2 text-[11px] uppercase text-primary-foreground backdrop-blur-sm">
                       {t("freeEvent")}
                     </div>

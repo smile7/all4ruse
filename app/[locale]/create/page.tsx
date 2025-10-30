@@ -12,7 +12,7 @@ import { DatePopover } from "@/components/DatePopover/DatePopover";
 import { SubmitButton } from "@/components/SubmitButton";
 import { TimePopover } from "@/components/TimePopover/TimePopover";
 import { Typography } from "@/components/Typography";
-import { ErrorAlert, Input, Label } from "@/components/ui";
+import { Button, ErrorAlert, Input, Label } from "@/components/ui";
 import { MinimalTiptapEditor } from "@/components/ui/minimal-tiptap";
 import { createClient } from "@/lib/supabase/client";
 
@@ -105,11 +105,17 @@ export default function CreateEventPage() {
           />
         </div>
 
-        <div className="grid gap-6 md:grid-cols-2">
+        <div className="grid gap-6 md:grid-cols-3">
           <div className="space-y-2">
             <Label className="font-medium">{t("address")} *</Label>
             <Input name="address" required placeholder={t("enterAddress")} />
           </div>
+
+          <div className="space-y-2">
+            <Label>{t("place")}</Label>
+            <Input name="place" required placeholder={t("enterPlace")} />
+          </div>
+
           <div className="space-y-2">
             <Label className="font-medium">{t("town")} *</Label>
             <Input name="town" required value="Русе" />
@@ -161,44 +167,83 @@ export default function CreateEventPage() {
           <Label>{t("organizers")} *</Label>
           <Input name="organizer" required placeholder={t("enterOrganizers")} />
         </div>
-        {/* Image Upload */}
+
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <div className="space-y-2">
+            <Label>{t("ticketsLink")}</Label>
+            <Input
+              name="ticketsLink"
+              required
+              placeholder={t("enterTicketsLink")}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label>{t("price")}</Label>
+            <Input name="price" required placeholder={t("enterPrice")} />
+          </div>
+
+          <div className="space-y-2">
+            <Label>{t("phoneNumber")}</Label>
+            <Input
+              name="phoneNumber"
+              required
+              placeholder={t("enterPhoneNumber")}
+            />
+          </div>
+        </div>
+
         <div className="space-y-2">
-          <Label>Image *</Label>
+          <Label>{t("images")} *</Label>
           <div
             {...getRootProps({
               className:
                 "border-2 border-dashed rounded-lg p-6 cursor-pointer text-center " +
                 (isDragActive
-                  ? "bg-gray-100 border-blue-500"
+                  ? "opacity-80 border-primary"
                   : "border-gray-300"),
             })}
           >
             <input
               {...getInputProps({
-                name: "image", // important: name must match server action `formData.get("image")`
+                name: "image",
               })}
             />
             {isDragActive ? (
-              <p>Drop the file here ...</p>
+              <p>{t("uploadImageDrop")}</p>
             ) : (
-              <p>Drag and drop an image here, or click to select</p>
+              <p>{t("uploadImages")}</p>
             )}
           </div>
 
-          {/* Preview */}
           {files.length > 0 && (
             <div className="mt-2">
               <p className="text-sm font-medium">Preview:</p>
-              {files.map((file) => (
-                <Image
-                  key={file.name}
-                  width={400}
-                  height={300}
-                  src={URL.createObjectURL(file)}
-                  alt="Preview"
-                  className="mt-1 max-h-48 rounded-lg"
-                />
-              ))}
+              <div className="flex gap-4 flex-wrap">
+                {files.map((file, idx) => (
+                  <div key={file.name} className="relative inline-block">
+                    <Image
+                      width={300}
+                      height={150}
+                      src={URL.createObjectURL(file)}
+                      alt="Preview"
+                    />
+                    <Button
+                      type="button"
+                      onClick={() => {
+                        setFiles(files.filter((_, i) => i !== idx));
+                        document.querySelector<HTMLInputElement>(
+                          'input[name="image"]'
+                        )!.value = "";
+                      }}
+                      className="absolute top-2 right-2 bg-background text-primary-foreground rounded-full size-8 flex items-center justify-center hover:bg-destructive transition cursor-pointer"
+                      aria-label="Remove image"
+                    >
+                      ×
+                    </Button>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
         </div>
@@ -217,16 +262,6 @@ export default function CreateEventPage() {
             />
           )}
         </div> */}
-
-        <Label className="inline-flex items-center gap-2 rounded-lg border border-input bg-background px-4 py-3">
-          <input
-            type="checkbox"
-            name="isFree"
-            value="on"
-            className="size-4 accent-primary"
-          />
-          <span className="font-medium">{t("freeEvent")}</span>
-        </Label>
 
         {state.error && <ErrorAlert error={state.error} className="mt-4" />}
 

@@ -27,10 +27,6 @@ const baseEventSchema = z.object(
 export const createEventSchema = baseEventSchema
   .extend({
     image: z.union([z.instanceof(File), z.string().url()]).optional(),
-    isFree: z.preprocess(
-      (val) => val === "on" || val === true || val === "true",
-      z.boolean()
-    ),
   })
   .superRefine((data, ctx) => {
     const { startDate, startTime, endDate, endTime } = data;

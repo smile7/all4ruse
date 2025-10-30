@@ -39,7 +39,7 @@ export default async function EventPage(props: {
             )}
             <div className="minimal-tiptap-editor">
               <div
-                className="ProseMirror"
+                className="whitespace-pre-wrap"
                 dangerouslySetInnerHTML={{ __html: event.description }}
               />
             </div>{" "}

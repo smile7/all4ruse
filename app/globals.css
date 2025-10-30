@@ -344,12 +344,8 @@
   }
 }
 
-.minimal-tiptap-editor .ProseMirror a {
+.minimal-tiptap-editor a {
   color: var(--mt-accent-bold-blue, #05c);
   text-decoration: underline;
   cursor: pointer;
-}
-
-.minimal-tiptap-editor .ProseMirror p {
-  min-height: 0.5rem;
 }

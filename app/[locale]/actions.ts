@@ -25,7 +25,6 @@ export async function createEventAction(
 
     const raw: Record<string, unknown> = {};
     for (const [k, v] of formData.entries()) raw[k] = v;
-    if (!raw.isFree) raw.isFree = false;
 
     const parsed = createEventSchema.safeParse(raw);
     if (!parsed.success) {
