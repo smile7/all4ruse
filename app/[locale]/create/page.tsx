@@ -368,7 +368,7 @@ export default function CreateEventPage() {
   );
 }
 
-export function OrganizersFieldArray({ disabled }: { disabled?: boolean }) {
+function OrganizersFieldArray({ disabled }: { disabled?: boolean }) {
   const { control, register } = useFormContext();
   const { fields, append, remove } = useFieldArray({
     control,
