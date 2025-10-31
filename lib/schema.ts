@@ -2,61 +2,76 @@ import { z } from "zod";
 
 import type { TablesInsert } from "./database.types";
 
-type EventInsert = TablesInsert<"events">;
+export type EventInsert = TablesInsert<"events">;
 
-export const eventFields = [
-  "title",
-  "description",
-  "address",
-  "organizer",
-  "town",
-  "startDate",
-  "startTime",
-  "endDate",
-  "endTime",
-  "place",
-  "price",
-  "ticketsLink",
-  "phoneNumber",
-] as const satisfies readonly (keyof EventInsert)[];
-
-export type EventField = (typeof eventFields)[number];
-
-const baseEventSchema = z.object(
-  Object.fromEntries(
-    eventFields.map((k) => [k, z.string().min(1, "Задължително поле")])
-  ) as { [K in EventField]: z.ZodString }
-);
-
-export const createEventSchema = baseEventSchema
-  .extend({
-    image: z.union([z.instanceof(File), z.string().url()]).optional(),
-  })
-  .superRefine((data, ctx) => {
-    const { startDate, startTime, endDate, endTime } = data;
-
-    if (endDate < startDate) {
-      ctx.addIssue({
-        code: "custom",
-        path: ["endDate"],
-        message: "Крайната дата трябва да е след началната.",
-      });
-      return;
-    }
-
-    if (endDate === startDate && endTime <= startTime) {
-      ctx.addIssue({
-        code: "custom",
-        path: ["endTime"],
-        message: "Крайният час трябва да е след началния.",
-      });
-    }
+export const organizerSchema = (t: (key: string) => string) =>
+  z.object({
+    name: z.string().min(1, t("requiredField")),
+    link: z
+      .string()
+      .url({ message: t("invalidUrl") })
+      .optional()
+      .or(z.literal("")),
   });
 
-export type CreateEventSchemaType = z.infer<typeof createEventSchema>;
+export const createEventSchema = (t: (key: string) => string) =>
+  z
+    .object({
+      title: z.string().min(1, t("requiredField")),
+      description: z.string().min(1, t("requiredField")),
+      address: z.string().min(1, t("requiredField")),
+      place: z.string().min(1, t("requiredField")),
+      town: z.string().min(1, t("requiredField")),
+      startDate: z.string().min(1, t("requiredField")),
+      startTime: z.string().min(1, t("requiredField")),
+      endDate: z.string().min(1, t("requiredField")),
+      endTime: z.string().min(1, t("requiredField")),
+      organizers: z.array(organizerSchema(t)).min(1, t("atLeastOneOrganizer")),
+      ticketsLink: z.string().optional().or(z.literal("")),
+      price: z.string().optional().or(z.literal("")),
+      phoneNumber: z.string().optional().or(z.literal("")),
+      image: z
+        .union([
+          z.instanceof(File),
+          z.string().url({ message: t("invalidUrl") }),
+        ])
+        .optional(),
+    })
+    .superRefine((data, ctx) => {
+      if (data.endDate < data.startDate) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["endDate"],
+          message: t("endDateAfterStartDate"),
+        });
+        return;
+      }
+      if (data.endDate === data.startDate && data.endTime <= data.startTime) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["endTime"],
+          message: t("endTimeAfterStartTime"),
+        });
+      }
+    });
 
-export const defaultEventValues: Record<EventField, string> =
-  Object.fromEntries(eventFields.map((k) => [k, ""])) as Record<
-    EventField,
-    string
-  >;
+export type CreateEventSchemaType = z.infer<
+  ReturnType<typeof createEventSchema>
+>;
+
+export const defaultEventValues = (): CreateEventSchemaType => ({
+  title: "",
+  description: "",
+  address: "",
+  place: "",
+  town: "Русе",
+  startDate: "",
+  startTime: "",
+  endDate: "",
+  endTime: "",
+  organizers: [{ name: "", link: "" }],
+  ticketsLink: "",
+  price: "",
+  phoneNumber: "",
+  image: undefined,
+});

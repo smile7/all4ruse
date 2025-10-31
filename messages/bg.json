@@ -57,7 +57,13 @@
     "enterPrice": "0",
     "phoneNumber": "Телефон за контакти",
     "enterPhoneNumber": "08ХХ ХХХ ХХХ",
-    "submitButton": "Създай"
+    "submitButton": "Създай",
+    "requiredField": "Това поле е задължително",
+    "invalidUrl": "Невалиден линк",
+    "atLeastOneOrganizer": "Трябва да има поне един организатор",
+    "endDateAfterStartDate": "Крайната дата трябва да е след началната дата",
+    "endTimeAfterStartTime": "Крайният час трябва да е след началния час",
+    "addOrganizer": "Добави Организатор"
   },
   "PastEvents": {
     "createEvent": "Създай Събитие",

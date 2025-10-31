@@ -57,7 +57,13 @@
     "enterPrice": "Enter price or price range (0 for free event)",
     "phoneNumber": "Contact Phone Number",
     "enterPhoneNumber": "Enter phone number",
-    "submitButton": "Create"
+    "submitButton": "Create",
+    "requiredField": "This field is required",
+    "invalidUrl": "Invalid link",
+    "atLeastOneOrganizer": "At least one organizer is required",
+    "endDateAfterStartDate": "End date must be after start date",
+    "endTimeAfterStartTime": "End time must be after start time",
+    "addOrganizer": "Add an Organizer"
   },
   "PastEvents": {
     "createEvent": "Create an Event",

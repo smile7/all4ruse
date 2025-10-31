@@ -2,7 +2,8 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
-import { useForm } from "react-hook-form";
+import { useFieldArray, useForm, useFormContext } from "react-hook-form";
+import { Trash2Icon } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
@@ -13,6 +14,7 @@ import { SubmitButton } from "@/components/SubmitButton";
 import { TimePopover } from "@/components/TimePopover/TimePopover";
 import { Typography } from "@/components/Typography";
 import {
+  Button,
   ErrorAlert,
   Form,
   FormControl,
@@ -48,14 +50,14 @@ export default function CreateEventPage() {
     startTime: "",
     endDate: "",
     endTime: "",
-    organizer: "",
+    organizers: [{ name: "", link: "" }],
     ticketsLink: "",
     price: "",
     phoneNumber: "",
   };
 
   const form = useForm<CreateEventSchemaType>({
-    resolver: zodResolver(createEventSchema),
+    resolver: zodResolver(createEventSchema(t)),
     defaultValues: defaultValues,
   });
 
@@ -93,11 +95,12 @@ export default function CreateEventPage() {
   }, [router]);
 
   const onSubmit = async (values: CreateEventSchemaType) => {
-    // convert to FormData
     const formData = new FormData();
     Object.entries(values).forEach(([key, val]) => {
       if (val instanceof File) {
         formData.append(key, val);
+      } else if (Array.isArray(val) || typeof val === "object") {
+        formData.append(key, JSON.stringify(val));
       } else {
         formData.append(key, String(val));
       }
@@ -263,19 +266,13 @@ export default function CreateEventPage() {
             />
           </div>
 
-          <FormField
-            control={form.control}
-            name="organizer"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel isRequired>{t("organizers")}</FormLabel>
-                <FormControl>
-                  <Input placeholder={t("enterOrganizers")} {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <FormItem>
+            <FormLabel isRequired>{t("organizers")}</FormLabel>
+            <FormControl>
+              <OrganizersFieldArray />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
 
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             <FormField
@@ -350,7 +347,7 @@ export default function CreateEventPage() {
                     height={300}
                     src={URL.createObjectURL(file)}
                     alt="Preview"
-                    className="mt-1 max-h-48 rounded-lg"
+                    className="mt-1 max-h-48 rounded-lg object-contain"
                   />
                 ))}
               </div>
@@ -367,6 +364,68 @@ export default function CreateEventPage() {
           </div>
         </form>
       </Form>
+    </div>
+  );
+}
+
+export function OrganizersFieldArray({ disabled }: { disabled?: boolean }) {
+  const { control, register } = useFormContext();
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "organizers",
+  });
+
+  return (
+    <div className="space-y-4">
+      {fields.map((field, index) => {
+        const isSingle = fields.length === 1;
+
+        return (
+          <FormItem
+            key={field.id}
+            className="flex flex-col md:flex-row gap-3 items-start"
+          >
+            <div className="flex-1">
+              <FormLabel isRequired>Organizer Name</FormLabel>
+              <FormControl>
+                <Input
+                  placeholder="Organizer name"
+                  disabled={disabled}
+                  {...register(`organizers.${index}.name`)}
+                />
+              </FormControl>
+              <FormMessage />
+            </div>
+            <div className="flex-1">
+              <FormLabel>Organizer Link (optional)</FormLabel>
+              <FormControl>
+                <Input
+                  placeholder="Organizer link"
+                  disabled={disabled}
+                  {...register(`organizers.${index}.link`)}
+                />
+              </FormControl>
+              <FormMessage />
+            </div>
+            <button
+              type="button"
+              disabled={disabled || isSingle}
+              onClick={() => remove(index)}
+              className="text-red-600 hover:text-red-800"
+            >
+              <Trash2Icon className="w-5 h-5" />
+            </button>
+          </FormItem>
+        );
+      })}
+      <Button
+        type="button"
+        onClick={() => append({ name: "", link: "" })}
+        disabled={disabled}
+        variant="outline"
+      >
+        Add another organizer
+      </Button>
     </div>
   );
 }

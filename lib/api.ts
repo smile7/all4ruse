@@ -11,6 +11,14 @@ type ServiceResult<T> = {
   error: PostgrestError | null;
 };
 
+type Organizer = {
+  name: string;
+  link?: string;
+};
+export type EventRow = Omit<Tables<"events">, "organizers"> & {
+  organizers: Organizer[];
+};
+
 // MARK: Events
 export async function getEvents(
   client: SupabaseClient
@@ -19,18 +27,20 @@ export async function getEvents(
     .from("events")
     .select("*")
     .order("startDate", { ascending: true });
+
   return { data: data ?? [], error };
 }
 
 export async function getEventBySlug(
   client: SupabaseClient,
   slug: string
-): Promise<ServiceResult<Event | null>> {
+): Promise<ServiceResult<EventRow | null>> {
   const { data, error } = await client
     .from("events")
     .select("*")
     .eq("slug", slug)
     .maybeSingle();
+
   return { data: data ?? null, error };
 }
 
@@ -43,7 +53,15 @@ export async function createEvent(
     .insert(payload)
     .select("*")
     .maybeSingle();
-  return { data: data ?? null, error };
+
+  if (data && Array.isArray(data.organizers)) {
+    return {
+      data: { ...data, organizers: data.organizers as Organizer[] },
+      error,
+    };
+  }
+
+  return { data: data as EventRow | null, error };
 }
 
 export async function updateEvent(
@@ -57,6 +75,7 @@ export async function updateEvent(
     .eq("id", id)
     .select("*")
     .maybeSingle();
+
   return { data: data ?? null, error };
 }
 
@@ -65,5 +84,6 @@ export async function deleteEvent(
   id: number
 ): Promise<ServiceResult<boolean>> {
   const { error } = await client.from("events").delete().eq("id", id);
+
   return { data: !error, error };
 }

@@ -43,6 +43,24 @@ export default async function EventPage(props: {
                 dangerouslySetInnerHTML={{ __html: event.description }}
               />
             </div>{" "}
+            <div className="flex flex-col gap-4">
+              <Typography.H3>Organizers:</Typography.H3>
+              {event.organizers.map((org, idx) => (
+                <div key={idx}>
+                  {org.link && (
+                    <Typography.P>
+                      <a
+                        href={org.link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        {org.name}
+                      </a>
+                    </Typography.P>
+                  )}
+                </div>
+              ))}
+            </div>
           </article>
         </div>
       </div>
