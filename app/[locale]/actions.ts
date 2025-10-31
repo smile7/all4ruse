@@ -2,6 +2,7 @@
 
 import { isRedirectError } from "next/dist/client/components/redirect-error";
 import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server"; // ✅ import translations
 import { SupabaseClient } from "@supabase/supabase-js";
 
 import { BUCKET } from "@/constants";
@@ -16,18 +17,23 @@ export async function createEventAction(
   formData: FormData
 ): Promise<CreateEventActionState> {
   try {
-    const supabase = await createClient();
+    const t = await getTranslations("CreateEvent");
 
+    const supabase = await createClient();
     const {
       data: { user },
     } = await supabase.auth.getUser();
     if (!user) return { error: "Моля влезте в профила си." };
 
     const raw: Record<string, unknown> = {};
-    for (const [k, v] of formData.entries()) raw[k] = v;
-    if (!raw.isFree) raw.isFree = false;
-
-    const parsed = createEventSchema.safeParse(raw);
+    for (const [k, v] of formData.entries()) {
+      if (k === "organizers") {
+        raw[k] = JSON.parse(v as string);
+      } else {
+        raw[k] = v;
+      }
+    }
+    const parsed = createEventSchema(t).safeParse(raw);
     if (!parsed.success) {
       return {
         error: parsed.error.issues[0]?.message || "Невалидни данни",
@@ -59,6 +65,7 @@ export async function createEventAction(
   }
 }
 
+// ----------------- image handling -----------------
 const ALLOWED_MIME = ["image/png", "image/jpeg", "image/webp", "image/gif"];
 const MAX_BYTES = 10 * 1024 * 1024; // 10MB
 
@@ -67,12 +74,10 @@ export async function validateAndUploadEventImage(
   file: File | null
 ): Promise<string | undefined> {
   if (!file || file.size === 0) return;
-
   if (file.size > MAX_BYTES)
     throw new Error("Файлът е твърде голям (макс. 10MB).");
   if (!ALLOWED_MIME.includes(file.type))
     throw new Error("Неподдържан тип изображение.");
-
   const uploaded = await uploadImage(supabase, file);
   return uploaded.url;
 }
@@ -87,13 +92,11 @@ export async function uploadImage(
   const path = `${folder}/${Date.now()}-${Math.random()
     .toString(36)
     .slice(2)}.${ext}`;
-
   const { error } = await supabase.storage.from(bucket).upload(path, file, {
     cacheControl: "3600",
     upsert: false,
     contentType: file.type,
   });
-
   if (error) throw new Error(error.message);
   const {
     data: { publicUrl },

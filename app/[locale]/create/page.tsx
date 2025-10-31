@@ -1,53 +1,75 @@
 "use client";
 
-import { useActionState, useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
+import { useFieldArray, useForm, useFormContext } from "react-hook-form";
+import { Trash2Icon } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { Content } from "@tiptap/react";
+import { zodResolver } from "@hookform/resolvers/zod";
 import StarterKit from "@tiptap/starter-kit";
 
-import { DatePopover } from "@/components/DatePopover/DatePopover";
 import { SubmitButton } from "@/components/SubmitButton";
 import { TimePopover } from "@/components/TimePopover/TimePopover";
 import { Typography } from "@/components/Typography";
-import { ErrorAlert, Input, Label } from "@/components/ui";
+import {
+  Button,
+  ErrorAlert,
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+  Input,
+} from "@/components/ui";
 import { MinimalTiptapEditor } from "@/components/ui/minimal-tiptap";
+import { createEventSchema, CreateEventSchemaType } from "@/lib/schema";
 import { createClient } from "@/lib/supabase/client";
 
+import { EventDateSelector } from "../_components";
 import { createEventAction } from "../actions";
 
-type CreateEventActionState = { error: string | null };
-const initialState: CreateEventActionState = { error: null };
-
-// TODO: apply react hook form!
 export default function CreateEventPage() {
   const t = useTranslations("CreateEvent");
 
-  const [state, formAction] = useActionState(createEventAction, initialState);
-
-  const [startDate, setStartDate] = useState<string>("");
-  const [endDate, setEndDate] = useState<string>("");
-  const [startTime, setStartTime] = useState<string>("");
-  const [endTime, setEndTime] = useState<string>("");
   const [authChecked, setAuthChecked] = useState(false);
-  const [description, setDescription] = useState<Content>("");
+  const [files, setFiles] = useState<File[]>([]);
+  const [serverError, setServerError] = useState<string | null>(null);
+
   const router = useRouter();
 
-  // const upload = useSupabaseUpload({
-  //   bucketName: process.env.NEXT_PUBLIC_SUPABASE_BUCKET_NAME!,
-  //   allowedMimeTypes: ["image/png", "image/jpeg", "image/webp", "image/gif"],
-  //   maxFiles: 10,
-  //   maxFileSize: 1 * 1024 * 1024, // 1MB
-  //   path: BUCKET,
-  //   upsert: true,
-  // });
-  const [files, setFiles] = useState<File[]>([]);
+  const defaultValues = {
+    title: "",
+    description: "",
+    address: "",
+    place: "",
+    town: "Русе",
+    startDate: "",
+    startTime: "",
+    endDate: "",
+    endTime: "",
+    organizers: [{ name: "", link: "" }],
+    ticketsLink: "",
+    price: "",
+    phoneNumber: "",
+  };
 
-  const onDrop = useCallback((acceptedFiles: File[]) => {
-    setFiles(acceptedFiles);
-  }, []);
+  const form = useForm<CreateEventSchemaType>({
+    resolver: zodResolver(createEventSchema(t)),
+    defaultValues: defaultValues,
+  });
+
+  const onDrop = useCallback(
+    (acceptedFiles: File[]) => {
+      setFiles(acceptedFiles);
+      if (acceptedFiles[0]) {
+        form.setValue("image", acceptedFiles[0]); // store file in RHF
+      }
+    },
+    [form]
+  );
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
@@ -72,168 +94,338 @@ export default function CreateEventPage() {
     });
   }, [router]);
 
-  if (!authChecked) return <div>...</div>;
+  const onSubmit = async (values: CreateEventSchemaType) => {
+    const formData = new FormData();
+    Object.entries(values).forEach(([key, val]) => {
+      if (val instanceof File) {
+        formData.append(key, val);
+      } else if (Array.isArray(val) || typeof val === "object") {
+        formData.append(key, JSON.stringify(val));
+      } else {
+        formData.append(key, String(val));
+      }
+    });
+
+    try {
+      const state = await createEventAction({ error: null }, formData);
+      if (state.error && state.error.length > 0) {
+        setServerError(state.error);
+      }
+    } catch (err) {
+      setServerError(
+        err instanceof Error ? err.message : "Unexpected error occurred"
+      );
+    }
+  };
+
+  if (!authChecked)
+    return <div>Влезте в профила си, за да създадете събитие!</div>;
 
   return (
     <div className="flex flex-col gap-6">
       <Typography.H1>{t("createEventTitle")}</Typography.H1>
-      <form action={formAction} className="space-y-6">
-        <div className="space-y-2">
-          <label className="font-medium">{t("title")} *</label>
-          <Input name="title" required placeholder={t("enterTitle")} />
-        </div>
-
-        <div className="space-y-2">
-          <Label className="font-medium">{t("description")} *</Label>
-          <MinimalTiptapEditor
-            value={description}
-            onChange={setDescription}
-            className="w-full"
-            editorContentClassName="p-5"
-            output="html"
-            placeholder={t("enterDescription")}
-            autofocus={true}
-            editable={true}
-            editorClassName="focus:outline-hidden h-80 overflow-auto"
-            extensions={[StarterKit]}
-          />
-          <input
-            type="hidden"
-            name="description"
-            value={String(description)}
-            required
-          />
-        </div>
-
-        <div className="grid gap-6 md:grid-cols-2">
-          <div className="space-y-2">
-            <Label className="font-medium">{t("address")} *</Label>
-            <Input name="address" required placeholder={t("enterAddress")} />
-          </div>
-          <div className="space-y-2">
-            <Label className="font-medium">{t("town")} *</Label>
-            <Input name="town" required value="Русе" />
-          </div>
-        </div>
-
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-          <div className="space-y-2">
-            <Label className="font-medium">{t("fromDate")} *</Label>
-            <DatePopover
-              id="startDate"
-              value={startDate}
-              onChange={(v) => setStartDate(v ?? "")}
-              onClear={() => setStartDate("")}
-            />
-            <input type="hidden" name="startDate" value={startDate} required />
-          </div>
-          <div className="space-y-2">
-            <Label className="font-medium">{t("fromTime")} *</Label>
-            <TimePopover
-              id="startTime"
-              value={startTime}
-              onChange={(v) => setStartTime(v ?? "")}
-            />
-            <input type="hidden" name="startTime" value={startTime} required />
-          </div>
-          <div className="space-y-2">
-            <Label className="font-medium">{t("toDate")} *</Label>
-            <DatePopover
-              id="endDate"
-              value={endDate}
-              onChange={(v) => setEndDate(v ?? "")}
-              onClear={() => setEndDate("")}
-            />
-            <input type="hidden" name="endDate" value={endDate} required />
-          </div>
-          <div className="space-y-2">
-            <Label className="font-medium">{t("toTime")} *</Label>
-            <TimePopover
-              id="endTime"
-              value={endTime}
-              onChange={(v) => setEndTime(v ?? "")}
-            />
-            <input type="hidden" name="endTime" value={endTime} required />
-          </div>
-        </div>
-
-        <div className="space-y-2">
-          <Label>{t("organizers")} *</Label>
-          <Input name="organizer" required placeholder={t("enterOrganizers")} />
-        </div>
-        {/* Image Upload */}
-        <div className="space-y-2">
-          <Label>Image *</Label>
-          <div
-            {...getRootProps({
-              className:
-                "border-2 border-dashed rounded-lg p-6 cursor-pointer text-center " +
-                (isDragActive
-                  ? "bg-gray-100 border-blue-500"
-                  : "border-gray-300"),
-            })}
-          >
-            <input
-              {...getInputProps({
-                name: "image", // important: name must match server action `formData.get("image")`
-              })}
-            />
-            {isDragActive ? (
-              <p>Drop the file here ...</p>
-            ) : (
-              <p>Drag and drop an image here, or click to select</p>
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <FormField
+            control={form.control}
+            name="title"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel isRequired>{t("title")}</FormLabel>
+                <FormControl>
+                  <Input placeholder={t("enterTitle")} {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
             )}
+          />
+
+          <FormField
+            control={form.control}
+            name="description"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel isRequired>{t("description")}</FormLabel>
+                <FormControl>
+                  <MinimalTiptapEditor
+                    value={field.value} // as Content}
+                    onChange={field.onChange}
+                    className="w-full"
+                    editorContentClassName="p-5"
+                    output="html"
+                    placeholder={t("enterDescription")}
+                    autofocus
+                    editable
+                    editorClassName="focus:outline-hidden h-80 overflow-auto"
+                    extensions={[StarterKit]}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <div className="grid gap-6 md:grid-cols-3">
+            <FormField
+              control={form.control}
+              name="address"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel isRequired>{t("address")}</FormLabel>
+                  <FormControl>
+                    <Input placeholder={t("enterAddress")} {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="place"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel isRequired>{t("place")}</FormLabel>
+                  <FormControl>
+                    <Input placeholder={t("enterPlace")} {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="town"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel isRequired>{t("town")}</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
           </div>
 
-          {/* Preview */}
-          {files.length > 0 && (
-            <div className="mt-2">
-              <p className="text-sm font-medium">Preview:</p>
-              {files.map((file) => (
-                <Image
-                  key={file.name}
-                  width={400}
-                  height={300}
-                  src={URL.createObjectURL(file)}
-                  alt="Preview"
-                  className="mt-1 max-h-48 rounded-lg"
-                />
-              ))}
-            </div>
-          )}
-        </div>
-        {/* <div className="space-y-2">
-          <Label>{t("images")} *</Label>
-          <Dropzone {...upload} className="my-2">
-            <DropzoneEmptyState />
-            <DropzoneContent />
-          </Dropzone>
-          {upload.successes.length > 0 && (
-            <input
-              type="hidden"
-              name="image"
-              required
-              value={`https://${process.env.NEXT_PUBLIC_SUPABASE_PROJECT_REF}.supabase.co/storage/v1/object/public/${process.env.NEXT_PUBLIC_SUPABASE_BUCKET_NAME}/${BUCKET}/${upload.successes[0]}`}
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <FormField
+              control={form.control}
+              name="startDate"
+              render={() => (
+                <FormItem>
+                  <FormLabel isRequired>{t("eventDate")}</FormLabel>
+                  <FormControl>
+                    <EventDateSelector
+                      startValue={form.watch("startDate")}
+                      endValue={form.watch("endDate")}
+                      onChange={(start, end) => {
+                        form.setValue("startDate", start);
+                        form.setValue("endDate", end);
+                      }}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-          )}
-        </div> */}
+            <FormField
+              control={form.control}
+              name="startTime"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel isRequired>{t("fromTime")}</FormLabel>
+                  <FormControl>
+                    <TimePopover
+                      id="startTime"
+                      value={field.value}
+                      onChange={(v) => field.onChange(v ?? "")}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="endTime"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel isRequired>{t("toTime")}</FormLabel>
+                  <FormControl>
+                    <TimePopover
+                      id="endTime"
+                      value={field.value}
+                      onChange={(v) => field.onChange(v ?? "")}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
 
-        <Label className="inline-flex items-center gap-2 rounded-lg border border-input bg-background px-4 py-3">
-          <input
-            type="checkbox"
-            name="isFree"
-            value="on"
-            className="size-4 accent-primary"
-          />
-          <span className="font-medium">{t("freeEvent")}</span>
-        </Label>
+          <FormItem>
+            <FormLabel isRequired>{t("organizers")}</FormLabel>
+            <FormControl>
+              <OrganizersFieldArray />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
 
-        {state.error && <ErrorAlert error={state.error} className="mt-4" />}
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <FormField
+              control={form.control}
+              name="ticketsLink"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("ticketsLink")}</FormLabel>
+                  <FormControl>
+                    <Input placeholder={t("enterTicketsLink")} {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="price"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("price")}</FormLabel>
+                  <FormControl>
+                    <Input placeholder={t("enterPrice")} {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="phoneNumber"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("phoneNumber")}</FormLabel>
+                  <FormControl>
+                    <Input placeholder={t("enterPhoneNumber")} {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
 
-        <div className="flex justify-end">
-          <SubmitButton>{t("submitButton")}</SubmitButton>
-        </div>
-      </form>
+          <FormItem>
+            <FormLabel isRequired>{t("images")}</FormLabel>
+            <FormControl>
+              <div
+                {...getRootProps({
+                  className:
+                    "border-2 border-dashed rounded-lg p-6 cursor-pointer text-center " +
+                    (isDragActive
+                      ? "bg-gray-100 border-blue-500"
+                      : "border-gray-300"),
+                })}
+              >
+                <input {...getInputProps({ name: "image" })} />
+                {isDragActive ? (
+                  <Typography.P>{t("uploadImageDrop")}</Typography.P>
+                ) : (
+                  <Typography.P>{t("uploadImages")}</Typography.P>
+                )}
+              </div>
+            </FormControl>
+
+            {files.length > 0 && (
+              <div className="mt-2">
+                <p className="text-sm font-medium">Preview:</p>
+                {files.map((file) => (
+                  <Image
+                    key={file.name}
+                    width={400}
+                    height={300}
+                    src={URL.createObjectURL(file)}
+                    alt="Preview"
+                    className="mt-1 max-h-48 rounded-lg object-contain"
+                  />
+                ))}
+              </div>
+            )}
+            <FormMessage />
+          </FormItem>
+
+          {serverError && <ErrorAlert error={serverError} className="mt-4" />}
+
+          <div className="flex justify-end">
+            <SubmitButton disabled={form.formState.isSubmitting}>
+              {t("submitButton")}
+            </SubmitButton>
+          </div>
+        </form>
+      </Form>
+    </div>
+  );
+}
+
+export function OrganizersFieldArray({ disabled }: { disabled?: boolean }) {
+  const { control, register } = useFormContext();
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "organizers",
+  });
+
+  return (
+    <div className="space-y-4">
+      {fields.map((field, index) => {
+        const isSingle = fields.length === 1;
+
+        return (
+          <FormItem
+            key={field.id}
+            className="flex flex-col md:flex-row gap-3 items-start"
+          >
+            <div className="flex-1">
+              <FormLabel isRequired>Organizer Name</FormLabel>
+              <FormControl>
+                <Input
+                  placeholder="Organizer name"
+                  disabled={disabled}
+                  {...register(`organizers.${index}.name`)}
+                />
+              </FormControl>
+              <FormMessage />
+            </div>
+            <div className="flex-1">
+              <FormLabel>Organizer Link (optional)</FormLabel>
+              <FormControl>
+                <Input
+                  placeholder="Organizer link"
+                  disabled={disabled}
+                  {...register(`organizers.${index}.link`)}
+                />
+              </FormControl>
+              <FormMessage />
+            </div>
+            <button
+              type="button"
+              disabled={disabled || isSingle}
+              onClick={() => remove(index)}
+              className="text-red-600 hover:text-red-800"
+            >
+              <Trash2Icon className="w-5 h-5" />
+            </button>
+          </FormItem>
+        );
+      })}
+      <Button
+        type="button"
+        onClick={() => append({ name: "", link: "" })}
+        disabled={disabled}
+        variant="outline"
+      >
+        Add another organizer
+      </Button>
     </div>
   );
 }

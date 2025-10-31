@@ -24,11 +24,14 @@ export type Database = {
           endTime: string
           id: number
           image: string | null
-          isFree: boolean
-          organizer: string
+          organizers: Json | null
+          phoneNumber: string | null
+          place: string | null
+          price: string | null
           slug: string | null
           startDate: string
           startTime: string
+          ticketsLink: string | null
           title: string
           town: string
         }
@@ -41,11 +44,14 @@ export type Database = {
           endTime: string
           id?: number
           image?: string | null
-          isFree: boolean
-          organizer: string
+          organizers?: Json | null
+          phoneNumber?: string | null
+          place?: string | null
+          price?: string | null
           slug?: string | null
           startDate: string
           startTime: string
+          ticketsLink?: string | null
           title: string
           town: string
         }
@@ -58,11 +64,14 @@ export type Database = {
           endTime?: string
           id?: number
           image?: string | null
-          isFree?: boolean
-          organizer?: string
+          organizers?: Json | null
+          phoneNumber?: string | null
+          place?: string | null
+          price?: string | null
           slug?: string | null
           startDate?: string
           startTime?: string
+          ticketsLink?: string | null
           title?: string
           town?: string
         }
