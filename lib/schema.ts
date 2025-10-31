@@ -14,6 +14,10 @@ export const eventFields = [
   "startTime",
   "endDate",
   "endTime",
+  "place",
+  "price",
+  "ticketsLink",
+  "phoneNumber",
 ] as const satisfies readonly (keyof EventInsert)[];
 
 export type EventField = (typeof eventFields)[number];
