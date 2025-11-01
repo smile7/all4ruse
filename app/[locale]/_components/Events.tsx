@@ -96,6 +96,7 @@ function EventsGrid({ events }: { events: Event[] }) {
                       className="w-full object-cover"
                       draggable={false}
                     />
+                    <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-opacity" />
                   </div>
                   <div className="pointer-events-none absolute inset-0 z-10 bg-gradient-to-t from-black/70 via-black/25 to-transparent transition-opacity duration-300 group-hover:from-black/80" />
                   {e.price === "0" && (
@@ -131,18 +132,18 @@ function EventsGrid({ events }: { events: Event[] }) {
 }
 
 function EmptyState({ onReset }: { onReset: () => void }) {
+  const t = useTranslations("HomePage");
+
   return (
     <Card>
       <CardContent className="flex flex-col gap-6 items-center py-14">
         <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
           <Sparkles className="h-8 w-8" />
         </div>
-        <Typography.Lead>0 събития</Typography.Lead>
-        <Typography.Small>
-          Не бяха намерени събития по избраните критерии.
-        </Typography.Small>
+        <Typography.Lead>0 {t("events")}</Typography.Lead>
+        <Typography.Small>{t("noEvents")}</Typography.Small>
         <Button className="mt-2" variant="secondary" onClick={onReset}>
-          Изчисти филтрите
+          {t("clear")}
         </Button>
       </CardContent>
     </Card>

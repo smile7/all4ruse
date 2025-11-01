@@ -1,6 +1,7 @@
-import Image from "next/image";
 import { getTranslations } from "next-intl/server";
 
+import { EventDetailsCard } from "@/components/EventDetailsCard";
+import EventHeroImage from "@/components/EventHeroImage/EventHeroImage";
 import { Typography } from "@/components/Typography";
 import { getEventBySlug } from "@/lib/api";
 import { createClient } from "@/lib/supabase/server";
@@ -11,59 +12,33 @@ export default async function EventPage(props: {
   params: Promise<{ slug: string }>;
 }) {
   const { params } = props;
-  const t = await getTranslations("HomePage");
+  const t = await getTranslations("SingleEvent");
   const supabase = await createClient();
   const { slug } = await params;
   const { data: event, error } = await getEventBySlug(supabase, slug);
 
-  if (error || !event)
-    return <div>Възникна грешка. Моля опитайте отново по-късно.</div>;
+  if (error || !event) return <div>{t("error")}</div>;
 
   return (
-    <div className="bg-background min-h-screen">
-      <div className="mx-auto max-w-4xl px-6 py-12">
-        <Typography.H1>{event.title}</Typography.H1>
+    <div className="flex flex-col gap-6">
+      {event.image && <EventHeroImage src={event.image} alt={event.title} />}
+      <article className="space-y-8">
+        <Typography.H1 className="text-center">{event.title}</Typography.H1>
 
-        <div className="mt-16">
-          <article className="space-y-8">
-            {event.image && (
-              <div className="bg-muted aspect-video w-full overflow-hidden rounded-xl">
-                <Image
-                  src={event.image}
-                  width={800}
-                  height={450}
-                  alt="Event image"
-                  className="h-full w-full object-cover"
-                />
-              </div>
-            )}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-6">
+          <div className="md:col-span-2 space-y-6">
             <div className="minimal-tiptap-editor">
               <div
                 className="whitespace-pre-wrap"
                 dangerouslySetInnerHTML={{ __html: event.description }}
               />
-            </div>{" "}
-            <div className="flex flex-col gap-4">
-              <Typography.H3>Organizers:</Typography.H3>
-              {event.organizers.map((org, idx) => (
-                <div key={idx}>
-                  {org.link && (
-                    <Typography.P>
-                      <a
-                        href={org.link}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        {org.name}
-                      </a>
-                    </Typography.P>
-                  )}
-                </div>
-              ))}
             </div>
-          </article>
+          </div>
+          <div className="md:col-span-1">
+            <EventDetailsCard event={event} />
+          </div>
         </div>
-      </div>
+      </article>
     </div>
   );
 }

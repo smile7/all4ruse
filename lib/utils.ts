@@ -47,6 +47,24 @@ export function formatShortDate(value?: string | null) {
   return format(d, "d MMM", { locale: bg });
 }
 
+export function formatTimeRange(
+  startTime?: string | null,
+  endTime?: string | null
+): string {
+  if (!startTime) return "";
+  if (!endTime || endTime === startTime) return formatTimeTZ(startTime);
+  return `${formatTimeTZ(startTime)} - ${formatTimeTZ(endTime)}`;
+}
+
+export function formatDateRange(
+  startDate?: string | null,
+  endDate?: string | null
+): string {
+  if (!startDate) return "";
+  if (!endDate || endDate === startDate) return formatDate(startDate);
+  return `${formatDate(startDate)} - ${formatDate(endDate)}`;
+}
+
 export function getString(fd: FormData, key: string) {
   const v = fd.get(key);
   if (typeof v !== "string") return null;
