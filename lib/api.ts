@@ -11,12 +11,12 @@ type ServiceResult<T> = {
   error: PostgrestError | null;
 };
 
-type Organizer = {
+export type Host = {
   name: string;
   link?: string;
 };
 export type EventRow = Omit<Tables<"events">, "organizers"> & {
-  organizers: Organizer[];
+  organizers: Host[];
 };
 
 // MARK: Events
@@ -56,7 +56,7 @@ export async function createEvent(
 
   if (data && Array.isArray(data.organizers)) {
     return {
-      data: { ...data, organizers: data.organizers as Organizer[] },
+      data: { ...data, organizers: data.organizers as Host[] },
       error,
     };
   }

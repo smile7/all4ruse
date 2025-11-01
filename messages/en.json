@@ -29,7 +29,10 @@
     "bulgarian": "Bulgarian",
     "menuEvents": "Events",
     "menuPastEvents": "Past Events",
-    "more": "More"
+    "more": "More",
+    "clear": "Clear Filters",
+    "events": "events",
+    "noEvents": "No events found for the search criteria."
   },
   "CreateEvent": {
     "createEventTitle": "Create New Event",
@@ -63,11 +66,26 @@
     "atLeastOneOrganizer": "At least one organizer is required",
     "endDateAfterStartDate": "End date must be after start date",
     "endTimeAfterStartTime": "End time must be after start time",
-    "addOrganizer": "Add an Organizer"
+    "addOrganizer": "Add an Organizer",
+    "organizerName": "Host Name",
+    "enterOrganizerName": "Puppet Theater Ruse",
+    "organizerLink": "Organizer Link",
+    "enterOrganizerLink": "https://"
   },
   "PastEvents": {
     "createEvent": "Create an Event",
     "pageTitle": "Past Events in Ruse",
     "pageDescription": "All past cultural and non-cultural events in Ruse and the surrounding area"
+  },
+  "SingleEvent": {
+    "date": "Date",
+    "time": "Time",
+    "address": "Address",
+    "organizers": "Hosts",
+    "tickets": "Tickets",
+    "price": "Price",
+    "free": "Free",
+    "contactPhone": "Contacts",
+    "error": "An error occurred. Please try again later."
   }
 }

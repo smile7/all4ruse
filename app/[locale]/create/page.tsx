@@ -267,7 +267,6 @@ export default function CreateEventPage() {
           </div>
 
           <FormItem>
-            <FormLabel isRequired>{t("organizers")}</FormLabel>
             <FormControl>
               <OrganizersFieldArray />
             </FormControl>
@@ -369,6 +368,8 @@ export default function CreateEventPage() {
 }
 
 function OrganizersFieldArray({ disabled }: { disabled?: boolean }) {
+  const t = useTranslations("CreateEvent");
+
   const { control, register } = useFormContext();
   const { fields, append, remove } = useFieldArray({
     control,
@@ -386,10 +387,10 @@ function OrganizersFieldArray({ disabled }: { disabled?: boolean }) {
             className="flex flex-col md:flex-row gap-3 items-start"
           >
             <div className="flex-1">
-              <FormLabel isRequired>Organizer Name</FormLabel>
+              <FormLabel isRequired>{t("organizerName")}</FormLabel>
               <FormControl>
                 <Input
-                  placeholder="Organizer name"
+                  placeholder={t("enterOrganizerName")}
                   disabled={disabled}
                   {...register(`organizers.${index}.name`)}
                 />
@@ -397,24 +398,25 @@ function OrganizersFieldArray({ disabled }: { disabled?: boolean }) {
               <FormMessage />
             </div>
             <div className="flex-1">
-              <FormLabel>Organizer Link (optional)</FormLabel>
+              <FormLabel>{t("organizerLink")}</FormLabel>
               <FormControl>
                 <Input
-                  placeholder="Organizer link"
+                  placeholder={t("enterOrganizerLink")}
                   disabled={disabled}
                   {...register(`organizers.${index}.link`)}
                 />
               </FormControl>
               <FormMessage />
             </div>
-            <button
+            <Button
               type="button"
+              variant="outline"
               disabled={disabled || isSingle}
               onClick={() => remove(index)}
-              className="text-red-600 hover:text-red-800"
+              className="text-destructive hover:text-destructive/80 mt-6"
             >
               <Trash2Icon className="w-5 h-5" />
-            </button>
+            </Button>
           </FormItem>
         );
       })}
@@ -424,7 +426,7 @@ function OrganizersFieldArray({ disabled }: { disabled?: boolean }) {
         disabled={disabled}
         variant="outline"
       >
-        Add another organizer
+        {t("addOrganizer")}
       </Button>
     </div>
   );

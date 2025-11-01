@@ -29,7 +29,10 @@
     "bulgarian": "Български",
     "menuEvents": "Събития",
     "menuPastEvents": "Минали Събития",
-    "more": "Още"
+    "more": "Още",
+    "clear": "Изчисти филтрите",
+    "events": "събития",
+    "noEvents": "Няма намерени събития по избраните критерии."
   },
   "CreateEvent": {
     "createEventTitle": "Създай Ново Събитие",
@@ -63,11 +66,26 @@
     "atLeastOneOrganizer": "Трябва да има поне един организатор",
     "endDateAfterStartDate": "Крайната дата трябва да е след началната дата",
     "endTimeAfterStartTime": "Крайният час трябва да е след началния час",
-    "addOrganizer": "Добави Организатор"
+    "addOrganizer": "Добави друг организатор",
+    "organizerName": "Име на организатора",
+    "enterOrganizerName": "Куклен театър Русе",
+    "organizerLink": "Линк към организатора",
+    "enterOrganizerLink": "https://"
   },
   "PastEvents": {
     "createEvent": "Създай Събитие",
     "pageTitle": "Минали събития в Русе",
     "pageDescription": "Всички минали културни и некултурни събития в Русе и околността"
+  },
+  "SingleEvent": {
+    "date": "Дата",
+    "time": "Час",
+    "address": "Адрес",
+    "organizers": "Организатори",
+    "tickets": "Билети",
+    "price": "Цена",
+    "free": "Безплатно",
+    "contactPhone": "Телефон за контакти",
+    "error": "Възникна грешка. Моля опитайте отново по-късно."
   }
 }
