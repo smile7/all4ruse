@@ -1,7 +1,16 @@
-import { Building, CalendarDays, Clock, Phone, Ticket } from "lucide-react";
+import {
+  BuildingIcon,
+  CalendarDaysIcon,
+  ClockIcon,
+  PhoneIcon,
+  ReceiptEuroIcon,
+  TicketIcon,
+  UsersIcon,
+} from "lucide-react";
+import { PersonIcon } from "@radix-ui/react-icons";
 
 import { Typography } from "@/components/Typography";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Event, Host } from "@/lib/api";
 import { formatDateRange, formatTimeRange } from "@/lib/utils";
 
@@ -9,14 +18,10 @@ function OrganizersList({ organizers }: { organizers: Host[] }) {
   return (
     <div className="space-y-1">
       {organizers.map((org, idx) => (
-        <div key={idx}>
+        <div key={idx} className="flex items-center gap-2">
+          <PersonIcon className="size-4 shrink-0" />
           {org.link ? (
-            <a
-              href={org.link}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-primary hover:underline"
-            >
+            <a href={org.link} target="_blank" rel="noopener noreferrer">
               {org.name}
             </a>
           ) : (
@@ -35,40 +40,39 @@ export function EventDetailsCard({ event }: { event: Event }) {
     <div className="flex flex-col gap-4">
       <Card>
         <CardContent className="space-y-3">
-          {/* Date */}
           <div className="flex items-center gap-2">
-            <CalendarDays className="w-5 h-5 text-gray-500" />
+            <CalendarDaysIcon className="size-4 shrink-0" />
             <Typography.P>
               {formatDateRange(event.startDate, event.endDate)}
             </Typography.P>
           </div>
 
           <div className="flex items-center gap-2">
-            <Clock className="w-5 h-5 text-gray-500" />
+            <ClockIcon className="size-4 shrink-0" />
             <Typography.P>
               {formatTimeRange(event.startTime, event.endTime)}
             </Typography.P>
           </div>
 
-          {/* Place */}
           <div className="flex items-center gap-2">
-            <Building className="w-5 h-5 text-gray-500" />
-            <Typography.P>
-              <strong>{event.place}</strong>, {event.address}, {event.town}
+            <BuildingIcon className="size-4 shrink-0" />
+            <Typography.P className="leading-tight">
+              {event.place}, {event.address}, {event.town}
             </Typography.P>
           </div>
 
-          {/* Phone (clickable) */}
           {event.phoneNumber?.trim() && (
             <div className="flex items-center gap-2">
-              <Phone className="w-5 h-5 text-gray-500" />
+              <PhoneIcon className="size-4 shrink-0" />
               <Typography.P>
                 <a
                   href={`tel:${event.phoneNumber}`}
-                  className="text-primary hover:underline"
+                  className="text-primary hover:underline block md:hidden"
                 >
                   {event.phoneNumber}
                 </a>
+
+                <span className="hidden md:block">{event.phoneNumber}</span>
               </Typography.P>
             </div>
           )}
@@ -77,36 +81,34 @@ export function EventDetailsCard({ event }: { event: Event }) {
 
       <Card>
         <CardContent className="space-y-3">
-          {/* Organizers */}
-          {organizers.length > 0 && (
-            <div>
-              <Typography.P className="font-semibold">
-                Организатори:{" "}
-              </Typography.P>
-              <OrganizersList organizers={organizers} />
-            </div>
-          )}
-
-          {/* Tickets */}
           {event.ticketsLink?.trim() && (
             <div className="flex items-center gap-2">
-              <Ticket className="w-5 h-5 text-gray-500" />
+              <TicketIcon className="size-4 shrink-0" />
               <a
                 href={event.ticketsLink}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-primary hover:underline"
               >
                 Билети
               </a>
             </div>
           )}
 
-          {/* Price */}
           {event.price?.trim() && (
-            <Typography.P>
-              <strong>Цена:</strong> {event.price}лв
-            </Typography.P>
+            <div className="flex items-center gap-2">
+              <ReceiptEuroIcon className="size-4 shrink-0" />
+              <Typography.P>Цена: {event.price}лв</Typography.P>
+            </div>
+          )}
+
+          {organizers.length > 0 && (
+            <div>
+              <div className="flex items-center gap-2">
+                <UsersIcon className="size-4 shrink-0" />
+                <Typography.P>Организатори: </Typography.P>
+              </div>
+              <OrganizersList organizers={organizers} />
+            </div>
           )}
         </CardContent>
       </Card>

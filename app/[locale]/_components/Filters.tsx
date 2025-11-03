@@ -35,7 +35,7 @@ export function EventsFilters() {
       type="single"
       collapsible
       defaultValue="filters"
-      className="rounded-lg border"
+      className="rounded-md border"
     >
       <AccordionItem value="filters">
         <AccordionTrigger className="p-4 hover:cursor-pointer">

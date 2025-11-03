@@ -321,7 +321,7 @@ export default function CreateEventPage() {
               <div
                 {...getRootProps({
                   className:
-                    "border-2 border-dashed rounded-lg p-6 cursor-pointer text-center " +
+                    "border-2 border-dashed rounded-md p-6 cursor-pointer text-center " +
                     (isDragActive
                       ? "bg-gray-100 border-blue-500"
                       : "border-gray-300"),
@@ -346,7 +346,7 @@ export default function CreateEventPage() {
                     height={300}
                     src={URL.createObjectURL(file)}
                     alt="Preview"
-                    className="mt-1 max-h-48 rounded-lg object-contain"
+                    className="mt-1 max-h-48 rounded-md object-contain"
                   />
                 ))}
               </div>
