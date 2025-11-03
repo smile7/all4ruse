@@ -20,16 +20,17 @@ export default async function EventPage(props: {
   if (error || !event) return <div>{t("error")}</div>;
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-12">
       {event.image && <EventHeroImage src={event.image} alt={event.title} />}
-      <article className="space-y-8">
+      <article className="flex flex-col gap-12">
         <Typography.H1 className="text-center">{event.title}</Typography.H1>
+        <hr />
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-6">
-          <div className="md:col-span-2 space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+          <div className="md:col-span-3 space-y-6">
             <div className="minimal-tiptap-editor">
               <div
-                className="whitespace-pre-wrap"
+                className="whitespace-pre-wrap text-pretty"
                 dangerouslySetInnerHTML={{ __html: event.description }}
               />
             </div>

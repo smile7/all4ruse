@@ -15,7 +15,6 @@ export default function EventHeroImage({
 }: EventHeroImageProps) {
   const [isOpen, setIsOpen] = useState(false);
 
-  // Close on ESC key
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
       if (e.key === "Escape") setIsOpen(false);
@@ -26,9 +25,8 @@ export default function EventHeroImage({
 
   return (
     <>
-      {/* Thumbnail with permanent subtle overlay */}
       <div
-        className="group relative w-full overflow-hidden cursor-zoom-in rounded-lg shadow-md hover:shadow-lg transition"
+        className="group relative w-full overflow-hidden cursor-zoom-in rounded-md shadow-md hover:shadow-lg transition"
         onClick={() => setIsOpen(true)}
       >
         {/* Image */}
@@ -72,7 +70,7 @@ export default function EventHeroImage({
               alt={alt}
               width={1920} // helps Next optimizations
               height={1080}
-              className="object-contain w-full h-auto"
+              className="object-contain w-full h-auto rounded-md"
               draggable={false}
               onClick={(e) => e.stopPropagation()}
             />

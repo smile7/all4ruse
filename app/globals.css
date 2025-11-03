@@ -286,6 +286,14 @@
     color-scheme: dark;
   }
 
+  article a {
+    color: var(--mt-accent-bold-blue, #05c);
+    cursor: pointer;
+  }
+  article a:hover {
+    text-decoration: underline;
+  }
+
   .break-word {
     word-break: break-word;
   }
@@ -342,10 +350,4 @@
   .outline-focus {
     @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50;
   }
-}
-
-.minimal-tiptap-editor a {
-  color: var(--mt-accent-bold-blue, #05c);
-  text-decoration: underline;
-  cursor: pointer;
 }
