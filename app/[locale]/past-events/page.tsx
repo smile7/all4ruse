@@ -40,7 +40,11 @@ export default async function PastEventsPage({
           <Typography.Small>{t("pageDescription")}</Typography.Small>
         </div>
       </div>
-      <Events events={events} errorMessage={error?.message} isPastEvents />
+      <Events
+        events={events ?? []}
+        errorMessage={error?.message}
+        timeFilter="past"
+      />
     </div>
   );
 }

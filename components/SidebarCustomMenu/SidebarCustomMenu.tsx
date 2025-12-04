@@ -18,6 +18,11 @@ export function SidebarCustomMenu() {
     {
       name: `${t("menuEvents")}`,
       url: `/${locale}`,
+      emoji: "📅",
+    },
+    {
+      name: `${t("menuCurrentEvents")}`,
+      url: `/${locale}/current-events`,
       emoji: "🔥",
     },
     {

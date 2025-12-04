@@ -11,21 +11,22 @@ import { Button, Card, CardContent, ErrorAlert } from "@/components/ui";
 import { FALLBACK_IMAGE } from "@/constants";
 import { useFilteredEvents } from "@/hooks";
 import type { Event } from "@/lib/api";
-import { formatShortDate, formatTimeTZ, toTimestamp } from "@/lib/utils";
+import { formatShortDate, formatTimeTZ } from "@/lib/utils";
 
+import { EventTimeFilter, filterEventsByTime } from "./FilterByTime";
 import { EventsFilters } from "./Filters";
 
 export function Events({
   events,
   errorMessage,
-  isPastEvents = false,
+  timeFilter,
 }: {
   events: Event[];
   errorMessage?: string | null;
-  isPastEvents?: boolean;
+  timeFilter: EventTimeFilter;
 }) {
-  const filteredByTime = events.filter((e) => isPastEvent(e) === isPastEvents);
-  const { filteredEvents, filters } = useFilteredEvents(filteredByTime);
+  const timeFiltered = filterEventsByTime(events, timeFilter);
+  const { filteredEvents, filters } = useFilteredEvents(timeFiltered);
 
   return (
     <div className="flex flex-col gap-6">
@@ -34,13 +35,19 @@ export function Events({
       {filteredEvents.length === 0 ? (
         <EmptyState onReset={filters.clear} />
       ) : (
-        <EventsGrid events={filteredEvents} />
+        <EventsGrid events={filteredEvents} timeFilter={timeFilter} />
       )}
     </div>
   );
 }
 
-function EventsGrid({ events }: { events: Event[] }) {
+function EventsGrid({
+  events,
+  timeFilter,
+}: {
+  events: Event[];
+  timeFilter?: EventTimeFilter;
+}) {
   const t = useTranslations("HomePage");
   const locale = useLocale();
 
@@ -50,7 +57,6 @@ function EventsGrid({ events }: { events: Event[] }) {
       aria-label="Събития"
     >
       {events.map((e) => {
-        const isPast = isPastEvent(e);
         return (
           <Link
             key={e.id}
@@ -63,10 +69,10 @@ function EventsGrid({ events }: { events: Event[] }) {
                 flex flex-col h-full p-0 overflow-hidden border-border/60 transition-all duration-300 hover:shadow-lg
                 relative border-2 hover:border-secondary
                 after:content-[''] after:block after:w-full after:h-[10px] after:bg-[hsl(var(--secondary))] after:absolute after:bottom-0 after:left-0 
-                ${isPast ? "opacity-60 grayscale" : ""}
+                ${timeFilter === "past" ? "opacity-60 grayscale" : ""}
               `}
             >
-              {isPast && (
+              {timeFilter === "past" && (
                 <div
                   className="absolute left-1/2 top-1/4 z-40"
                   style={{
@@ -90,7 +96,7 @@ function EventsGrid({ events }: { events: Event[] }) {
                   <div className="absolute inset-0 transform-gpu will-change-transform transition-transform duration-500 ease-out group-hover:scale-[1.05]">
                     <Image
                       src={e.image || FALLBACK_IMAGE}
-                      alt={e.title || "Снимка събитие"}
+                      alt={e.title || "Event image"}
                       fill
                       sizes="18rem"
                       className="w-full object-cover"
@@ -113,7 +119,8 @@ function EventsGrid({ events }: { events: Event[] }) {
 
                 <div className="flex items-center gap-2 text-xs opacity-80">
                   <Calendar1Icon className="size-4 opacity-70 shrink-0" />
-                  {formatShortDate(e.startDate)} от {formatTimeTZ(e.startTime)}
+                  {formatShortDate(e.startDate)} {t("at")}{" "}
+                  {formatTimeTZ(e.startTime)}
                 </div>
 
                 <div className="flex items-center gap-2 text-xs opacity-80">
@@ -148,16 +155,4 @@ function EmptyState({ onReset }: { onReset: () => void }) {
       </CardContent>
     </Card>
   );
-}
-
-function isPastEvent(event: Event): boolean {
-  const now = new Date();
-
-  const date = event.endDate ?? event.startDate;
-  const time = event.endDate ? event.endTime : event.startTime;
-
-  const dateTimeStr = date && time ? `${date}T${time}` : date;
-  const eventTimestamp = toTimestamp(dateTimeStr);
-
-  return eventTimestamp !== null && eventTimestamp < now.getTime();
 }
