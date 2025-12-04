@@ -23,12 +23,14 @@
     "town": "Place",
     "organizer": "Organizer",
     "eventImages": "Picture Image",
+    "at": "at",
     "freeEvent": "Free",
     "pastEvent": "Past Event",
     "english": "English",
     "bulgarian": "Bulgarian",
-    "menuEvents": "Events",
+    "menuEvents": "Upcoming Events",
     "menuPastEvents": "Past Events",
+    "menuCurrentEvents": "Current Events",
     "more": "More",
     "clear": "Clear Filters",
     "events": "events",
@@ -87,5 +89,10 @@
     "free": "Free",
     "contactPhone": "Contacts",
     "error": "An error occurred. Please try again later."
+  },
+  "CurrentEvents": {
+    "createEvent": "Create an Event",
+    "pageTitle": "Current Events in Ruse",
+    "pageDescription": "All current cultural and non-cultural events in Ruse and the surrounding area"
   }
 }

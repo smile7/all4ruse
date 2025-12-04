@@ -6,19 +6,20 @@ import { Button } from "@/components/ui";
 import { getEvents } from "@/lib/api";
 import { createClient } from "@/lib/supabase/server";
 
-import { Events } from "./_components";
+import { Events } from "../_components";
 
-export default async function EventsPage({
+export default async function CurrentEventsPage({
   params,
 }: {
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
-  const t = await getTranslations("HomePage");
+  const t = await getTranslations("CurrentEvents");
 
   const supabase = await createClient();
   const { data: events, error } = await getEvents(supabase);
+
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -42,7 +43,7 @@ export default async function EventsPage({
       <Events
         events={events ?? []}
         errorMessage={error?.message}
-        timeFilter="upcoming"
+        timeFilter="current"
       />
     </div>
   );
