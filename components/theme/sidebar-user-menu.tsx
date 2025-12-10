@@ -1,15 +1,17 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { LogOutIcon, MoreVerticalIcon } from "lucide-react";
+import { LogOutIcon, MoreVerticalIcon, UserIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 
+import { FALLBACK_IMAGE } from "@/constants";
+import { getCurrentUserProfile } from "@/lib/api";
 import { createClient } from "@/lib/supabase/client";
 
 import {
   Avatar,
-  AvatarFallback,
+  AvatarImage,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -17,26 +19,38 @@ import {
   SidebarMenuButton,
 } from "../ui";
 
-export function SidebarUserMenu({
-  initialEmail,
-}: {
-  initialEmail: string | null;
-}) {
+type SidebarUser = {
+  fullName: string | null;
+  avatarUrl: string | null;
+};
+
+export function SidebarUserMenu() {
   const t = useTranslations("HomePage");
 
   const router = useRouter();
   const supabase = createClient();
-  const [email, setEmail] = useState<string | null>(initialEmail);
+  const [user, setUser] = useState<SidebarUser>({
+    fullName: "",
+    avatarUrl: "",
+  });
 
   useEffect(() => {
-    if (!initialEmail) {
-      supabase.auth.getUser().then(({ data }) => {
-        if (data.user) {
-          setEmail(data.user.email ?? null);
-        }
+    (async () => {
+      const { data: profile } = await getCurrentUserProfile(supabase);
+
+      if (!profile) {
+        setUser({ fullName: null, avatarUrl: null });
+        return;
+      }
+
+      setUser({
+        fullName: profile.full_name || profile.email || null,
+        avatarUrl: profile.avatar_url || null,
       });
-    }
-  }, [initialEmail, supabase]);
+    })();
+  }, [supabase]);
+
+  const { fullName, avatarUrl } = user;
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -48,25 +62,32 @@ export function SidebarUserMenu({
       <DropdownMenuTrigger asChild>
         <SidebarMenuButton className="ring-primary h-auto flex gap-2 items-center justify-center cursor-pointer">
           <Avatar>
-            <AvatarFallback>
-              {email ? email.charAt(0).toUpperCase() : t("guest")}
-            </AvatarFallback>
+            <AvatarImage
+              src={avatarUrl || FALLBACK_IMAGE}
+              alt={fullName || "Avatar"}
+            />
           </Avatar>
           <span className="inline-flex flex-col gap-1 truncate">
-            <span className="truncate">{email || t("guest")}</span>
+            <span className="truncate">{fullName || t("guest")}</span>
           </span>
-          <MoreVerticalIcon className="mt-1 ml-auto" />
+          <MoreVerticalIcon className="ml-auto" />
         </SidebarMenuButton>
       </DropdownMenuTrigger>
       <DropdownMenuContent
         side="top"
         className="w-(--radix-popper-anchor-width)"
       >
-        {email ? (
-          <DropdownMenuItem onClick={handleLogout}>
-            <LogOutIcon className="text-destructive mr-2" />
-            {t("logout")}
-          </DropdownMenuItem>
+        {fullName ? (
+          <>
+            <DropdownMenuItem onClick={() => router.push("/account")}>
+              <UserIcon className="mr-2" />
+              {t("account")}
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={handleLogout}>
+              <LogOutIcon className="text-destructive mr-2" />
+              {t("logout")}
+            </DropdownMenuItem>
+          </>
         ) : (
           <DropdownMenuItem onClick={() => router.push("/auth/login")}>
             {t("loginSignup")}

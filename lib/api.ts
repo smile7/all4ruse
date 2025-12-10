@@ -1,6 +1,12 @@
-import type { PostgrestError, SupabaseClient } from "@supabase/supabase-js";
+import type {
+  AuthError,
+  PostgrestError,
+  SupabaseClient,
+} from "@supabase/supabase-js";
 
 import type { Tables, TablesInsert, TablesUpdate } from "./database.types";
+
+// MARK: Events
 
 export type Event = Tables<"events">;
 export type NewEvent = TablesInsert<"events">;
@@ -8,7 +14,7 @@ export type EventUpdate = TablesUpdate<"events">;
 
 type ServiceResult<T> = {
   data: T;
-  error: PostgrestError | null;
+  error: PostgrestError | AuthError | null;
 };
 
 export type Host = {
@@ -19,7 +25,6 @@ export type EventRow = Omit<Tables<"events">, "organizers"> & {
   organizers: Host[];
 };
 
-// MARK: Events
 export async function getEvents(
   client: SupabaseClient
 ): Promise<ServiceResult<Event[]>> {
@@ -86,4 +91,79 @@ export async function deleteEvent(
   const { error } = await client.from("events").delete().eq("id", id);
 
   return { data: !error, error };
+}
+
+// Mark: Profiles
+
+export type Profile = Tables<"profiles">;
+export type ProfileUpdate = TablesUpdate<"profiles">;
+
+export async function getProfileById(
+  client: SupabaseClient,
+  id: string
+): Promise<ServiceResult<Profile | null>> {
+  const { data, error } = await client
+    .from("profiles")
+    .select("*")
+    .eq("id", id)
+    .maybeSingle();
+
+  return { data: data ?? null, error };
+}
+
+export async function getCurrentUserProfile(client: SupabaseClient): Promise<
+  ServiceResult<
+    | (Profile & {
+        email?: string | null;
+      })
+    | null
+  >
+> {
+  const {
+    data: { user },
+    error: userError,
+  } = await client.auth.getUser();
+
+  if (userError || !user) {
+    return { data: null, error: userError };
+  }
+  const { data: profile, error: profileError } = await client
+    .from("profiles")
+    .select("*")
+    .eq("id", user.id)
+    .maybeSingle();
+
+  if (profileError || !profile) {
+    return {
+      data: profile ? { ...profile, email: user.email ?? null } : null,
+      error: profileError,
+    };
+  }
+
+  return {
+    data: { ...profile, email: user.email ?? null },
+    error: null,
+  };
+}
+
+export async function updateCurrentUserProfile(
+  client: SupabaseClient,
+  patch: ProfileUpdate
+): Promise<ServiceResult<Profile | null>> {
+  const {
+    data: { user },
+    error: userError,
+  } = await client.auth.getUser();
+
+  if (userError || !user) {
+    return { data: null, error: userError };
+  }
+  const { data, error } = await client
+    .from("profiles")
+    .update(patch)
+    .eq("id", user.id)
+    .select("*")
+    .maybeSingle();
+
+  return { data: data ?? null, error };
 }
