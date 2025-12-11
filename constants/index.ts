@@ -4,6 +4,9 @@ export const FALLBACK_IMAGE = "/no-image.png";
 export const DEBOUNCE_MS = 400;
 export const EMPTY_DISPLAY = "—";
 
+export const DEFAULT_AVATAR =
+  "https://lohdrrezrtmcupuogytt.supabase.co/storage/v1/object/public/avatars/cat.png";
+
 export const BREAKPOINTS = {
   sm: "640px",
   md: "768px",

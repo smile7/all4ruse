@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { LogOutIcon, MoreVerticalIcon, UserIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 
 import { FALLBACK_IMAGE } from "@/constants";
 import { getCurrentUserProfile } from "@/lib/api";
@@ -26,6 +26,7 @@ type SidebarUser = {
 
 export function SidebarUserMenu() {
   const t = useTranslations("HomePage");
+  const locale = useLocale();
 
   const router = useRouter();
   const supabase = createClient();
@@ -79,7 +80,8 @@ export function SidebarUserMenu() {
       >
         {fullName ? (
           <>
-            <DropdownMenuItem onClick={() => router.push("/account")}>
+            {/* TODO: add published events page */}
+            <DropdownMenuItem onClick={() => router.push(`/${locale}/profile`)}>
               <UserIcon className="mr-2" />
               {t("account")}
             </DropdownMenuItem>
@@ -89,7 +91,9 @@ export function SidebarUserMenu() {
             </DropdownMenuItem>
           </>
         ) : (
-          <DropdownMenuItem onClick={() => router.push("/auth/login")}>
+          <DropdownMenuItem
+            onClick={() => router.push(`/${locale}/auth/login`)}
+          >
             {t("loginSignup")}
           </DropdownMenuItem>
         )}

@@ -95,5 +95,28 @@
     "createEvent": "Create an Event",
     "pageTitle": "Current Events in Ruse",
     "pageDescription": "All current cultural and non-cultural events in Ruse and the surrounding area"
+  },
+  "Profile": {
+    "personal": "Personal",
+    "personalInformation": "Personal Information",
+    "personalInformationDescr": "Update your personal information and contact details.",
+    "fullName": "Full Name",
+    "email": "Email Address",
+    "username": "Username",
+    "website": "Website",
+    "edit": "Save",
+    "savedMessage": "Profile updated successfully.",
+    "errorMessage": "Error updating profile.",
+    "account": "Account",
+    "accountSettings": "Account Settings",
+    "status": "Account Status",
+    "statusDescr": "Your account is currently active.",
+    "active": "Active",
+    "password": "Password",
+    "passwordDescr": "Last changed 3 months ago",
+    "changePassword": "Change Password",
+    "dangerZone": "Danger Zone",
+    "deleteAccount": "Delete Account",
+    "deleteAccountDescr": "If you delete your account, it cannot be recovered. Please be sure you want to delete your account before proceeding."
   }
 }
