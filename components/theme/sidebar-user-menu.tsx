@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { LogOutIcon, MoreVerticalIcon, UserIcon } from "lucide-react";
+import { ListIcon, LogOutIcon, MoreVerticalIcon, UserIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 
@@ -80,7 +80,12 @@ export function SidebarUserMenu() {
       >
         {fullName ? (
           <>
-            {/* TODO: add published events page */}
+            <DropdownMenuItem
+              onClick={() => router.push(`/${locale}/published-events`)}
+            >
+              <ListIcon className="mr-2" />
+              {t("publishedEvents")}
+            </DropdownMenuItem>
             <DropdownMenuItem onClick={() => router.push(`/${locale}/profile`)}>
               <UserIcon className="mr-2" />
               {t("account")}

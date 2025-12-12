@@ -35,7 +35,7 @@
     "more": "Още",
     "clear": "Изчисти филтрите",
     "events": "събития",
-    "noEvents": "Няма намерени събития по избраните критерии."
+    "publishedEvents": "Публикувани Събития"
   },
   "CreateEvent": {
     "createEventTitle": "Създай Ново Събитие",
@@ -72,8 +72,7 @@
     "addOrganizer": "Добави друг организатор",
     "organizerName": "Име на организатора",
     "enterOrganizerName": "Куклен театър Русе",
-    "organizerLink": "Линк към организатора",
-    "enterOrganizerLink": "https://"
+    "organizerLink": "Линк към организатора"
   },
   "PastEvents": {
     "createEvent": "Създай Събитие",
