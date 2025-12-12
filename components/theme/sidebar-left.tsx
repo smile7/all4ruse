@@ -34,7 +34,7 @@ const favorites = [
   },
 ];
 
-export function SidebarLeft({ еmail }: { еmail?: string | null }) {
+export function SidebarLeft() {
   const { theme, systemTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
@@ -73,7 +73,7 @@ export function SidebarLeft({ еmail }: { еmail?: string | null }) {
         <SidebarFooter>
           <SidebarMenu>
             <SidebarMenuItem>
-              <SidebarUserMenu initialEmail={еmail ?? null} />
+              <SidebarUserMenu />
             </SidebarMenuItem>
           </SidebarMenu>
         </SidebarFooter>

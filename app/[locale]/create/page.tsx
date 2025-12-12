@@ -25,20 +25,25 @@ import {
   Input,
 } from "@/components/ui";
 import { MinimalTiptapEditor } from "@/components/ui/minimal-tiptap";
+import { EVENTS_BUCKET } from "@/constants";
+import { useCreateEvent } from "@/hooks/query";
 import { createEventSchema, CreateEventSchemaType } from "@/lib/schema";
 import { createClient } from "@/lib/supabase/client";
+import { slugify } from "@/lib/utils";
 
 import { EventDateSelector } from "../_components";
-import { createEventAction } from "../actions";
+import { validateAndUploadEventImageClient } from "../actions";
 
 export default function CreateEventPage() {
   const t = useTranslations("CreateEvent");
 
   const [authChecked, setAuthChecked] = useState(false);
   const [files, setFiles] = useState<File[]>([]);
-  const [serverError, setServerError] = useState<string | null>(null);
 
   const router = useRouter();
+  const supabase = createClient();
+
+  const { mutateAsync, isPending, error } = useCreateEvent();
 
   const defaultValues = {
     title: "",
@@ -54,6 +59,8 @@ export default function CreateEventPage() {
     ticketsLink: "",
     price: "",
     phoneNumber: "",
+    image: undefined,
+    images: [],
   };
 
   const form = useForm<CreateEventSchemaType>({
@@ -63,10 +70,31 @@ export default function CreateEventPage() {
 
   const onDrop = useCallback(
     (acceptedFiles: File[]) => {
-      setFiles(acceptedFiles);
-      if (acceptedFiles[0]) {
-        form.setValue("image", acceptedFiles[0]); // store file in RHF
-      }
+      setFiles((prev) => {
+        const next = [...prev, ...acceptedFiles];
+        const uniqueByName = Array.from(
+          new Map(next.map((f) => [f.name, f])).values()
+        );
+
+        form.setValue("image", uniqueByName[0] ?? undefined);
+        form.setValue("images", uniqueByName);
+        return uniqueByName;
+      });
+    },
+    [form]
+  );
+
+  const removeImage = useCallback(
+    (idx: number) => {
+      setFiles((prev) => {
+        const next = [...prev];
+        const [removed] = next.splice(idx, 1);
+        if (removed) URL.revokeObjectURL(URL.createObjectURL(removed));
+
+        form.setValue("image", next[0] ?? undefined);
+        form.setValue("images", next);
+        return next;
+      });
     },
     [form]
   );
@@ -79,12 +107,26 @@ export default function CreateEventPage() {
       "image/webp": [],
       "image/gif": [],
     },
-    maxSize: 1 * 1024 * 1024,
+    maxSize: 1 * 1024 * 1024, // 1MB
     multiple: true,
   });
 
+  const makeCover = useCallback(
+    (idx: number) => {
+      setFiles((prev) => {
+        if (idx <= 0) return prev;
+        const next = [...prev];
+        const [picked] = next.splice(idx, 1);
+        next.unshift(picked);
+        form.setValue("image", next[0]);
+        form.setValue("images", next);
+        return next;
+      });
+    },
+    [form]
+  );
+
   useEffect(() => {
-    const supabase = createClient();
     supabase.auth.getUser().then(({ data }) => {
       if (!data.user) {
         router.replace("/auth/login");
@@ -92,31 +134,49 @@ export default function CreateEventPage() {
         setAuthChecked(true);
       }
     });
-  }, [router]);
+  }, [router, supabase]);
 
   const onSubmit = async (values: CreateEventSchemaType) => {
-    const formData = new FormData();
-    Object.entries(values).forEach(([key, val]) => {
-      if (val instanceof File) {
-        formData.append(key, val);
-      } else if (Array.isArray(val) || typeof val === "object") {
-        formData.append(key, JSON.stringify(val));
-      } else {
-        formData.append(key, String(val));
-      }
-    });
-
-    try {
-      const state = await createEventAction({ error: null }, formData);
-      if (state.error && state.error.length > 0) {
-        setServerError(state.error);
-      }
-    } catch (err) {
-      setServerError(
-        err instanceof Error ? err.message : "Unexpected error occurred"
+    const uploads: string[] = [];
+    for (const f of files) {
+      const url = await validateAndUploadEventImageClient(
+        supabase,
+        f,
+        "events",
+        EVENTS_BUCKET
       );
+      if (url) uploads.push(url);
     }
+    const coverUrl = uploads[0];
+
+    const payload = {
+      title: values.title,
+      description: values.description,
+      address: values.address,
+      place: values.place,
+      town: values.town,
+      startDate: values.startDate,
+      startTime: values.startTime,
+      endDate: values.endDate,
+      endTime: values.endTime,
+      organizers: values.organizers,
+      ticketsLink: values.ticketsLink || null,
+      price: values.price || null,
+      phoneNumber: values.phoneNumber || null,
+      image: coverUrl || null,
+      images: uploads.length > 1 ? uploads : null,
+      slug: slugify(values.title),
+    };
+
+    const result = await mutateAsync(payload);
+
+    if (result?.error) {
+      return <>errorrr</>;
+    }
+
+    router.push("/");
   };
+  console.log(form.formState.errors);
 
   if (!authChecked)
     return <div>Влезте в профила си, за да създадете събитие!</div>;
@@ -148,7 +208,7 @@ export default function CreateEventPage() {
                 <FormLabel isRequired>{t("description")}</FormLabel>
                 <FormControl>
                   <MinimalTiptapEditor
-                    value={field.value} // as Content}
+                    value={field.value}
                     onChange={field.onChange}
                     className="w-full"
                     editorContentClassName="p-5"
@@ -316,7 +376,7 @@ export default function CreateEventPage() {
           </div>
 
           <FormItem>
-            <FormLabel isRequired>{t("images")}</FormLabel>
+            <FormLabel>{t("images")}</FormLabel>
             <FormControl>
               <div
                 {...getRootProps({
@@ -337,27 +397,61 @@ export default function CreateEventPage() {
             </FormControl>
 
             {files.length > 0 && (
-              <div className="mt-2">
-                <p className="text-sm font-medium">Preview:</p>
-                {files.map((file) => (
-                  <Image
-                    key={file.name}
-                    width={400}
-                    height={300}
-                    src={URL.createObjectURL(file)}
-                    alt="Preview"
-                    className="mt-1 max-h-48 rounded-md object-contain"
-                  />
+              <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {files.map((file, idx) => (
+                  <div key={file.name} className="relative group">
+                    <Image
+                      key={file.name}
+                      width={400}
+                      height={300}
+                      src={URL.createObjectURL(file)}
+                      alt="image"
+                      className="rounded-md object-contain"
+                    />
+
+                    <button
+                      type="button"
+                      aria-label="Remove image"
+                      onClick={() => removeImage(idx)}
+                      className="absolute top-2 right-2 size-8 cursor-pointer items-center justify-center rounded-full bg-black/60 text-white hover:opacity-80"
+                    >
+                      ×
+                    </button>
+                    {idx !== 0 && (
+                      <button
+                        type="button"
+                        aria-label="Make cover"
+                        onClick={() => makeCover(idx)}
+                        className="absolute bottom-2 right-2 inline-flex h-7 px-3 items-center justify-center rounded-md bg-blue-600/80 text-white text-xs hover:bg-blue-600"
+                      >
+                        Set as cover
+                      </button>
+                    )}
+                    {idx === 0 && (
+                      <span className="absolute bottom-2 left-2 rounded-md bg-blue-600/80 text-white text-xs px-2 py-1">
+                        Cover
+                      </span>
+                    )}
+                  </div>
                 ))}
               </div>
             )}
             <FormMessage />
           </FormItem>
 
-          {serverError && <ErrorAlert error={serverError} className="mt-4" />}
+          {Boolean(error) && (
+            <ErrorAlert
+              error={
+                error instanceof Error
+                  ? error.message
+                  : "Възникна неочаквана грешка."
+              }
+              className="mt-4"
+            />
+          )}
 
           <div className="flex justify-end">
-            <SubmitButton disabled={form.formState.isSubmitting}>
+            <SubmitButton disabled={form.formState.isSubmitting || isPending}>
               {t("submitButton")}
             </SubmitButton>
           </div>

@@ -30,12 +30,8 @@ export const createEventSchema = (t: (key: string) => string) =>
       ticketsLink: z.string().optional().or(z.literal("")),
       price: z.string().optional().or(z.literal("")),
       phoneNumber: z.string().optional().or(z.literal("")),
-      image: z
-        .union([
-          z.instanceof(File),
-          z.string().url({ message: t("invalidUrl") }),
-        ])
-        .optional(),
+      image: z.instanceof(File).optional(),
+      images: z.array(z.instanceof(File)).optional(),
     })
     .superRefine((data, ctx) => {
       if (data.endDate < data.startDate) {
@@ -74,4 +70,5 @@ export const defaultEventValues = (): CreateEventSchemaType => ({
   price: "",
   phoneNumber: "",
   image: undefined,
+  images: [],
 });

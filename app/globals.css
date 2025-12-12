@@ -297,6 +297,11 @@
   .break-word {
     word-break: break-word;
   }
+
+  /* hide nextjs overlay icon */
+  /* nextjs-portal {
+    display: none;
+  } */
 }
 
 /* ---- Line Clamp ------------------------------------- */
