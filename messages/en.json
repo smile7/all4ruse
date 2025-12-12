@@ -35,7 +35,7 @@
     "more": "More",
     "clear": "Clear Filters",
     "events": "events",
-    "noEvents": "No events found for the search criteria."
+    "publishedEvents": "Published Events"
   },
   "CreateEvent": {
     "createEventTitle": "Create New Event",
@@ -72,8 +72,7 @@
     "addOrganizer": "Add an Organizer",
     "organizerName": "Host Name",
     "enterOrganizerName": "Puppet Theater Ruse",
-    "organizerLink": "Organizer Link",
-    "enterOrganizerLink": "https://"
+    "organizerLink": "Organizer Link"
   },
   "PastEvents": {
     "createEvent": "Create an Event",
