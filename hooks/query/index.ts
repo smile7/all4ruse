@@ -4,13 +4,13 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import {
   createEvent,
+  type CreateNewEvent,
   deleteEvent,
   type Event,
   type EventUpdate,
   getCurrentUserProfile,
   getEventBySlug,
   getEvents,
-  type NewEvent,
   updateCurrentUserProfile,
   updateEvent,
 } from "@/lib/api";
@@ -109,12 +109,18 @@ export function useCreateEvent() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (payload: NewEvent) => {
-      const { data, error } = await createEvent(supabase, payload);
-      if (error) throw error;
-      return data;
+    mutationFn: async (body: CreateNewEvent) => {
+      return await createEvent(supabase, body);
+      //   const { data, error } = await createEvent(supabase, body);
+      //   if (error) throw error;
+      //   return data;
     },
     onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: eventQueryKeys.list(),
+      });
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({
         queryKey: eventQueryKeys.list(),
       });

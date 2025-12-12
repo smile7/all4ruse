@@ -1,4 +1,4 @@
-export const BUCKET = "event-images";
+export const EVENTS_BUCKET = "event-images";
 export const THEME_STORE_KEY = "theme";
 export const FALLBACK_IMAGE = "/no-image.png";
 export const DEBOUNCE_MS = 400;

@@ -9,7 +9,7 @@ import type { Tables, TablesInsert, TablesUpdate } from "./database.types";
 // MARK: Events
 
 export type Event = Tables<"events">;
-export type NewEvent = TablesInsert<"events">;
+export type CreateNewEvent = TablesInsert<"events">;
 export type EventUpdate = TablesUpdate<"events">;
 
 type ServiceResult<T> = {
@@ -51,7 +51,7 @@ export async function getEventBySlug(
 
 export async function createEvent(
   client: SupabaseClient,
-  payload: NewEvent
+  payload: CreateNewEvent
 ): Promise<ServiceResult<Event | null>> {
   const { data, error } = await client
     .from("events")

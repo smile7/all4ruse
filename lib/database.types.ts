@@ -24,6 +24,7 @@ export type Database = {
           endTime: string
           id: number
           image: string | null
+          images: Json | null
           organizers: Json | null
           phoneNumber: string | null
           place: string | null
@@ -44,6 +45,7 @@ export type Database = {
           endTime: string
           id?: number
           image?: string | null
+          images?: Json | null
           organizers?: Json | null
           phoneNumber?: string | null
           place?: string | null
@@ -64,6 +66,7 @@ export type Database = {
           endTime?: string
           id?: number
           image?: string | null
+          images?: Json | null
           organizers?: Json | null
           phoneNumber?: string | null
           place?: string | null
