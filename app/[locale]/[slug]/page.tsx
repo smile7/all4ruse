@@ -2,6 +2,7 @@ import { getTranslations } from "next-intl/server";
 
 import { EventDetailsCard } from "@/components/EventDetailsCard";
 import EventHeroImage from "@/components/EventHeroImage/EventHeroImage";
+import { ImagesGallery } from "@/components/ImagesGallery";
 import { Typography } from "@/components/Typography";
 import { getEventBySlug } from "@/lib/api";
 import { createClient } from "@/lib/supabase/server";
@@ -18,6 +19,10 @@ export default async function EventPage(props: {
   const { data: event, error } = await getEventBySlug(supabase, slug);
 
   if (error || !event) return <div>{t("error")}</div>;
+
+  const images: string[] = Array.isArray(event.images)
+    ? event.images.filter((x): x is string => typeof x === "string")
+    : [];
 
   return (
     <div className="flex flex-col gap-12">
@@ -39,6 +44,13 @@ export default async function EventPage(props: {
             <EventDetailsCard event={event} />
           </div>
         </div>
+
+        {images.length > 0 && (
+          <section className="mt-8 space-y-4">
+            <Typography.H3>{t("gallery")}</Typography.H3>
+            <ImagesGallery images={images} title={event.title} />
+          </section>
+        )}
       </article>
     </div>
   );
