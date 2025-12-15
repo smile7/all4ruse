@@ -590,7 +590,7 @@ export function EventForm({ mode, event }: EventFormProps) {
 
                       {idx === 0 && (
                         <span className="absolute bottom-2 left-2 rounded-md bg-blue-600/80 text-white text-xs px-2 py-1">
-                          {t("coverImage")}
+                          {t("cover")}
                         </span>
                       )}
                     </div>
