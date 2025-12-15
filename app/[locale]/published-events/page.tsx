@@ -1,42 +1,75 @@
 "use client";
 
-// import { useMemo } from "react";
+import { useMemo } from "react";
+import { useTranslations } from "next-intl";
 
 import { Typography } from "@/components/Typography";
-// import { ErrorAlert } from "@/components/ui";
-// import { useEvents, useProfile } from "@/hooks/query";
+import { ErrorAlert } from "@/components/ui";
+import { useEvents, useProfile } from "@/hooks/query";
 
-// import { Events } from "../_components";
+import { EventsGrid, filterEventsByTime } from "../_components";
 
 export default function PublishedEventsPage() {
-  //   const { data: profile, isLoading: isProfileLoading } = useProfile();
-  //   const { data: events = [], isLoading: isEventsLoading, error } = useEvents();
+  const t = useTranslations("HomePage");
 
-  //   const myEvents = useMemo(() => {
-  //     if (!profile) return events;
+  const { data: profile, isLoading: isProfileLoading } = useProfile();
+  const { data: events, isLoading: isEventsLoading, error } = useEvents();
 
-  //     // ⬇️ IMPORTANT:
-  //     // Replace `created_by` with the actual foreign-key field in your `events` table
-  //     // that points to the user/profile (e.g. `owner_id`, `creator_id`, `profile_id`, etc).
-  //     return events.filter((e) => (e as any).created_by === profile.id);
-  //   }, [events, profile]);
+  const userEvents = useMemo(() => {
+    if (!events || !profile) {
+      return [];
+    }
 
-  //   if (isProfileLoading || isEventsLoading) {
-  //     return <p>Loading...</p>;
-  //   }
+    return events.filter((e) => e.createdBy === profile?.id);
+  }, [events, profile]);
+
+  const upcomingEvents = useMemo(
+    () => filterEventsByTime(userEvents, "upcoming"),
+    [userEvents]
+  );
+
+  const currentEvents = useMemo(
+    () => filterEventsByTime(userEvents, "current"),
+    [userEvents]
+  );
+
+  const pastEvents = useMemo(
+    () => filterEventsByTime(userEvents, "past"),
+    [userEvents]
+  );
+
+  // TODO: skeleton
+  if (isProfileLoading || isEventsLoading) {
+    return <p>Loading...</p>;
+  }
+
+  if (!events) {
+    return <Typography.P>{t("noEventsFound")}</Typography.P>;
+  }
 
   return (
     <div className="space-y-10">
-      {/* {error && <ErrorAlert error={error.message} />} */}
+      {error && <ErrorAlert error={error.message} />}
+
+      {Boolean(error) && (
+        <Typography.Small className="text-red-600">
+          {t("error")} {error?.message}
+        </Typography.Small>
+      )}
 
       <section className="space-y-4">
-        <Typography.H2>Upcoming and current events</Typography.H2>
-        {/* <Events events={myEvents} timeFilter="upcoming" showEditButton /> */}
+        <Typography.H2>{t("menuEvents")}</Typography.H2>
+        <EventsGrid events={upcomingEvents} timeFilter="upcoming" isEditMode />
       </section>
 
       <section className="space-y-4">
-        <Typography.H2>Past events</Typography.H2>
-        {/* <Events events={myEvents} timeFilter="past" showEditButton /> */}
+        <Typography.H2>{t("menuCurrentEvents")}</Typography.H2>
+        <EventsGrid events={currentEvents} timeFilter="current" isEditMode />
+      </section>
+
+      <section className="space-y-4">
+        <Typography.H2>{t("menuPastEvents")}</Typography.H2>
+        <EventsGrid events={pastEvents} timeFilter="past" isEditMode />
       </section>
     </div>
   );

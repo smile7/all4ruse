@@ -35,10 +35,13 @@
     "more": "More",
     "clear": "Clear Filters",
     "events": "events",
-    "publishedEvents": "Published Events"
+    "publishedEvents": "Published Events",
+    "noEventsFound": "No events found.",
+    "error": "An error occurred. Please try again later."
   },
   "CreateEvent": {
     "createEventTitle": "Create New Event",
+    "editEventTitle": "Edit Event",
     "title": "Title",
     "enterTitle": "Enter title",
     "description": "Description",
@@ -63,7 +66,7 @@
     "enterPrice": "Enter price or price range (0 for free event)",
     "phoneNumber": "Contact Phone Number",
     "enterPhoneNumber": "Enter phone number",
-    "submitButton": "Create",
+    "submitButton": "Save",
     "requiredField": "This field is required",
     "invalidUrl": "Invalid link",
     "atLeastOneOrganizer": "At least one organizer is required",
@@ -72,7 +75,11 @@
     "addOrganizer": "Add an Organizer",
     "organizerName": "Host Name",
     "enterOrganizerName": "Puppet Theater Ruse",
-    "organizerLink": "Organizer Link"
+    "organizerLink": "Organizer Link",
+    "eventNotFound": "Event not found.",
+    "cover": "Cover",
+    "makeCover": "Set as cover",
+    "error": "An error occurred. Please try again later."
   },
   "PastEvents": {
     "createEvent": "Create an Event",

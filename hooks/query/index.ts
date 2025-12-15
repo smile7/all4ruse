@@ -133,17 +133,28 @@ export function useUpdateEvent() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ id, patch }: { id: number; patch: EventUpdate }) => {
+    mutationFn: async ({
+      id,
+      slug,
+      patch,
+    }: {
+      id: number;
+      slug: string;
+      patch: EventUpdate;
+    }) => {
       const { data, error } = await updateEvent(supabase, id, patch);
       if (error) throw error;
       return data;
     },
-    onSuccess: (_data, { id }) => {
+    onSuccess: (_data, { id, slug }) => {
       queryClient.invalidateQueries({
         queryKey: eventQueryKeys.list(),
       });
       queryClient.invalidateQueries({
         queryKey: eventQueryKeys.byId(id),
+      });
+      queryClient.invalidateQueries({
+        queryKey: eventQueryKeys.bySlug(slug),
       });
     },
   });
