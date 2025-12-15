@@ -35,10 +35,13 @@
     "more": "Още",
     "clear": "Изчисти филтрите",
     "events": "събития",
-    "publishedEvents": "Публикувани Събития"
+    "publishedEvents": "Публикувани Събития",
+    "noEventsFound": "Няма намерени събития.",
+    "error": "Възникна грешка. Моля опитайте отново по-късно."
   },
   "CreateEvent": {
     "createEventTitle": "Създай Ново Събитие",
+    "editEventTitle": "Редактирай Събитие",
     "title": "Заглавие",
     "enterTitle": "Заглавие на събитието",
     "description": "Описание",
@@ -63,7 +66,7 @@
     "enterPrice": "0",
     "phoneNumber": "Телефон за контакти",
     "enterPhoneNumber": "08ХХ ХХХ ХХХ",
-    "submitButton": "Създай",
+    "submitButton": "Запази",
     "requiredField": "Това поле е задължително",
     "invalidUrl": "Невалиден линк",
     "atLeastOneOrganizer": "Трябва да има поне един организатор",
@@ -72,7 +75,11 @@
     "addOrganizer": "Добави друг организатор",
     "organizerName": "Име на организатора",
     "enterOrganizerName": "Куклен театър Русе",
-    "organizerLink": "Линк към организатора"
+    "organizerLink": "Линк към организатора",
+    "eventNotFound": "Събитието не е намерено.",
+    "cover": "Главна",
+    "makeCover": "Направи главна",
+    "error": "Възникна грешка. Моля опитайте отново по-късно."
   },
   "PastEvents": {
     "createEvent": "Създай Събитие",
