@@ -51,6 +51,7 @@ export function SignUpForm({
           data: {
             full_name: fullName,
             website: website,
+            email: email,
           },
         },
       });

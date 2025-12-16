@@ -54,8 +54,13 @@ export function SidebarUserMenu() {
   const { fullName, avatarUrl } = user;
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
-    router.replace("/auth/login");
+    await fetch(`/${locale}/auth/signout`, {
+      method: "POST",
+      credentials: "include",
+    });
+
+    router.replace(`/${locale}/auth/login`);
+    router.refresh();
   };
 
   return (

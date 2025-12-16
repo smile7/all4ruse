@@ -78,11 +78,20 @@ export type Database = {
           title?: string
           town?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "events_createdBy_fkey"
+            columns: ["createdBy"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
           avatar_url: string | null
+          email: string | null
           full_name: string | null
           id: string
           updated_at: string | null
@@ -91,6 +100,7 @@ export type Database = {
         }
         Insert: {
           avatar_url?: string | null
+          email?: string | null
           full_name?: string | null
           id: string
           updated_at?: string | null
@@ -99,6 +109,7 @@ export type Database = {
         }
         Update: {
           avatar_url?: string | null
+          email?: string | null
           full_name?: string | null
           id?: string
           updated_at?: string | null
