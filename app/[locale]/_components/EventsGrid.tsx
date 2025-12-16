@@ -31,6 +31,7 @@ export function EventsGrid({
       className="grid gap-6 [grid-template-columns:repeat(auto-fill,minmax(min(100%,18rem),1fr))]"
       aria-label="Събития"
     >
+      {events.length === 0 && <Typography.P>{t("noEvents")}</Typography.P>}
       {events.map((e) => {
         return (
           <Link

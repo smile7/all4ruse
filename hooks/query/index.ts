@@ -22,7 +22,7 @@ export type ProfileFormValues = {
   full_name: string;
   email: string;
   username: string;
-  website: string;
+  website?: string;
 };
 
 const profileQueryKeys = {
@@ -51,6 +51,7 @@ export function useUpdateProfile() {
     mutationFn: async (values: ProfileFormValues) => {
       const { error } = await updateCurrentUserProfile(supabase, {
         full_name: values.full_name || null,
+        email: values.email || null,
         username: values.username || null,
         website: values.website || null,
       });

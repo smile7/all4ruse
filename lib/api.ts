@@ -148,7 +148,7 @@ export async function getCurrentUserProfile(client: SupabaseClient): Promise<
 
 export async function updateCurrentUserProfile(
   client: SupabaseClient,
-  patch: ProfileUpdate
+  payload: ProfileUpdate
 ): Promise<ServiceResult<Profile | null>> {
   const {
     data: { user },
@@ -160,7 +160,7 @@ export async function updateCurrentUserProfile(
   }
   const { data, error } = await client
     .from("profiles")
-    .update(patch)
+    .update(payload)
     .eq("id", user.id)
     .select("*")
     .maybeSingle();
