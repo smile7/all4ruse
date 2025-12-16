@@ -1,11 +1,9 @@
 export const EVENTS_BUCKET = "event-images";
 export const THEME_STORE_KEY = "theme";
 export const FALLBACK_IMAGE = "/no-image.png";
+export const DEFAULT_AVATAR = "/cat.png";
 export const DEBOUNCE_MS = 400;
 export const EMPTY_DISPLAY = "—";
-
-export const DEFAULT_AVATAR =
-  "https://lohdrrezrtmcupuogytt.supabase.co/storage/v1/object/public/avatars/cat.png";
 
 export const BREAKPOINTS = {
   sm: "640px",
