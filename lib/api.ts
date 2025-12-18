@@ -158,6 +158,7 @@ export async function updateCurrentUserProfile(
   if (userError || !user) {
     return { data: null, error: userError };
   }
+
   const { data, error } = await client
     .from("profiles")
     .update(payload)

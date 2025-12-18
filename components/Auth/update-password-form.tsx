@@ -1,80 +1,151 @@
 "use client";
 
-import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { useTranslations } from "next-intl";
+import { toast } from "sonner";
 
-import { Button } from "@/components/ui/button";
 import {
+  Button,
   Card,
   CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+  Input,
+} from "@/components/ui";
 import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
+
+type UpdatePasswordFormValues = {
+  password: string;
+  confirmPassword: string;
+};
 
 export function UpdatePasswordForm({
   className,
   ...props
 }: React.ComponentPropsWithoutRef<"div">) {
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const t = useTranslations("Profile");
+  const supabase = createClient();
 
-  const handleForgotPassword = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const supabase = createClient();
-    setIsLoading(true);
-    setError(null);
+  const form = useForm<UpdatePasswordFormValues>({
+    defaultValues: {
+      password: "",
+      confirmPassword: "",
+    },
+  });
 
-    if (password.length < 6) {
-      setError("Password must be at least 6 characters.");
-      setIsLoading(false);
+  const onSubmit = async (values: UpdatePasswordFormValues) => {
+    form.clearErrors();
+
+    if (values.password.length < 6) {
+      form.setError("password", {
+        type: "manual",
+        message: "Password must be at least 6 characters.",
+      });
+      return;
+    }
+
+    if (values.password !== values.confirmPassword) {
+      form.setError("confirmPassword", {
+        type: "manual",
+        message: "Passwords must match.",
+      });
       return;
     }
 
     try {
-      const { error } = await supabase.auth.updateUser({ password });
-      if (error) throw error;
-      // TODO: push msg successfully updated
-    } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : "An error occurred");
-    } finally {
-      setIsLoading(false);
+      const { error } = await supabase.auth.updateUser({
+        password: values.password,
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      toast.success(t("passwordUpdatedSuccessfully"));
+      form.reset();
+      // TODO: show success message / toast
+    } catch (err: unknown) {
+      form.setError("root", {
+        type: "server",
+        message:
+          err instanceof Error ? err.message : "An unexpected error occurred.",
+      });
     }
   };
+
+  const {
+    handleSubmit,
+    control,
+    formState: { isSubmitting, errors },
+  } = form;
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
-        <CardHeader>
-          <CardTitle className="text-2xl">Reset Your Password</CardTitle>
-          <CardDescription>
-            Please enter your new password below.
-          </CardDescription>
-        </CardHeader>
         <CardContent>
-          <form onSubmit={handleForgotPassword}>
-            <div className="flex flex-col gap-6">
-              <div className="grid gap-2">
-                <Label htmlFor="password">New password</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="New password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
+          <Form {...form}>
+            <form
+              onSubmit={handleSubmit(onSubmit)}
+              className="flex flex-col gap-6"
+            >
+              <FormField
+                control={control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("newPassword")}</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="password"
+                        autoComplete="new-password"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={control}
+                name="confirmPassword"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("repeatPassword")}</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="password"
+                        autoComplete="new-password"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {errors.root?.message && (
+                <p className="text-sm text-red-500">
+                  {errors.root.message as string}
+                </p>
+              )}
+
+              <div className="flex justify-end">
+                <Button
+                  type="submit"
+                  disabled={isSubmitting}
+                  isLoading={isSubmitting}
+                >
+                  {t("edit")}
+                </Button>
               </div>
-              {error && <p className="text-sm text-red-500">{error}</p>}
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? "Saving..." : "Save new password"}
-              </Button>
-            </div>
-          </form>
+            </form>
+          </Form>
         </CardContent>
       </Card>
     </div>

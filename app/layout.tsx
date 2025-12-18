@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { Toaster } from "sonner";
 
 import { QueryProvider } from "@/components/QueryProvider";
 import { ThemeProvider } from "@/components/theme";
@@ -39,6 +40,7 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
+            <Toaster richColors />
             <TooltipProvider>{children}</TooltipProvider>
           </ThemeProvider>
         </QueryProvider>
