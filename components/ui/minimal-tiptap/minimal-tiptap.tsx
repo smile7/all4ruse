@@ -3,6 +3,7 @@ import { type Content, type Editor, EditorContent } from "@tiptap/react";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 
+import { EmojiButton } from "./components/emoji-button";
 import { LinkBubbleMenu } from "./components/bubble-menu/link-bubble-menu";
 import { MeasuredContainer } from "./components/measured-container";
 import { SectionFive } from "./components/section/five";
@@ -43,6 +44,8 @@ const Toolbar = ({ editor }: { editor: Editor }) => (
         ]}
         mainActionCount={3}
       />
+
+      <EmojiButton editor={editor} />
 
       {/* <Separator orientation="vertical" className="mx-2" /> */}
 
@@ -93,7 +96,7 @@ export const MinimalTiptapEditor = ({
       className={cn(
         "border-input min-data-[orientation=vertical]:h-72 flex h-auto w-full flex-col rounded-md border shadow-xs",
         "focus-within:border-ring focus-within:ring-ring/50 focus-within:ring-[3px]",
-        className
+        className,
       )}
     >
       <Toolbar editor={editor} />

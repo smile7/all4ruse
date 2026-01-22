@@ -7,7 +7,6 @@ import { Typography } from "@/components/Typography";
 import { Card, CardContent, CardTitle } from "@/components/ui";
 import { TAG_LABELS_BG } from "@/constants";
 import { getEventBySlug, type Tag } from "@/lib/api";
-import { htmlToPlainWithNewlines } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/server";
 
 import "@/components/ui/minimal-tiptap/styles/index.css";
@@ -46,8 +45,6 @@ export default async function EventPage(props: {
     ? event.images.filter((x): x is string => typeof x === "string")
     : [];
 
-  const descriptionText = htmlToPlainWithNewlines(event.description ?? "");
-
   return (
     <div className="flex flex-col gap-6">
       {event.image && <EventHeroImage src={event.image} alt={event.title} />}
@@ -80,9 +77,12 @@ export default async function EventPage(props: {
           <div className="grid grid-cols-1 gap-8 md:grid-cols-4">
             <div className="md:col-span-3 space-y-6">
               <div className="minimal-tiptap-editor">
-                <div className="whitespace-pre-wrap text-pretty">
-                  {descriptionText}
-                </div>
+                <div
+                  className="whitespace-pre-wrap text-pretty"
+                  dangerouslySetInnerHTML={{
+                    __html: event.description || "",
+                  }}
+                />
               </div>
             </div>
             <div className="md:col-span-1">
