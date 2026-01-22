@@ -18,7 +18,7 @@ function OrganizersList({ organizers }: { organizers: Host[] }) {
   return (
     <div className="space-y-1">
       {organizers.map((org, idx) => (
-        <div key={idx} className="flex items-center gap-2">
+        <div key={idx} className="flex items-center gap-2 ml-2">
           <PersonIcon className="size-4 shrink-0" />
           {org.link ? (
             <a href={org.link} target="_blank" rel="noopener noreferrer">
@@ -97,7 +97,7 @@ export function EventDetailsCard({ event }: { event: Event }) {
           {event.price?.trim() && (
             <div className="flex items-center gap-2">
               <ReceiptEuroIcon className="size-4 shrink-0" />
-              <Typography.P>Цена: {event.price}лв</Typography.P>
+              <Typography.P>Цена: {event.price} евро</Typography.P>
             </div>
           )}
 

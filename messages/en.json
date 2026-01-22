@@ -122,9 +122,6 @@
     "password": "Password",
     "passwordDescr": "Last changed 3 months ago",
     "changePassword": "Change Password",
-    "newPassword": "New Password",
-    "repeatPassword": "Repeat Password",
-    "dangerZone": "Danger Zone",
     "deleteAccount": "Delete Account",
     "deleteAccountDescr": "If you delete your account, it cannot be recovered. Please be sure you want to delete your account before proceeding.",
     "passwordUpdatedSuccessfully": "Password updated successfully."
