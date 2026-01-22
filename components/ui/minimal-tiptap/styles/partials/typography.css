@@ -37,3 +37,9 @@
 .minimal-tiptap-editor .ProseMirror a.link:hover {
   @apply underline;
 }
+
+/* blank lines in both editor and viewer */
+.minimal-tiptap-editor p:empty::before {
+  content: "\00a0";
+  display: block;
+}

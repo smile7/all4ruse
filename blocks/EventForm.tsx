@@ -34,7 +34,12 @@ import {
 } from "@/components/ui";
 import { MinimalTiptapEditor } from "@/components/ui/minimal-tiptap";
 import { EVENTS_BUCKET, TAG_LABELS_BG } from "@/constants";
-import { useCreateEvent, useTags, useUpdateEvent } from "@/hooks/query";
+import {
+  useCreateEvent,
+  useDeleteEvent,
+  useTags,
+  useUpdateEvent,
+} from "@/hooks/query";
 import type { Event, EventUpdate, Host, Tag } from "@/lib/api";
 import { createEventSchema, type CreateEventSchemaType } from "@/lib/schema";
 import { createClient } from "@/lib/supabase/client";
@@ -99,8 +104,10 @@ export function EventForm({ mode, event }: EventFormProps) {
     isPending: isUpdating,
     error: updateError,
   } = useUpdateEvent();
+  const { mutateAsync: deleteEventMutate, isPending: isDeleting } =
+    useDeleteEvent();
 
-  const isPending = isCreating || isUpdating;
+  const isPending = isCreating || isUpdating || isDeleting;
   const error = createError ?? updateError;
 
   const defaultValues: CreateEventSchemaType = event
@@ -379,6 +386,18 @@ export function EventForm({ mode, event }: EventFormProps) {
     router.push("/");
   };
 
+  const handleDelete = async () => {
+    if (mode !== "edit" || !event?.id) return;
+
+    const confirmed = window.confirm(
+      t("confirmDeleteEvent") ?? "Are you sure you want to delete this event?",
+    );
+    if (!confirmed) return;
+
+    await deleteEventMutate(event.id);
+    router.push("/");
+  };
+
   useEffect(() => {
     syncFormImagesFromState();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -426,7 +445,7 @@ export function EventForm({ mode, event }: EventFormProps) {
                       onChange={field.onChange}
                       className="w-full"
                       editorContentClassName="p-5"
-                      output="text"
+                      output="html"
                       placeholder={t("enterDescription")}
                       editable
                       editorClassName="focus:outline-hidden h-80 overflow-auto"
@@ -800,7 +819,18 @@ export function EventForm({ mode, event }: EventFormProps) {
               />
             )}
 
-            <div className="flex justify-end">
+            <div className="flex justify-end gap-3">
+              {mode === "edit" && event?.id && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  disabled={isPending}
+                  onClick={handleDelete}
+                  className="border-destructive text-destructive hover:bg-destructive/10"
+                >
+                  {t("deleteEventButton")}
+                </Button>
+              )}
               <SubmitButton disabled={form.formState.isSubmitting || isPending}>
                 {t("submitButton")}
               </SubmitButton>
