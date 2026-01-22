@@ -1,7 +1,7 @@
 "use client";
 
 import { FilterIcon, XIcon } from "lucide-react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 
 import { DatePopover } from "@/components/DatePopover";
 import {
@@ -14,8 +14,15 @@ import {
   Label,
 } from "@/components/ui";
 import { useEventFilters } from "@/hooks";
+import { useTags } from "@/hooks/query";
+import { TAG_LABELS_BG } from "@/constants";
+import type { Tag } from "@/lib/api";
 
-export function EventsFilters() {
+type EventsFiltersProps = {
+  filters: ReturnType<typeof useEventFilters>;
+};
+
+export function EventsFilters({ filters }: EventsFiltersProps) {
   const {
     title,
     setTitle,
@@ -23,19 +30,29 @@ export function EventsFilters() {
     setFrom,
     to,
     setTo,
+    tagIds,
+    setTagIds,
     hasFilters,
     appliedFiltersCount,
     clear,
-  } = useEventFilters();
+  } = filters;
 
   const t = useTranslations("HomePage");
+  const tCreate = useTranslations("CreateEvent");
+  const locale = useLocale();
+  const { data: allTags = [] } = useTags();
+
+  const formatLabel = (tag: Tag) => {
+    const base = (tag.title ?? "").toUpperCase();
+    return locale === "bg" ? (TAG_LABELS_BG[base] ?? base) : base;
+  };
 
   return (
     <Accordion
       type="single"
       collapsible
       defaultValue="filters"
-      className="rounded-md border"
+      className="rounded-md border bg-secondary"
     >
       <AccordionItem value="filters">
         <AccordionTrigger className="p-4 hover:cursor-pointer">
@@ -45,7 +62,7 @@ export function EventsFilters() {
             {appliedFiltersCount ? ` (${appliedFiltersCount})` : ""}
           </span>
         </AccordionTrigger>
-        <AccordionContent className="grid border-t p-4">
+        <AccordionContent className="grid border-t p-4 gap-4">
           <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_10rem_10rem_auto]">
             <div className="relative">
               <Label
@@ -117,6 +134,40 @@ export function EventsFilters() {
               </Button>
             </div>
           </div>
+
+          {allTags.length > 0 && (
+            <div className="mt-2">
+              <p className="mb-2 text-xs text-muted-foreground">
+                {tCreate("tags")}
+                {tagIds.length ? ` (${tagIds.length})` : ""}
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {allTags.map((tag) => {
+                  const selected = tagIds.includes(tag.id);
+                  return (
+                    <button
+                      key={tag.id}
+                      type="button"
+                      onClick={() => {
+                        if (selected) {
+                          setTagIds(tagIds.filter((id) => id !== tag.id));
+                        } else {
+                          setTagIds([...tagIds, tag.id]);
+                        }
+                      }}
+                      className={`inline-flex items-center gap-1 rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-wide shadow-sm transition-colors ${
+                        selected
+                          ? "border-primary bg-primary text-primary-foreground"
+                          : "border-primary/30 bg-primary/5 text-primary hover:bg-primary/10 hover:border-primary/60"
+                      }`}
+                    >
+                      <span>#{formatLabel(tag)}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </AccordionContent>
       </AccordionItem>
     </Accordion>

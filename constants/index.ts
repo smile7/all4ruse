@@ -19,3 +19,36 @@ export type UploadedImage = {
   url: string;
   path: string;
 };
+
+export const TAG_LABELS_BG: Record<string, string> = {
+  COMEDY: "КОМЕДИЯ",
+  THEATRE: "ТЕАТЪР",
+  ART: "ИЗКУСТВО",
+  CONCERT: "КОНЦЕРТ",
+  SPORTS: "СПОРТ",
+  KIDS: "ДЕЦА",
+  ENGLISH: "АНГЛИЙСКИ ЕЗИК",
+  HIKE: "ПРЕХОД",
+  PARTY: "ПАРТИ",
+  THERAPY: "ТЕРАПИЯ",
+  DANCES: "ТАНЦИ",
+  RESTAURANTS: "РЕСТОРАНТИ",
+  MUSIC: "МУЗИКА",
+  LEARNING: "ОБУЧЕНИЕ",
+  COMPETITION: "СЪСТЕЗАНИЕ",
+  QUIZ: "КУИЗ",
+  LECTURE: "ЛЕКЦИЯ",
+  CINEMA: "КИНО",
+  FEST: "ФЕСТИВАЛ",
+  WORKSHOP: "РАБОТИЛНИЦА",
+  EXHIBITION: "ИЗЛОЖБА",
+  BOOKS: "КНИГИ",
+  FOOD: "ХРАНА",
+  TECHNOLOGY: "ТЕХНОЛОГИИ",
+  VOLUNTEERING: "ДОБРОВОЛЧЕСТВО",
+  FAIR: "БАЗАР",
+  OUTDOOR: "НА ОТКРИТО",
+  HISTORY: "ИСТОРИЯ",
+  NETWORKING: "НЕТУЪРКИНГ",
+  INFANTS: "БЕБЕТА",
+};

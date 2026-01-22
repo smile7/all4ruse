@@ -19,7 +19,7 @@ function OrganizersList({ organizers }: { organizers: Host[] }) {
     <div className="space-y-1">
       {organizers.map((org, idx) => (
         <div key={idx} className="flex items-center gap-2 ml-2">
-          <PersonIcon className="size-4 shrink-0" />
+          <PersonIcon className="size-4 shrink-0 text-primary" />
           {org.link ? (
             <a href={org.link} target="_blank" rel="noopener noreferrer">
               {org.name}
@@ -38,32 +38,32 @@ export function EventDetailsCard({ event }: { event: Event }) {
 
   return (
     <div className="flex flex-col gap-4">
-      <Card>
+      <Card className="bg-accent border-none shadow-xl">
         <CardContent className="space-y-3">
-          <div className="flex items-center gap-2">
-            <CalendarDaysIcon className="size-4 shrink-0" />
+          <div className="flex items-center gap-2 border-b pb-2 border-foreground/20">
+            <CalendarDaysIcon className="size-4 shrink-0 text-primary" />
             <Typography.P>
               {formatDateRange(event.startDate, event.endDate)}
             </Typography.P>
           </div>
 
-          <div className="flex items-center gap-2">
-            <ClockIcon className="size-4 shrink-0" />
+          <div className="flex items-center gap-2 border-b pb-2 border-foreground/20">
+            <ClockIcon className="size-4 shrink-0 text-primary" />
             <Typography.P>
               {formatTimeRange(event.startTime, event.endTime)}
             </Typography.P>
           </div>
 
-          <div className="flex items-center gap-2">
-            <BuildingIcon className="size-4 shrink-0" />
+          <div className="flex items-center gap-2 border-b pb-2 border-foreground/20">
+            <BuildingIcon className="size-4 shrink-0 text-primary" />
             <Typography.P className="leading-tight">
               {event.place}, {event.address}, {event.town}
             </Typography.P>
           </div>
 
           {event.phoneNumber?.trim() && (
-            <div className="flex items-center gap-2">
-              <PhoneIcon className="size-4 shrink-0" />
+            <div className="flex items-center gap-2 border-b pb-2 border-foreground/20">
+              <PhoneIcon className="size-4 shrink-0 text-primary" />
               <Typography.P>
                 <a
                   href={`tel:${event.phoneNumber}`}
@@ -79,11 +79,11 @@ export function EventDetailsCard({ event }: { event: Event }) {
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className="bg-accent border-none shadow-xl">
         <CardContent className="space-y-3">
           {event.ticketsLink?.trim() && (
-            <div className="flex items-center gap-2">
-              <TicketIcon className="size-4 shrink-0" />
+            <div className="flex items-center gap-2 border-b pb-2 border-foreground/20">
+              <TicketIcon className="size-4 shrink-0 text-primary" />
               <a
                 href={event.ticketsLink}
                 target="_blank"
@@ -95,8 +95,8 @@ export function EventDetailsCard({ event }: { event: Event }) {
           )}
 
           {event.price?.trim() && (
-            <div className="flex items-center gap-2">
-              <ReceiptEuroIcon className="size-4 shrink-0" />
+            <div className="flex items-center gap-2 border-b pb-2 border-foreground/20">
+              <ReceiptEuroIcon className="size-4 shrink-0 text-primary" />
               <Typography.P>Цена: {event.price} евро</Typography.P>
             </div>
           )}
@@ -104,7 +104,7 @@ export function EventDetailsCard({ event }: { event: Event }) {
           {organizers.length > 0 && (
             <div>
               <div className="flex items-center gap-2">
-                <UsersIcon className="size-4 shrink-0" />
+                <UsersIcon className="size-4 shrink-0 text-primary" />
                 <Typography.P>Организатори: </Typography.P>
               </div>
               <OrganizersList organizers={organizers} />

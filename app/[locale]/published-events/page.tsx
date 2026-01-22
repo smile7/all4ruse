@@ -4,7 +4,7 @@ import { useMemo } from "react";
 import { useTranslations } from "next-intl";
 
 import { Typography } from "@/components/Typography";
-import { ErrorAlert } from "@/components/ui";
+import { Card, CardContent, CardTitle, ErrorAlert } from "@/components/ui";
 import { useEvents, useProfile } from "@/hooks/query";
 
 import { EventsGrid, filterEventsByTime } from "../_components";
@@ -25,17 +25,17 @@ export default function PublishedEventsPage() {
 
   const upcomingEvents = useMemo(
     () => filterEventsByTime(userEvents, "upcoming"),
-    [userEvents]
+    [userEvents],
   );
 
   const currentEvents = useMemo(
     () => filterEventsByTime(userEvents, "current"),
-    [userEvents]
+    [userEvents],
   );
 
   const pastEvents = useMemo(
     () => filterEventsByTime(userEvents, "past"),
-    [userEvents]
+    [userEvents],
   );
 
   // TODO: skeleton
@@ -48,29 +48,45 @@ export default function PublishedEventsPage() {
   }
 
   return (
-    <div className="space-y-10">
+    <div className="flex flex-col gap-6">
       {error && <ErrorAlert error={error.message} />}
 
       {Boolean(error) && (
-        <Typography.Small className="text-red-600">
+        <Typography.Small className="text-destructive">
           {t("error")} {error?.message}
         </Typography.Small>
       )}
 
-      <section className="space-y-4">
-        <Typography.H2>{t("menuEvents")}</Typography.H2>
-        <EventsGrid events={upcomingEvents} timeFilter="upcoming" isEditMode />
-      </section>
+      <Card className="space-y-4 p-6">
+        <CardTitle>
+          <Typography.H2>{t("menuEvents")}</Typography.H2>
+        </CardTitle>
+        <CardContent className="p-0">
+          <EventsGrid
+            events={upcomingEvents}
+            timeFilter="upcoming"
+            isEditMode
+          />
+        </CardContent>
+      </Card>
 
-      <section className="space-y-4">
-        <Typography.H2>{t("menuCurrentEvents")}</Typography.H2>
-        <EventsGrid events={currentEvents} timeFilter="current" isEditMode />
-      </section>
+      <Card className="space-y-4 p-6">
+        <CardTitle>
+          <Typography.H2>{t("menuCurrentEvents")}</Typography.H2>
+        </CardTitle>
+        <CardContent className="p-0">
+          <EventsGrid events={currentEvents} timeFilter="current" isEditMode />
+        </CardContent>
+      </Card>
 
-      <section className="space-y-4">
-        <Typography.H2>{t("menuPastEvents")}</Typography.H2>
-        <EventsGrid events={pastEvents} timeFilter="past" isEditMode />
-      </section>
+      <Card className="space-y-4 p-6">
+        <CardTitle>
+          <Typography.H2>{t("menuPastEvents")}</Typography.H2>
+        </CardTitle>
+        <CardContent className="p-0">
+          <EventsGrid events={pastEvents} timeFilter="past" isEditMode />
+        </CardContent>
+      </Card>
     </div>
   );
 }

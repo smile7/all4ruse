@@ -1,21 +1,21 @@
 import { useMemo } from "react";
 
-import { useEventFilters } from "@/hooks/useEventFilters";
 import type { Event } from "@/lib/api";
 import { toTimestamp } from "@/lib/utils";
 
-export function useFilteredEvents(events: Event[]) {
-  const {
-    title,
-    from,
-    to,
-    clear,
-    hasFilters,
-    appliedFiltersCount,
-    setTitle,
-    setFrom,
-    setTo,
-  } = useEventFilters();
+type BasicFilters = {
+  title: string;
+  from: string | null;
+  to: string | null;
+  tagIds: number[];
+};
+
+export function useFilteredEvents(
+  events: Event[],
+  filters: BasicFilters,
+  eventTags?: Record<number, number[]>,
+) {
+  const { title, from, to, tagIds } = filters;
 
   const filteredEvents = useMemo(() => {
     const query = title.trim().toLowerCase();
@@ -33,6 +33,12 @@ export function useFilteredEvents(events: Event[]) {
           if (fromTs && start && start < fromTs) return false;
           if (toTs && start && start > toTs) return false;
         }
+        if (tagIds.length && eventTags) {
+          const tagsForEvent = eventTags[e.id as number] ?? [];
+          if (!tagsForEvent.length) return false;
+          const hasMatch = tagsForEvent.some((id) => tagIds.includes(id));
+          if (!hasMatch) return false;
+        }
         return true;
       })
       .sort((a, b) => {
@@ -43,20 +49,9 @@ export function useFilteredEvents(events: Event[]) {
         if (bT === null) return -1;
         return aT - bT;
       });
-  }, [events, title, from, to]);
+  }, [events, title, from, to, tagIds, eventTags]);
 
   return {
     filteredEvents,
-    filters: {
-      title,
-      setTitle,
-      from,
-      setFrom,
-      to,
-      setTo,
-      hasFilters,
-      appliedFiltersCount,
-      clear,
-    },
   };
 }

@@ -12,6 +12,10 @@ export type Event = Tables<"events">;
 export type CreateNewEvent = TablesInsert<"events">;
 export type EventUpdate = TablesUpdate<"events">;
 
+// MARK: Tags
+
+export type Tag = Tables<"tags">;
+
 type ServiceResult<T> = {
   data: T;
   error: PostgrestError | AuthError | null;
@@ -26,7 +30,7 @@ export type EventRow = Omit<Tables<"events">, "organizers"> & {
 };
 
 export async function getEvents(
-  client: SupabaseClient
+  client: SupabaseClient,
 ): Promise<ServiceResult<Event[]>> {
   const { data, error } = await client
     .from("events")
@@ -38,7 +42,7 @@ export async function getEvents(
 
 export async function getEventBySlug(
   client: SupabaseClient,
-  slug: string
+  slug: string,
 ): Promise<ServiceResult<EventRow | null>> {
   const { data, error } = await client
     .from("events")
@@ -51,7 +55,7 @@ export async function getEventBySlug(
 
 export async function createEvent(
   client: SupabaseClient,
-  payload: CreateNewEvent
+  payload: CreateNewEvent,
 ): Promise<ServiceResult<Event | null>> {
   const { data, error } = await client
     .from("events")
@@ -72,7 +76,7 @@ export async function createEvent(
 export async function updateEvent(
   client: SupabaseClient,
   id: number,
-  patch: EventUpdate
+  patch: EventUpdate,
 ): Promise<ServiceResult<Event | null>> {
   const { data, error } = await client
     .from("events")
@@ -86,11 +90,22 @@ export async function updateEvent(
 
 export async function deleteEvent(
   client: SupabaseClient,
-  id: number
+  id: number,
 ): Promise<ServiceResult<boolean>> {
   const { error } = await client.from("events").delete().eq("id", id);
 
   return { data: !error, error };
+}
+
+export async function getTags(
+  client: SupabaseClient,
+): Promise<ServiceResult<Tag[]>> {
+  const { data, error } = await client
+    .from("tags")
+    .select("*")
+    .order("title", { ascending: true });
+
+  return { data: data ?? [], error };
 }
 
 // Mark: Profiles
@@ -100,7 +115,7 @@ export type ProfileUpdate = TablesUpdate<"profiles">;
 
 export async function getProfileById(
   client: SupabaseClient,
-  id: string
+  id: string,
 ): Promise<ServiceResult<Profile | null>> {
   const { data, error } = await client
     .from("profiles")
@@ -148,7 +163,7 @@ export async function getCurrentUserProfile(client: SupabaseClient): Promise<
 
 export async function updateCurrentUserProfile(
   client: SupabaseClient,
-  payload: ProfileUpdate
+  payload: ProfileUpdate,
 ): Promise<ServiceResult<Profile | null>> {
   const {
     data: { user },

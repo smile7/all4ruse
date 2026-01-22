@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 
 import { Typography } from "@/components/Typography";
 import { Button, Card, CardContent, ErrorAlert } from "@/components/ui";
-import { useFilteredEvents } from "@/hooks";
+import { useEventTagsMap, useEventFilters, useFilteredEvents } from "@/hooks";
 import type { Event } from "@/lib/api";
 
 import { EventTimeFilter, filterEventsByTime } from "./FilterByTime";
@@ -22,16 +22,30 @@ export function Events({
   timeFilter: EventTimeFilter;
 }) {
   const timeFiltered = filterEventsByTime(events, timeFilter);
-  const { filteredEvents, filters } = useFilteredEvents(timeFiltered);
+  const filters = useEventFilters();
+  const eventIds = timeFiltered
+    .map((e) => e.id)
+    .filter((id): id is number => typeof id === "number");
+  const { data: eventTags = {} } = useEventTagsMap(eventIds);
+
+  const { filteredEvents } = useFilteredEvents(
+    timeFiltered,
+    filters,
+    eventTags,
+  );
 
   return (
     <div className="flex flex-col gap-6">
-      <EventsFilters />
+      <EventsFilters filters={filters} />
       {errorMessage && <ErrorAlert error={errorMessage} className="mt-4" />}
       {filteredEvents.length === 0 ? (
         <EmptyState onReset={filters.clear} />
       ) : (
-        <EventsGrid events={filteredEvents} timeFilter={timeFilter} />
+        <EventsGrid
+          events={filteredEvents}
+          timeFilter={timeFilter}
+          eventTags={eventTags}
+        />
       )}
     </div>
   );
