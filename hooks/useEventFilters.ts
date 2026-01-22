@@ -20,9 +20,10 @@ export function useEventFilters() {
 
   const [title, setTitle] = useState(() => searchParams.get("title") || "");
   const [from, setFrom] = useState<string | null>(() =>
-    searchParams.get("from")
+    searchParams.get("from"),
   );
   const [to, setTo] = useState<string | null>(() => searchParams.get("to"));
+  const [tagIds, setTagIds] = useState<number[]>([]);
   const debouncedTitle = useDebounce(title, DEBOUNCE_MS);
   const lastAppliedQSRef = useRef<string | null>(null);
 
@@ -49,12 +50,18 @@ export function useEventFilters() {
     setTitle("");
     setFrom(null);
     setTo(null);
+    setTagIds([]);
     lastAppliedQSRef.current = "";
     router.replace(pathname, { scroll: false });
   }, [pathname, router]);
 
-  const hasFilters = Boolean(title.trim() || from || to);
-  const appliedFiltersCount = [title.trim(), from, to].filter(Boolean).length;
+  const hasFilters = Boolean(title.trim() || from || to || tagIds.length);
+  const appliedFiltersCount = [
+    title.trim(),
+    from,
+    to,
+    tagIds.length ? "tags" : "",
+  ].filter(Boolean).length;
 
   return {
     title,
@@ -63,6 +70,8 @@ export function useEventFilters() {
     setFrom,
     to,
     setTo,
+    tagIds,
+    setTagIds,
     hasFilters,
     appliedFiltersCount,
     clear,

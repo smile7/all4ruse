@@ -2,9 +2,9 @@
 
 import { useForm } from "react-hook-form";
 import { Key, Trash2 } from "lucide-react";
-import Link from "next/link";
-import { useLocale, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
 
+import { UpdatePasswordForm } from "@/components/Auth";
 import {
   Badge,
   Button,
@@ -13,6 +13,9 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
   Form,
   FormControl,
   FormField,
@@ -72,7 +75,6 @@ export default function ProfileContent() {
 
 function ProfileForm({ defaultValues }: { defaultValues: ProfileFormValues }) {
   const t = useTranslations("Profile");
-  const locale = useLocale();
 
   const form = useForm<ProfileFormValues>({
     defaultValues,
@@ -211,20 +213,27 @@ function ProfileForm({ defaultValues }: { defaultValues: ProfileFormValues }) {
               </Badge>
             </div>
             <Separator />
-            <div className="flex items-center justify-between">
-              <div className="space-y-1">
-                <Label className="text-base">{t("password")}</Label>
-                <p className="text-muted-foreground text-sm">
-                  {t("passwordDescr")}
-                </p>
+            <Collapsible>
+              <div className="flex items-center justify-between">
+                <div className="space-y-1">
+                  <Label className="text-base">{t("password")}</Label>
+                  <p className="text-muted-foreground text-sm">
+                    {t("passwordDescr")}
+                  </p>
+                </div>
+
+                <CollapsibleTrigger asChild>
+                  <Button variant="outline" type="button">
+                    <Key className="mr-2 size-4" />
+                    {t("changePassword")}
+                  </Button>
+                </CollapsibleTrigger>
               </div>
-              <Button variant="outline" type="button" asChild>
-                <Link href={`/${locale}/auth/update-password`}>
-                  <Key className="mr-2 size-4" />
-                  {t("changePassword")}
-                </Link>
-              </Button>
-            </div>
+
+              <CollapsibleContent className="pt-4">
+                <UpdatePasswordForm />
+              </CollapsibleContent>
+            </Collapsible>
           </CardContent>
         </Card>
 

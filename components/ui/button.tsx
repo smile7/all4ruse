@@ -16,7 +16,7 @@ const buttonVariants = cva(
         outline:
           "border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50",
         secondary:
-          "bg-secondary text-secondary-foreground shadow-xs hover:bg-secondary/80",
+          "border border-input bg-secondary text-secondary-foreground shadow-xs hover:bg-secondary/80 hover:border-secondary-foreground disabled:border-muted disabled:bg-muted disabled:text-muted-foreground",
         ghost:
           "hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
         link: "text-primary underline-offset-4 hover:underline",
@@ -32,7 +32,7 @@ const buttonVariants = cva(
       variant: "default",
       size: "default",
     },
-  }
+  },
 );
 
 export type ButtonProps = React.ComponentProps<"button"> &
@@ -60,9 +60,9 @@ function Button({
           className: cn(
             className,
             isLoading && "pointer-events-none",
-            "cursor-pointer"
+            "cursor-pointer",
           ),
-        })
+        }),
       )}
       {...props}
     >

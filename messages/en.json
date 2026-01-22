@@ -79,7 +79,9 @@
     "eventNotFound": "Event not found.",
     "cover": "Cover",
     "makeCover": "Set as cover",
-    "error": "An error occurred. Please try again later."
+    "error": "An error occurred. Please try again later.",
+    "noTagsAvailable": "No tags available",
+    "tags": "Tags"
   },
   "PastEvents": {
     "createEvent": "Create an Event",
@@ -123,6 +125,7 @@
     "passwordDescr": "Last changed 3 months ago",
     "changePassword": "Change Password",
     "deleteAccount": "Delete Account",
-    "deleteAccountDescr": "If you delete your account, it cannot be recovered. Please be sure you want to delete your account before proceeding."
+    "deleteAccountDescr": "If you delete your account, it cannot be recovered. Please be sure you want to delete your account before proceeding.",
+    "passwordUpdatedSuccessfully": "Password updated successfully."
   }
 }

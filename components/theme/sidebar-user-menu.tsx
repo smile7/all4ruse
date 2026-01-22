@@ -5,7 +5,7 @@ import { ListIcon, LogOutIcon, MoreVerticalIcon, UserIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 
-import { FALLBACK_IMAGE } from "@/constants";
+import { DEFAULT_AVATAR } from "@/constants";
 import { getCurrentUserProfile } from "@/lib/api";
 import { createClient } from "@/lib/supabase/client";
 
@@ -69,7 +69,7 @@ export function SidebarUserMenu() {
         <SidebarMenuButton className="ring-primary h-auto flex gap-2 items-center justify-center cursor-pointer">
           <Avatar>
             <AvatarImage
-              src={avatarUrl || FALLBACK_IMAGE}
+              src={avatarUrl || DEFAULT_AVATAR}
               alt={fullName || "Avatar"}
             />
           </Avatar>

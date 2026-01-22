@@ -14,6 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      event_tags: {
+        Row: {
+          event_id: number
+          tag_id: number
+        }
+        Insert: {
+          event_id: number
+          tag_id: number
+        }
+        Update: {
+          event_id?: number
+          tag_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_tags_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_tags_tag_id_fkey"
+            columns: ["tag_id"]
+            isOneToOne: false
+            referencedRelation: "tags"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       events: {
         Row: {
           address: string
@@ -120,73 +150,19 @@ export type Database = {
       }
       tags: {
         Row: {
-          art: boolean | null
-          club: boolean | null
-          comedy: boolean | null
-          competition: boolean | null
-          concert: boolean | null
-          course: boolean | null
           created_at: string
-          dances: boolean | null
-          dinner: boolean | null
-          english: boolean | null
-          fun: boolean | null
-          hike: boolean | null
           id: number
-          kids: boolean | null
-          marketing: boolean | null
-          music: boolean | null
-          party: boolean | null
-          sports: boolean | null
-          theatre: boolean | null
-          therapy: boolean | null
-          tour: boolean | null
+          title: string | null
         }
         Insert: {
-          art?: boolean | null
-          club?: boolean | null
-          comedy?: boolean | null
-          competition?: boolean | null
-          concert?: boolean | null
-          course?: boolean | null
           created_at?: string
-          dances?: boolean | null
-          dinner?: boolean | null
-          english?: boolean | null
-          fun?: boolean | null
-          hike?: boolean | null
           id?: number
-          kids?: boolean | null
-          marketing?: boolean | null
-          music?: boolean | null
-          party?: boolean | null
-          sports?: boolean | null
-          theatre?: boolean | null
-          therapy?: boolean | null
-          tour?: boolean | null
+          title?: string | null
         }
         Update: {
-          art?: boolean | null
-          club?: boolean | null
-          comedy?: boolean | null
-          competition?: boolean | null
-          concert?: boolean | null
-          course?: boolean | null
           created_at?: string
-          dances?: boolean | null
-          dinner?: boolean | null
-          english?: boolean | null
-          fun?: boolean | null
-          hike?: boolean | null
           id?: number
-          kids?: boolean | null
-          marketing?: boolean | null
-          music?: boolean | null
-          party?: boolean | null
-          sports?: boolean | null
-          theatre?: boolean | null
-          therapy?: boolean | null
-          tour?: boolean | null
+          title?: string | null
         }
         Relationships: []
       }

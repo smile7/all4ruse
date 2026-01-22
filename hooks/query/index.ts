@@ -11,8 +11,10 @@ import {
   getCurrentUserProfile,
   getEventBySlug,
   getEvents,
+  getTags,
   updateCurrentUserProfile,
   updateEvent,
+  type Tag,
 } from "@/lib/api";
 import { createClient } from "@/lib/supabase/client";
 
@@ -87,6 +89,46 @@ export function useEvents() {
       const { data, error } = await getEvents(supabase);
       if (error) throw error;
       return data;
+    },
+  });
+}
+
+// -------------------- Tags --------------------
+
+const tagQueryKeys = {
+  all: () => ["tags"] as const,
+  list: () => [...tagQueryKeys.all(), "list"] as const,
+};
+
+export function useTags() {
+  const supabase = createClient();
+
+  return useQuery({
+    queryKey: tagQueryKeys.list(),
+    queryFn: async (): Promise<Tag[]> => {
+      const { data: tags, error } = await getTags(supabase);
+      if (error) throw error;
+
+      const { data: usageRows, error: usageError } = await supabase
+        .from("event_tags")
+        .select("tag_id");
+
+      if (usageError) throw usageError;
+
+      const counts = new Map<number, number>();
+      for (const row of usageRows ?? []) {
+        const tagId = (row as { tag_id: number }).tag_id;
+        counts.set(tagId, (counts.get(tagId) ?? 0) + 1);
+      }
+
+      return [...(tags ?? [])].sort((a, b) => {
+        const countA = counts.get(a.id) ?? 0;
+        const countB = counts.get(b.id) ?? 0;
+        if (countA !== countB) return countB - countA;
+        const titleA = (a.title ?? "").toUpperCase();
+        const titleB = (b.title ?? "").toUpperCase();
+        return titleA.localeCompare(titleB);
+      });
     },
   });
 }

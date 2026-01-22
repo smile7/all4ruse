@@ -32,6 +32,7 @@ export const createEventSchema = (t: (key: string) => string) =>
       phoneNumber: z.string().optional().or(z.literal("")),
       image: z.instanceof(File).optional(),
       images: z.array(z.instanceof(File)).optional(),
+      tags: z.array(z.number()).default([]),
     })
     .superRefine((data, ctx) => {
       if (data.endDate < data.startDate) {
@@ -71,4 +72,5 @@ export const defaultEventValues = (): CreateEventSchemaType => ({
   phoneNumber: "",
   image: undefined,
   images: [],
+  tags: [],
 });

@@ -3,20 +3,23 @@
 import { useCallback, useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { useFieldArray, useForm, useFormContext } from "react-hook-form";
-import { Trash2Icon } from "lucide-react";
+import { ChevronDownIcon, Trash2Icon } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { zodResolver } from "@hookform/resolvers/zod";
 import StarterKit from "@tiptap/starter-kit";
 
 import { EventDateSelector } from "@/app/[locale]/_components";
+import { AspectRatio } from "@/components/AspectRatio";
 import { validateAndUploadEventImageClient } from "@/app/[locale]/actions";
 import { SubmitButton } from "@/components/SubmitButton";
 import { TimePopover } from "@/components/TimePopover";
 import { Typography } from "@/components/Typography";
 import {
   Button,
+  Card,
+  CardContent,
   ErrorAlert,
   Form,
   FormControl,
@@ -25,11 +28,14 @@ import {
   FormLabel,
   FormMessage,
   Input,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
 } from "@/components/ui";
 import { MinimalTiptapEditor } from "@/components/ui/minimal-tiptap";
-import { EVENTS_BUCKET } from "@/constants";
-import { useCreateEvent, useUpdateEvent } from "@/hooks/query";
-import type { Event, EventUpdate, Host } from "@/lib/api";
+import { EVENTS_BUCKET, TAG_LABELS_BG } from "@/constants";
+import { useCreateEvent, useTags, useUpdateEvent } from "@/hooks/query";
+import type { Event, EventUpdate, Host, Tag } from "@/lib/api";
 import { createEventSchema, type CreateEventSchemaType } from "@/lib/schema";
 import { createClient } from "@/lib/supabase/client";
 import { slugify } from "@/lib/utils";
@@ -48,6 +54,7 @@ type EventImageItem = {
 
 export function EventForm({ mode, event }: EventFormProps) {
   const t = useTranslations("CreateEvent");
+  const locale = useLocale();
 
   const [authChecked, setAuthChecked] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
@@ -80,6 +87,8 @@ export function EventForm({ mode, event }: EventFormProps) {
   const router = useRouter();
   const supabase = createClient();
 
+  const { data: allTags = [] } = useTags();
+
   const {
     mutateAsync: createEventMutate,
     isPending: isCreating,
@@ -111,6 +120,7 @@ export function EventForm({ mode, event }: EventFormProps) {
         phoneNumber: event.phoneNumber ?? "",
         image: undefined,
         images: [],
+        tags: [],
       }
     : {
         title: "",
@@ -128,10 +138,11 @@ export function EventForm({ mode, event }: EventFormProps) {
         phoneNumber: "",
         image: undefined,
         images: [],
+        tags: [],
       };
 
   const form = useForm<CreateEventSchemaType>({
-    resolver: zodResolver(createEventSchema(t)),
+    resolver: zodResolver(createEventSchema(t)) as any,
     defaultValues,
   });
 
@@ -245,6 +256,21 @@ export function EventForm({ mode, event }: EventFormProps) {
     multiple: true,
   });
 
+  // When editing, load existing tags for this event so they appear pre-selected
+  useEffect(() => {
+    if (mode !== "edit" || !event?.id) return;
+
+    supabase
+      .from("event_tags")
+      .select("tag_id")
+      .eq("event_id", event.id)
+      .then(({ data, error }) => {
+        if (error || !data) return;
+        const tagIds = data.map((row: { tag_id: number }) => row.tag_id);
+        form.setValue("tags", tagIds);
+      });
+  }, [mode, event, supabase, form]);
+
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
       if (!data.user) {
@@ -306,12 +332,25 @@ export function EventForm({ mode, event }: EventFormProps) {
       images: galleryUrls.length > 0 ? galleryUrls : null,
     };
 
+    const selectedTagIds = values.tags ?? [];
+
     if (mode === "create") {
-      await createEventMutate({
+      const result = await createEventMutate({
         ...basePayload,
         slug: slugify(values.title),
         createdBy: userId,
       });
+
+      const createdEvent = (result as { data?: Event | null })?.data;
+
+      if (createdEvent?.id && selectedTagIds.length > 0) {
+        await supabase.from("event_tags").insert(
+          selectedTagIds.map((tagId) => ({
+            event_id: createdEvent.id,
+            tag_id: tagId,
+          })),
+        );
+      }
     } else if (mode === "edit" && event) {
       const patch: EventUpdate = {
         ...basePayload,
@@ -323,6 +362,18 @@ export function EventForm({ mode, event }: EventFormProps) {
         slug: event.slug || "",
         patch,
       });
+
+      // replace existing tags with the newly selected ones
+      await supabase.from("event_tags").delete().eq("event_id", event.id);
+
+      if (selectedTagIds.length > 0) {
+        await supabase.from("event_tags").insert(
+          selectedTagIds.map((tagId) => ({
+            event_id: event.id,
+            tag_id: tagId,
+          })),
+        );
+      }
     }
 
     router.push("/");
@@ -336,15 +387,19 @@ export function EventForm({ mode, event }: EventFormProps) {
   if (!authChecked) return null;
 
   return (
-    <>
-      {error && <ErrorAlert error={error.message} />}
-      <div className="flex flex-col gap-6">
+    <Card>
+      <CardContent className="flex flex-col gap-6 p-6">
         <Typography.H1>
           {mode === "create" ? t("createEventTitle") : t("editEventTitle")}
         </Typography.H1>
 
+        {error && <ErrorAlert error={error.message} />}
+
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <form
+            onSubmit={form.handleSubmit(onSubmit as any)}
+            className="space-y-6"
+          >
             <FormField
               control={form.control}
               name="title"
@@ -371,7 +426,7 @@ export function EventForm({ mode, event }: EventFormProps) {
                       onChange={field.onChange}
                       className="w-full"
                       editorContentClassName="p-5"
-                      output="html"
+                      output="text"
                       placeholder={t("enterDescription")}
                       editable
                       editorClassName="focus:outline-hidden h-80 overflow-auto"
@@ -426,6 +481,114 @@ export function EventForm({ mode, event }: EventFormProps) {
                 )}
               />
             </div>
+
+            <FormField
+              control={form.control}
+              name="tags"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("tags")}</FormLabel>
+                  {(() => {
+                    const selectedIds: number[] = field.value ?? [];
+                    const selectedTags = allTags.filter((tag) =>
+                      selectedIds.includes(tag.id),
+                    );
+                    const availableTags = allTags.filter(
+                      (tag) => !selectedIds.includes(tag.id),
+                    );
+
+                    const formatLabel = (tag: Tag) => {
+                      const base = (tag.title ?? "").toUpperCase();
+                      return locale === "bg"
+                        ? (TAG_LABELS_BG[base] ?? base)
+                        : base;
+                    };
+
+                    return (
+                      <>
+                        {availableTags.length > 0 ? (
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <FormControl>
+                                <button
+                                  type="button"
+                                  className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-transparent px-3 py-2 text-left text-sm text-muted-foreground hover:bg-accent hover:text-accent-foreground hover:cursor-pointer"
+                                >
+                                  <span>
+                                    {t("tags")}
+                                    {selectedTags.length > 0
+                                      ? ` (${selectedTags.length})`
+                                      : ""}
+                                  </span>
+                                  <span className="text-xs opacity-50">
+                                    <ChevronDownIcon />
+                                  </span>
+                                </button>
+                              </FormControl>
+                            </PopoverTrigger>
+                            <PopoverContent
+                              align="start"
+                              className="w-[var(--radix-popover-trigger-width)] max-w-sm p-2"
+                            >
+                              <div className="max-h-52 space-y-1 overflow-auto">
+                                {availableTags.map((tag) => (
+                                  <button
+                                    key={tag.id}
+                                    type="button"
+                                    onClick={() => {
+                                      if (!selectedIds.includes(tag.id)) {
+                                        field.onChange([
+                                          ...selectedIds,
+                                          tag.id,
+                                        ]);
+                                      }
+                                    }}
+                                    className="flex w-full items-center justify-between rounded-md px-2 py-1 text-sm hover:bg-accent hover:text-accent-foreground hover:cursor-pointer"
+                                  >
+                                    <span className="truncate">
+                                      # {formatLabel(tag)}
+                                    </span>
+                                  </button>
+                                ))}
+                              </div>
+                            </PopoverContent>
+                          </Popover>
+                        ) : (
+                          allTags.length === 0 && (
+                            <Typography.Small>
+                              {t("noTagsAvailable")}
+                            </Typography.Small>
+                          )
+                        )}
+
+                        {selectedTags.length > 0 && (
+                          <div className="mt-2 flex flex-wrap gap-2">
+                            {selectedTags.map((tag) => (
+                              <button
+                                key={tag.id}
+                                type="button"
+                                onClick={() =>
+                                  field.onChange(
+                                    selectedIds.filter((id) => id !== tag.id),
+                                  )
+                                }
+                                className="inline-flex items-center gap-2 rounded-full border border-primary bg-primary px-3 py-1 text-xs font-semibold uppercase tracking-wide text-primary-foreground shadow-sm hover:bg-primary/90 hover:cursor-pointer transition-colors"
+                              >
+                                <span># {formatLabel(tag)}</span>
+                                <span className="text-xs" aria-hidden="true">
+                                  ×
+                                </span>
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </>
+                    );
+                  })()}
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               <FormField
@@ -557,44 +720,74 @@ export function EventForm({ mode, event }: EventFormProps) {
               </FormControl>
 
               {images.length > 0 && (
-                <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {images.map((item, idx) => (
-                    <div key={item.id} className="relative group">
+                <div className="mt-6 space-y-4">
+                  <div className="relative group w-full max-w-[18rem] mx-auto">
+                    <AspectRatio ratio={6 / 9}>
                       <Image
-                        width={400}
-                        height={300}
-                        src={item.url}
-                        alt="image"
-                        className="rounded-md object-contain"
+                        src={images[0].url}
+                        alt="Cover image"
+                        fill
+                        sizes="600px"
+                        className="rounded-md object-cover"
                       />
+                    </AspectRatio>
 
-                      <button
-                        type="button"
-                        aria-label="Remove image"
-                        onClick={() => removeImage(idx)}
-                        className="absolute top-2 right-2 size-8 cursor-pointer items-center justify-center rounded-full bg-black/60 text-white hover:opacity-80"
-                      >
-                        ×
-                      </button>
+                    <button
+                      type="button"
+                      aria-label="Remove image"
+                      onClick={() => removeImage(0)}
+                      className="absolute top-2 right-2 flex size-8 cursor-pointer items-center justify-center rounded-full bg-black/60 text-white hover:opacity-80"
+                    >
+                      ×
+                    </button>
 
-                      {idx !== 0 && (
-                        <button
-                          type="button"
-                          aria-label="Make cover"
-                          onClick={() => makeCover(idx)}
-                          className="absolute bottom-2 right-2 inline-flex h-7 px-3 items-center justify-center rounded-md bg-blue-600/80 text-white text-xs hover:bg-blue-600"
-                        >
-                          {t("makeCover")}
-                        </button>
-                      )}
+                    <span className="absolute bottom-2 left-2 rounded-md bg-blue-600/80 px-2 py-1 text-xs text-white">
+                      {t("cover")}
+                    </span>
+                  </div>
 
-                      {idx === 0 && (
-                        <span className="absolute bottom-2 left-2 rounded-md bg-blue-600/80 text-white text-xs px-2 py-1">
-                          {t("cover")}
-                        </span>
-                      )}
+                  {/* Other images as horizontal thumbnails */}
+                  {images.length > 1 && (
+                    <div className="flex gap-3 overflow-x-auto pb-1">
+                      {images.slice(1).map((item, idx) => {
+                        const originalIndex = idx + 1;
+                        return (
+                          <div
+                            key={item.id}
+                            className="relative group shrink-0 w-64"
+                          >
+                            <AspectRatio ratio={4 / 3}>
+                              <Image
+                                src={item.url}
+                                alt="image"
+                                fill
+                                sizes="256px"
+                                className="rounded-md object-cover"
+                              />
+                            </AspectRatio>
+
+                            <button
+                              type="button"
+                              aria-label="Remove image"
+                              onClick={() => removeImage(originalIndex)}
+                              className="absolute top-2 right-2 flex size-8 cursor-pointer items-center justify-center rounded-full bg-black/60 text-white hover:opacity-80"
+                            >
+                              ×
+                            </button>
+
+                            <button
+                              type="button"
+                              aria-label="Make cover"
+                              onClick={() => makeCover(originalIndex)}
+                              className="absolute bottom-2 right-2 inline-flex h-6 items-center justify-center rounded-md bg-blue-600/80 px-2 text-[10px] text-white hover:bg-blue-600"
+                            >
+                              {t("makeCover")}
+                            </button>
+                          </div>
+                        );
+                      })}
                     </div>
-                  ))}
+                  )}
                 </div>
               )}
               <FormMessage />
@@ -614,8 +807,8 @@ export function EventForm({ mode, event }: EventFormProps) {
             </div>
           </form>
         </Form>
-      </div>
-    </>
+      </CardContent>
+    </Card>
   );
 }
 

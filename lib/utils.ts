@@ -40,16 +40,25 @@ export function formatDate(value?: string | null) {
   return format(d, "d MMM yyyy", { locale: bg });
 }
 
-export function formatShortDate(value?: string | null) {
+export function formatShortDate(
+  value?: string | null,
+  localeCode: "bg" | "en" = "bg",
+) {
   if (!value) return EMPTY_DISPLAY;
   const d = parseISO(value);
   if (!isValid(d)) return EMPTY_DISPLAY;
-  return format(d, "d MMM", { locale: bg });
+
+  if (localeCode === "bg") {
+    return format(d, "d MMM", { locale: bg });
+  }
+
+  // Default to English month abbreviations when not Bulgarian
+  return format(d, "d MMM");
 }
 
 export function formatTimeRange(
   startTime?: string | null,
-  endTime?: string | null
+  endTime?: string | null,
 ): string {
   if (!startTime) return "";
   if (!endTime || endTime === startTime) return formatTimeTZ(startTime);
@@ -58,7 +67,7 @@ export function formatTimeRange(
 
 export function formatDateRange(
   startDate?: string | null,
-  endDate?: string | null
+  endDate?: string | null,
 ): string {
   if (!startDate) return "";
   if (!endDate || endDate === startDate) return formatDate(startDate);
@@ -87,4 +96,37 @@ export function slugify(title: string): string {
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");
+}
+
+// Convert simple HTML produced by the editor (mainly <p>, <br>)
+// into plain text with newline characters so that
+// CSS `white-space: pre-wrap` can faithfully render line breaks.
+export function htmlToPlainWithNewlines(value?: string | null): string {
+  if (!value) return "";
+
+  let text = value;
+
+  // Normalize paragraph and line break tags into newlines
+  text = text.replace(/<br\s*\/?>(\s*)/gi, "\n");
+  text = text.replace(/<\/p>/gi, "\n");
+  text = text.replace(/<p[^>]*>/gi, "");
+
+  // Strip any remaining HTML tags
+  text = text.replace(/<[^>]+>/g, "");
+
+  // Decode a few common entities so text looks natural
+  text = text.replace(/&nbsp;/gi, " ");
+  text = text.replace(/&amp;/gi, "&");
+  text = text.replace(/&lt;/gi, "<");
+  text = text.replace(/&gt;/gi, ">");
+
+  // Numeric entities (decimal and hex), including emoji code points
+  text = text.replace(/&#(\d+);/g, (_, num: string) =>
+    String.fromCodePoint(Number(num)),
+  );
+  text = text.replace(/&#x([0-9a-fA-F]+);/g, (_, hex: string) =>
+    String.fromCodePoint(parseInt(hex, 16)),
+  );
+
+  return text.trimEnd();
 }

@@ -31,8 +31,8 @@ export function TimePopover({
         onChange(v ? v : "");
       }}
       className={cn(
-        "bg-background appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-clear-button]:hidden",
-        className
+        "bg-transparent appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-clear-button]:hidden",
+        className,
       )}
     />
   );
