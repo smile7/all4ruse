@@ -172,7 +172,7 @@ export function EventForm({ mode, event }: EventFormProps) {
         return next;
       });
     },
-    [form]
+    [form],
   );
 
   const removeImage = useCallback(
@@ -202,7 +202,7 @@ export function EventForm({ mode, event }: EventFormProps) {
         return next;
       });
     },
-    [form]
+    [form],
   );
 
   const makeCover = useCallback(
@@ -230,7 +230,7 @@ export function EventForm({ mode, event }: EventFormProps) {
         return next;
       });
     },
-    [form]
+    [form],
   );
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -268,7 +268,7 @@ export function EventForm({ mode, event }: EventFormProps) {
         supabase,
         file,
         "events",
-        EVENTS_BUCKET
+        EVENTS_BUCKET,
       );
       if (url) {
         uploadMap.set(item.id, url);

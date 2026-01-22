@@ -48,7 +48,6 @@ export function EventsGrid({
               className={`
                 flex flex-col h-full p-0 overflow-hidden border-border/60 transition-all duration-300 hover:shadow-lg
                 relative border-2 hover:border-secondary
-                after:content-[''] after:block after:w-full after:h-[10px] after:bg-[hsl(var(--secondary))] after:absolute after:bottom-0 after:left-0 
                 ${timeFilter === "past" ? "opacity-60 grayscale" : ""}
               `}
             >
@@ -78,7 +77,7 @@ export function EventsGrid({
                       src={e.image || FALLBACK_IMAGE}
                       alt={e.title || "Event image"}
                       fill
-                      sizes="18rem"
+                      sizes="28rem"
                       className="w-full object-cover"
                       draggable={false}
                     />
@@ -97,16 +96,11 @@ export function EventsGrid({
                   {e.title}
                 </Typography.Lead>
 
-                <div className="flex items-center gap-2 text-xs opacity-80">
+                {/* <div className="flex items-center gap-2 text-xs opacity-80">
                   <Calendar1Icon className="size-4 opacity-70 shrink-0" />
                   {formatShortDate(e.startDate)} {t("at")}{" "}
                   {formatTimeTZ(e.startTime)}
-                </div>
-
-                <div className="flex items-center gap-2 text-xs opacity-80">
-                  <MapPinIcon className="size-4 opacity-70 shrink-0" />
-                  {e.address}, {e.town}
-                </div>
+                </div> */}
 
                 <span className="sr-only">{e.title}</span>
               </CardContent>

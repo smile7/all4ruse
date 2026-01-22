@@ -229,12 +229,6 @@ function ProfileForm({ defaultValues }: { defaultValues: ProfileFormValues }) {
         </Card>
 
         <Card className="border-destructive/50">
-          <CardHeader>
-            <CardTitle className="text-destructive">
-              {t("dangerZone")}
-            </CardTitle>
-            <Separator className="mt-3" />
-          </CardHeader>
           <CardContent>
             <div className="flex items-center justify-between">
               <div className="space-y-1">
