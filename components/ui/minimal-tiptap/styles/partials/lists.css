@@ -1,4 +1,5 @@
-.minimal-tiptap-editor .ProseMirror ol {
+.minimal-tiptap-editor .ProseMirror ol,
+.minimal-tiptap-editor ol {
   @apply list-decimal;
 }
 
@@ -10,7 +11,8 @@
   list-style: lower-roman;
 }
 
-.minimal-tiptap-editor .ProseMirror ul {
+.minimal-tiptap-editor .ProseMirror ul,
+.minimal-tiptap-editor ul {
   list-style: disc;
 }
 

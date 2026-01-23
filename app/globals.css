@@ -258,6 +258,12 @@
   --shadow-2xl: var(--shadow-2xl);
 }
 
+/* hide zoom button in gallery */
+.lg-zoom-in,
+.lg-zoom-out {
+  display: none !important;
+}
+
 /* ---- Global Styling ------------------------------------------ */
 @layer base {
   ::after,

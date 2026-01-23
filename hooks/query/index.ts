@@ -1,6 +1,7 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 import {
   createEvent,
@@ -17,6 +18,7 @@ import {
   type Tag,
 } from "@/lib/api";
 import { createClient } from "@/lib/supabase/client";
+import { useTranslations } from "next-intl";
 
 // -------------------- Profile --------------------
 
@@ -48,6 +50,7 @@ export function useProfile() {
 export function useUpdateProfile() {
   const supabase = createClient();
   const queryClient = useQueryClient();
+  const t = useTranslations("General");
 
   return useMutation({
     mutationFn: async (values: ProfileFormValues) => {
@@ -63,6 +66,7 @@ export function useUpdateProfile() {
       }
     },
     onSuccess: () => {
+      toast.success(t("profileUpdatedSuccessfully"));
       queryClient.invalidateQueries({
         queryKey: profileQueryKeys.all(),
       });
@@ -150,6 +154,7 @@ export function useEvent(slug: string) {
 export function useCreateEvent() {
   const supabase = createClient();
   const queryClient = useQueryClient();
+  const t = useTranslations("General");
 
   return useMutation({
     mutationFn: async (body: CreateNewEvent) => {
@@ -159,6 +164,7 @@ export function useCreateEvent() {
       //   return data;
     },
     onSuccess: () => {
+      toast.success(t("eventCreatedSuccessfully"));
       queryClient.invalidateQueries({
         queryKey: eventQueryKeys.list(),
       });
@@ -174,6 +180,7 @@ export function useCreateEvent() {
 export function useUpdateEvent() {
   const supabase = createClient();
   const queryClient = useQueryClient();
+  const t = useTranslations("General");
 
   return useMutation({
     mutationFn: async ({
@@ -190,6 +197,7 @@ export function useUpdateEvent() {
       return data;
     },
     onSuccess: (_data, { id, slug }) => {
+      toast.success(t("eventUpdatedSuccessfully"));
       queryClient.invalidateQueries({
         queryKey: eventQueryKeys.list(),
       });
@@ -206,6 +214,7 @@ export function useUpdateEvent() {
 export function useDeleteEvent() {
   const supabase = createClient();
   const queryClient = useQueryClient();
+  const t = useTranslations("General");
 
   return useMutation({
     mutationFn: async (id: number) => {
@@ -214,6 +223,7 @@ export function useDeleteEvent() {
       return true;
     },
     onSuccess: () => {
+      toast.success(t("eventDeletedSuccessfully"));
       queryClient.invalidateQueries({
         queryKey: eventQueryKeys.list(),
       });

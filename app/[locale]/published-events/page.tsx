@@ -49,13 +49,7 @@ export default function PublishedEventsPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      {error && <ErrorAlert error={error.message} />}
-
-      {Boolean(error) && (
-        <Typography.Small className="text-destructive">
-          {t("error")} {error?.message}
-        </Typography.Small>
-      )}
+      {Boolean(error) && <ErrorAlert error="">{t("error")}</ErrorAlert>}
 
       <Card className="space-y-4 p-6">
         <CardTitle>

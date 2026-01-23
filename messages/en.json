@@ -83,7 +83,7 @@
     "noTagsAvailable": "No tags available",
     "tags": "Tags",
     "deleteEventButton": "Delete Event",
-    "deleteEventConfirmation": "Are you sure you want to delete this event? This action cannot be undone.",
+    "confirmDeleteEvent": "Are you sure you want to delete this event? This action cannot be undone.",
     "eventDeleted": "Event deleted successfully."
   },
   "PastEvents": {
@@ -131,6 +131,13 @@
     "deleteAccountDescr": "If you delete your account, it cannot be recovered. Please be sure you want to delete your account before proceeding.",
     "passwordUpdatedSuccessfully": "Password updated successfully.",
     "newPassword": "New Password",
-    "repeatPassword": "Repeat Password"
+    "repeatPassword": "Repeat Password",
+    "errorUpdatingPassword": "Error updating password."
+  },
+  "General": {
+    "profileUpdatedSuccessfully": "Profile updated successfully.",
+    "eventCreatedSuccessfully": "Event created successfully.",
+    "eventUpdatedSuccessfully": "Event updated successfully.",
+    "eventDeletedSuccessfully": "Event deleted successfully."
   }
 }

@@ -68,8 +68,8 @@ export function UpdatePasswordForm({
 
       toast.success(t("passwordUpdatedSuccessfully"));
       form.reset();
-      // TODO: show success message / toast
     } catch (err: unknown) {
+      toast.error(t("errorUpdatingPassword"));
       form.setError("root", {
         type: "server",
         message:

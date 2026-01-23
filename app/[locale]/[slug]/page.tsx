@@ -5,7 +5,7 @@ import EventHeroImage from "@/components/EventHeroImage/EventHeroImage";
 import { FavoriteButton } from "@/components/FavoriteButton";
 import { ImagesGallery } from "@/components/ImagesGallery";
 import { Typography } from "@/components/Typography";
-import { Card, CardContent, CardTitle } from "@/components/ui";
+import { Card, CardContent, CardTitle, ErrorAlert } from "@/components/ui";
 import { TAG_LABELS_BG } from "@/constants";
 import { getEventBySlug, type Tag } from "@/lib/api";
 import { createClient } from "@/lib/supabase/server";
@@ -22,9 +22,11 @@ export default async function EventPage(props: {
   const { slug } = await params;
   const { data: event, error } = await getEventBySlug(supabase, slug);
 
-  if (error || !event) return <div>{t("error")}</div>;
+  if (Boolean(error) || !event) {
+    return <ErrorAlert error={t("error")} />;
+  }
 
-  // Load tags for this event via the join table
+  // Load tags for this event with the join table
   const { data: eventTags } = await supabase
     .from("event_tags")
     .select("tag_id")
