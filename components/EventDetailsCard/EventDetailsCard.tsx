@@ -12,7 +12,7 @@ import { PersonIcon } from "@radix-ui/react-icons";
 import { Typography } from "@/components/Typography";
 import { Card, CardContent } from "@/components/ui/card";
 import { Event, Host } from "@/lib/api";
-import { formatLongDate, formatTimeRange } from "@/lib/utils";
+import { formatLongDate, formatTimeRange, formatWeekday } from "@/lib/utils";
 import { useLocale, useTranslations } from "next-intl";
 
 function OrganizersList({ organizers }: { organizers: Host[] }) {
@@ -52,11 +52,10 @@ export function EventDetailsCard({ event }: { event: Event }) {
           <div className="flex items-center gap-2 border-b pb-2 border-foreground/20">
             <CalendarDaysIcon className="size-4 shrink-0 text-primary" />
             <Typography.P>
-              {event.startDate
-                ? event.endDate && event.endDate !== event.startDate
-                  ? `${formatLongDate(event.startDate, localeCode)} - ${formatLongDate(event.endDate, localeCode)}`
-                  : formatLongDate(event.startDate, localeCode)
-                : ""}
+              {event.startDate &&
+                (event.endDate && event.endDate !== event.startDate
+                  ? `${formatLongDate(event.startDate, localeCode)} (${formatWeekday(event.startDate, localeCode)}) - ${formatLongDate(event.endDate, localeCode)} (${formatWeekday(event.endDate, localeCode)})`
+                  : `${formatLongDate(event.startDate, localeCode)} (${formatWeekday(event.startDate, localeCode)})`)}
             </Typography.P>
           </div>
 

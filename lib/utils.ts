@@ -40,6 +40,21 @@ export function formatDate(value?: string | null) {
   return format(d, "d MMM yyyy", { locale: bg });
 }
 
+export function formatWeekday(
+  value?: string | null,
+  localeCode: "bg" | "en" = "bg",
+) {
+  if (!value) return EMPTY_DISPLAY;
+  const d = parseISO(value);
+  if (!isValid(d)) return EMPTY_DISPLAY;
+
+  if (localeCode === "bg") {
+    return format(d, "EEEE", { locale: bg });
+  }
+
+  return format(d, "EEEE");
+}
+
 export function formatLongDate(
   value?: string | null,
   localeCode: "bg" | "en" = "bg",
