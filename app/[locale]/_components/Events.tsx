@@ -23,6 +23,7 @@ export function Events({
 }) {
   const timeFiltered = filterEventsByTime(events, timeFilter);
   const filters = useEventFilters();
+  const t = useTranslations("HomePage");
   const eventIds = timeFiltered
     .map((e) => e.id)
     .filter((id): id is number => typeof id === "number");
@@ -37,7 +38,9 @@ export function Events({
   return (
     <div className="flex flex-col gap-6">
       <EventsFilters filters={filters} />
-      {errorMessage && <ErrorAlert error={errorMessage} className="mt-4" />}
+
+      {Boolean(errorMessage) && <ErrorAlert error="">{t("error")}</ErrorAlert>}
+
       {filteredEvents.length === 0 ? (
         <EmptyState onReset={filters.clear} />
       ) : (

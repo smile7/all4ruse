@@ -83,7 +83,7 @@
     "noTagsAvailable": "Няма добавени тагове",
     "tags": "Тагове",
     "deleteEventButton": "Изтрий",
-    "deleteEventConfirmation": "Сигурни ли сте, че искате да изтриете това събитие? Тази операция не може да бъде отменена.",
+    "confirmDeleteEvent": "Сигурни ли сте, че искате да изтриете това събитие? Тази операция не може да бъде отменена.",
     "eventDeleted": "Събитието е изтрито успешно."
   },
   "PastEvents": {
@@ -131,6 +131,13 @@
     "deleteAccountDescr": "Ако изтриете вашият акаунт, той няма да може да бъде възстановен. Моля, бъдете сигурни, че искате да изтриете акаунта си, преди да продължите.",
     "passwordUpdatedSuccessfully": "Паролата е актуализирана успешно.",
     "newPassword": "Нова парола",
-    "repeatPassword": "Повтори паролата"
+    "repeatPassword": "Повтори паролата",
+    "errorUpdatingPassword": "Грешка при актуализиране на паролата."
+  },
+  "General": {
+    "profileUpdatedSuccessfully": "Профилът е актуализиран успешно.",
+    "eventCreatedSuccessfully": "Събитието е създадено успешно.",
+    "eventUpdatedSuccessfully": "Събитието е актуализирано успешно.",
+    "eventDeletedSuccessfully": "Събитието е изтрито успешно."
   }
 }

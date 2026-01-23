@@ -16,6 +16,7 @@ import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
+  ErrorAlert,
   Form,
   FormControl,
   FormField,
@@ -80,7 +81,7 @@ function ProfileForm({ defaultValues }: { defaultValues: ProfileFormValues }) {
     defaultValues,
   });
 
-  const { mutate, isPending, isSuccess, isError } = useUpdateProfile();
+  const { mutate, isPending, isSuccess, error } = useUpdateProfile();
 
   const onSubmit = (values: ProfileFormValues) => {
     mutate(values);
@@ -167,13 +168,8 @@ function ProfileForm({ defaultValues }: { defaultValues: ProfileFormValues }) {
                   />
                 </div>
 
-                {isSuccess && (
-                  <p className="text-sm text-emerald-600">
-                    {t("savedMessage")}
-                  </p>
-                )}
-                {isError && (
-                  <p className="text-sm text-red-600">{t("errorMessage")}</p>
+                {Boolean(error) && (
+                  <ErrorAlert error="">{t("errorMessage")}</ErrorAlert>
                 )}
 
                 <Button

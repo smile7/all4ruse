@@ -88,8 +88,10 @@ export function NavFavorites() {
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => removeFavorite(item.id)}>
-                  <Trash2 className="text-muted-foreground" />
-                  <span>{t("removeFavorites")}</span>
+                  <Trash2 className="text-destructive" />
+                  <span className="text-destructive">
+                    {t("removeFavorites")}
+                  </span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

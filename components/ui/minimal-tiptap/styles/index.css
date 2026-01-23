@@ -123,7 +123,13 @@
 .minimal-tiptap-editor .ProseMirror ol,
 .minimal-tiptap-editor .ProseMirror p,
 .minimal-tiptap-editor .ProseMirror pre,
-.minimal-tiptap-editor .ProseMirror ul {
+.minimal-tiptap-editor .ProseMirror ul,
+.minimal-tiptap-editor blockquote,
+.minimal-tiptap-editor dl,
+.minimal-tiptap-editor ol,
+.minimal-tiptap-editor p,
+.minimal-tiptap-editor pre,
+.minimal-tiptap-editor ul {
   @apply m-0;
 }
 
@@ -142,12 +148,15 @@
   @apply mb-0;
 }
 
-.minimal-tiptap-editor .ProseMirror blockquote {
+.minimal-tiptap-editor .ProseMirror blockquote,
+.minimal-tiptap-editor blockquote {
   @apply relative pl-3.5;
 }
 
 .minimal-tiptap-editor .ProseMirror blockquote::before,
-.minimal-tiptap-editor .ProseMirror blockquote.is-empty::before {
+.minimal-tiptap-editor .ProseMirror blockquote.is-empty::before,
+.minimal-tiptap-editor blockquote::before,
+.minimal-tiptap-editor blockquote.is-empty::before {
   @apply bg-accent-foreground/15 absolute top-0 bottom-0 left-0 h-full w-1 rounded-sm content-[''];
 }
 

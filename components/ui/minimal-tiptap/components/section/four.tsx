@@ -55,7 +55,7 @@ interface SectionFourProps extends VariantProps<typeof toggleVariants> {
 export const SectionFour: React.FC<SectionFourProps> = ({
   editor,
   activeActions = formatActions.map((action) => action.value),
-  mainActionCount = 0,
+  mainActionCount = 5,
   size,
   variant,
 }) => {

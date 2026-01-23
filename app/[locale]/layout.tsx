@@ -5,6 +5,7 @@ import { setRequestLocale } from "next-intl/server";
 import BackButton from "@/components/BackButton/BackButton";
 import LanguageSwitcher from "@/components/LanguageSwitcher/LanguageSwitcher";
 import { MobileLogo } from "@/components/MobileLogo";
+import { Analytics } from "@vercel/analytics/next";
 import {
   FavoritesProvider,
   SidebarLeft,
@@ -39,6 +40,7 @@ export default async function EventsLayout({
   return (
     <NextIntlClientProvider>
       <SidebarProvider>
+        <Analytics />
         <FavoritesProvider>
           <SidebarLeft />
           <SidebarInset>
