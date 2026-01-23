@@ -18,17 +18,41 @@ import {
   useSidebar,
 } from "../ui";
 
-export function NavFavorites({
-  favorites,
-}: {
-  favorites: {
-    name: string;
-    url: string;
-    emoji: string;
-  }[];
-}) {
+import { useFavorites } from "./favorites-provider";
+export function NavFavorites() {
   const t = useTranslations("HomePage");
   const { isMobile } = useSidebar();
+  const { favorites, removeFavorite } = useFavorites();
+
+  if (!favorites.length) {
+    return null;
+  }
+
+  const handleCopyLink = async (url: string) => {
+    const absoluteUrl =
+      typeof window !== "undefined" && !url.startsWith("http")
+        ? `${window.location.origin}${url}`
+        : url;
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(absoluteUrl);
+      }
+    } catch (error) {
+      console.error("Failed to copy link", error);
+    }
+  };
+
+  const handleOpenNewTab = (url: string) => {
+    const absoluteUrl =
+      typeof window !== "undefined" && !url.startsWith("http")
+        ? `${window.location.origin}${url}`
+        : url;
+    try {
+      window.open(absoluteUrl, "_blank", "noopener,noreferrer");
+    } catch (error) {
+      console.error("Failed to open link", error);
+    }
+  };
 
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
@@ -54,16 +78,16 @@ export function NavFavorites({
                 side={isMobile ? "bottom" : "right"}
                 align={isMobile ? "end" : "start"}
               >
-                <DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleCopyLink(item.url)}>
                   <Link className="text-muted-foreground" />
                   <span>{t("copyLink")}</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleOpenNewTab(item.url)}>
                   <ArrowUpRight className="text-muted-foreground" />
                   <span>{t("openNewTab")}</span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>
+                <DropdownMenuItem onClick={() => removeFavorite(item.id)}>
                   <Trash2 className="text-muted-foreground" />
                   <span>{t("removeFavorites")}</span>
                 </DropdownMenuItem>

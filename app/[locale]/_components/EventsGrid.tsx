@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
 
 import { AspectRatio } from "@/components/AspectRatio";
+import { FavoriteButton } from "@/components/FavoriteButton";
 import { Typography } from "@/components/Typography";
 import { Card, CardContent } from "@/components/ui";
 import { FALLBACK_IMAGE, TAG_LABELS_BG } from "@/constants";
@@ -113,6 +114,16 @@ export function EventsGrid({
                     <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-opacity" />
                   </div>
                   <div className="pointer-events-none absolute inset-0 z-10 bg-gradient-to-t from-black/70 via-black/25 to-transparent transition-opacity duration-300 group-hover:from-black/80" />
+
+                  {!isEditMode && typeof e.id === "number" && (
+                    <div className="absolute bottom-3 right-3 z-20">
+                      <FavoriteButton
+                        id={e.id}
+                        name={e.title ?? ""}
+                        url={`/${locale}/${e.slug}`}
+                      />
+                    </div>
+                  )}
 
                   {day !== null && (
                     <div className="absolute left-3 top-3 z-20 flex flex-col items-center rounded-lg bg-white/95 px-3 py-2 font-semibold uppercase tracking-wide text-slate-800 shadow-md">

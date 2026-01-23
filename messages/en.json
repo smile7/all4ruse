@@ -129,6 +129,8 @@
     "changePassword": "Change Password",
     "deleteAccount": "Delete Account",
     "deleteAccountDescr": "If you delete your account, it cannot be recovered. Please be sure you want to delete your account before proceeding.",
-    "passwordUpdatedSuccessfully": "Password updated successfully."
+    "passwordUpdatedSuccessfully": "Password updated successfully.",
+    "newPassword": "New Password",
+    "repeatPassword": "Repeat Password"
   }
 }
