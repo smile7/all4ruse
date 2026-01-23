@@ -83,7 +83,7 @@ export function EventsGrid({
             >
               {timeFilter === "past" && (
                 <div
-                  className="absolute left-1/2 top-1/4 z-40"
+                  className="absolute left-1/2 top-2/5 z-40"
                   style={{
                     transform: "translate(-50%, -50%) rotate(-15deg)",
                   }}

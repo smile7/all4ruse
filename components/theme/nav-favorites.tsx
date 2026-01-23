@@ -1,6 +1,13 @@
 "use client";
+import Link from "next/link";
 
-import { ArrowUpRight, Link, MoreHorizontal, Trash2 } from "lucide-react";
+import {
+  ArrowUpRightIcon,
+  LinkIcon,
+  MoreHorizontal,
+  MoreHorizontalIcon,
+  Trash2Icon,
+} from "lucide-react";
 import { useTranslations } from "next-intl";
 
 import {
@@ -61,15 +68,15 @@ export function NavFavorites() {
         {favorites.map((item) => (
           <SidebarMenuItem key={item.name}>
             <SidebarMenuButton asChild>
-              <a href={item.url} title={item.name}>
+              <Link href={item.url} title={item.name}>
                 <span>{item.emoji}</span>
                 <span>{item.name}</span>
-              </a>
+              </Link>
             </SidebarMenuButton>
             <DropdownMenu modal={false}>
               <DropdownMenuTrigger asChild className="cursor-pointer">
                 <SidebarMenuAction showOnHover>
-                  <MoreHorizontal />
+                  <MoreHorizontalIcon />
                   <span className="sr-only">{t("more")}</span>
                 </SidebarMenuAction>
               </DropdownMenuTrigger>
@@ -79,16 +86,16 @@ export function NavFavorites() {
                 align={isMobile ? "end" : "start"}
               >
                 <DropdownMenuItem onClick={() => handleCopyLink(item.url)}>
-                  <Link className="text-muted-foreground" />
+                  <LinkIcon className="text-muted-foreground" />
                   <span>{t("copyLink")}</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => handleOpenNewTab(item.url)}>
-                  <ArrowUpRight className="text-muted-foreground" />
+                  <ArrowUpRightIcon className="text-muted-foreground" />
                   <span>{t("openNewTab")}</span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => removeFavorite(item.id)}>
-                  <Trash2 className="text-destructive" />
+                  <Trash2Icon className="text-destructive" />
                   <span className="text-destructive">
                     {t("removeFavorites")}
                   </span>

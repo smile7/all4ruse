@@ -54,7 +54,7 @@ export default async function EventPage(props: {
 
       <Card>
         <CardContent className="flex flex-col gap-6 p-6">
-          <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center flex-col md:flex-row md:justify-between gap-4">
             <Typography.H1 className="text-center flex-1">
               {event.title}
             </Typography.H1>
@@ -88,8 +88,8 @@ export default async function EventPage(props: {
 
           <hr />
 
-          <div className="grid grid-cols-1 gap-8 md:grid-cols-4">
-            <div className="md:col-span-3 space-y-6">
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
+            <div className="lg:col-span-8 space-y-6">
               <div className="minimal-tiptap-editor">
                 <div
                   className="whitespace-pre-wrap text-pretty"
@@ -99,7 +99,7 @@ export default async function EventPage(props: {
                 />
               </div>
             </div>
-            <div className="md:col-span-1">
+            <div className="lg:col-span-4">
               <EventDetailsCard event={event} />
             </div>
           </div>
