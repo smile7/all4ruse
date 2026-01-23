@@ -12,7 +12,8 @@ import { PersonIcon } from "@radix-ui/react-icons";
 import { Typography } from "@/components/Typography";
 import { Card, CardContent } from "@/components/ui/card";
 import { Event, Host } from "@/lib/api";
-import { formatDateRange, formatTimeRange } from "@/lib/utils";
+import { formatLongDate, formatTimeRange } from "@/lib/utils";
+import { useLocale, useTranslations } from "next-intl";
 
 function OrganizersList({ organizers }: { organizers: Host[] }) {
   return (
@@ -21,7 +22,12 @@ function OrganizersList({ organizers }: { organizers: Host[] }) {
         <div key={idx} className="flex items-center gap-2 ml-2">
           <PersonIcon className="size-4 shrink-0 text-primary" />
           {org.link ? (
-            <a href={org.link} target="_blank" rel="noopener noreferrer">
+            <a
+              href={org.link}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-primary underline"
+            >
               {org.name}
             </a>
           ) : (
@@ -35,15 +41,22 @@ function OrganizersList({ organizers }: { organizers: Host[] }) {
 
 export function EventDetailsCard({ event }: { event: Event }) {
   const organizers = event.organizers as Host[];
+  const t = useTranslations("SingleEvent");
+  const locale = useLocale();
+  const localeCode = locale === "bg" ? "bg" : "en";
 
   return (
     <div className="flex flex-col gap-4">
-      <Card className="bg-accent border-none shadow-xl">
+      <Card className="bg-accent border-2 shadow-xl">
         <CardContent className="space-y-3">
           <div className="flex items-center gap-2 border-b pb-2 border-foreground/20">
             <CalendarDaysIcon className="size-4 shrink-0 text-primary" />
             <Typography.P>
-              {formatDateRange(event.startDate, event.endDate)}
+              {event.startDate
+                ? event.endDate && event.endDate !== event.startDate
+                  ? `${formatLongDate(event.startDate, localeCode)} - ${formatLongDate(event.endDate, localeCode)}`
+                  : formatLongDate(event.startDate, localeCode)
+                : ""}
             </Typography.P>
           </div>
 
@@ -79,7 +92,7 @@ export function EventDetailsCard({ event }: { event: Event }) {
         </CardContent>
       </Card>
 
-      <Card className="bg-accent border-none shadow-xl">
+      <Card className="bg-accent border-2 shadow-xl">
         <CardContent className="space-y-3">
           {event.ticketsLink?.trim() && (
             <div className="flex items-center gap-2 border-b pb-2 border-foreground/20">
@@ -88,8 +101,9 @@ export function EventDetailsCard({ event }: { event: Event }) {
                 href={event.ticketsLink}
                 target="_blank"
                 rel="noopener noreferrer"
+                className="text-primary underline"
               >
-                Билети
+                {t("tickets")}
               </a>
             </div>
           )}
@@ -97,7 +111,11 @@ export function EventDetailsCard({ event }: { event: Event }) {
           {event.price?.trim() && (
             <div className="flex items-center gap-2 border-b pb-2 border-foreground/20">
               <ReceiptEuroIcon className="size-4 shrink-0 text-primary" />
-              <Typography.P>Цена: {event.price} евро</Typography.P>
+              <Typography.P>
+                {event.price === "0"
+                  ? t("free")
+                  : `${t("price")}: ${event.price} ${t("euros")}`}
+              </Typography.P>
             </div>
           )}
 
@@ -105,7 +123,7 @@ export function EventDetailsCard({ event }: { event: Event }) {
             <div>
               <div className="flex items-center gap-2">
                 <UsersIcon className="size-4 shrink-0 text-primary" />
-                <Typography.P>Организатори: </Typography.P>
+                <Typography.P>{t("hosts")}: </Typography.P>
               </div>
               <OrganizersList organizers={organizers} />
             </div>

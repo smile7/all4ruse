@@ -40,6 +40,22 @@ export function formatDate(value?: string | null) {
   return format(d, "d MMM yyyy", { locale: bg });
 }
 
+export function formatLongDate(
+  value?: string | null,
+  localeCode: "bg" | "en" = "bg",
+) {
+  if (!value) return EMPTY_DISPLAY;
+  const d = parseISO(value);
+  if (!isValid(d)) return EMPTY_DISPLAY;
+
+  if (localeCode === "bg") {
+    return format(d, "d MMMM yyyy", { locale: bg });
+  }
+
+  // Default to English month names when not Bulgarian
+  return format(d, "d MMMM yyyy");
+}
+
 export function formatShortDate(
   value?: string | null,
   localeCode: "bg" | "en" = "bg",

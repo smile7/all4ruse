@@ -101,7 +101,9 @@
     "free": "Free",
     "contactPhone": "Contacts",
     "error": "An error occurred. Please try again later.",
-    "gallery": "Gallery"
+    "gallery": "Gallery",
+    "euros": "euros",
+    "hosts": "Hosts"
   },
   "CurrentEvents": {
     "createEvent": "Create an Event",
