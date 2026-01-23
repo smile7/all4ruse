@@ -1,5 +1,6 @@
 export * from "./calendars";
 export * from "./date-picker";
+export * from "./favorites-provider";
 export * from "./nav-favorites";
 export * from "./nav-main";
 export * from "./nav-secondary";

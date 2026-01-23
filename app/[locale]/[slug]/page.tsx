@@ -2,6 +2,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 
 import { EventDetailsCard } from "@/components/EventDetailsCard";
 import EventHeroImage from "@/components/EventHeroImage/EventHeroImage";
+import { FavoriteButton } from "@/components/FavoriteButton";
 import { ImagesGallery } from "@/components/ImagesGallery";
 import { Typography } from "@/components/Typography";
 import { Card, CardContent, CardTitle } from "@/components/ui";
@@ -51,7 +52,18 @@ export default async function EventPage(props: {
 
       <Card>
         <CardContent className="flex flex-col gap-6 p-6">
-          <Typography.H1 className="text-center">{event.title}</Typography.H1>
+          <div className="flex items-center justify-between gap-4">
+            <Typography.H1 className="text-center flex-1">
+              {event.title}
+            </Typography.H1>
+            {typeof event.id === "number" && (
+              <FavoriteButton
+                id={event.id}
+                name={event.title ?? ""}
+                url={`/${locale}/${slug}`}
+              />
+            )}
+          </div>
 
           {tags.length > 0 && (
             <div className="flex flex-wrap justify-center gap-2">

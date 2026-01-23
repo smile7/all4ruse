@@ -21,19 +21,6 @@ import {
 import { SidebarUserMenu } from "./sidebar-user-menu";
 import { NavFavorites } from ".";
 
-const favorites = [
-  {
-    name: "Арт Ателие с Ема Йорданова",
-    url: "#",
-    emoji: "⭐️",
-  },
-  {
-    name: "Best of Гошо и Джовани",
-    url: "#",
-    emoji: "⭐️",
-  },
-];
-
 export function SidebarLeft() {
   const { theme, systemTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
@@ -68,7 +55,7 @@ export function SidebarLeft() {
         </SidebarHeader>
         <SidebarContent className="mt-8 md:mt-0">
           <SidebarCustomMenu />
-          <NavFavorites favorites={favorites} />
+          <NavFavorites />
         </SidebarContent>
         <SidebarFooter>
           <SidebarMenu>
