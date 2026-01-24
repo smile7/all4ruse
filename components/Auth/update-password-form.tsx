@@ -44,7 +44,7 @@ export function UpdatePasswordForm({
     if (values.password.length < 6) {
       form.setError("password", {
         type: "manual",
-        message: "Password must be at least 6 characters.",
+        message: t("passwordLength"),
       });
       return;
     }
@@ -52,7 +52,7 @@ export function UpdatePasswordForm({
     if (values.password !== values.confirmPassword) {
       form.setError("confirmPassword", {
         type: "manual",
-        message: "Passwords must match.",
+        message: t("passwordsDoNotMatch"),
       });
       return;
     }
@@ -72,8 +72,7 @@ export function UpdatePasswordForm({
       toast.error(t("errorUpdatingPassword"));
       form.setError("root", {
         type: "server",
-        message:
-          err instanceof Error ? err.message : "An unexpected error occurred.",
+        message: err instanceof Error ? err.message : t("errorOccurred"),
       });
     }
   };
@@ -130,7 +129,7 @@ export function UpdatePasswordForm({
               />
 
               {errors.root?.message && (
-                <p className="text-sm text-red-500">
+                <p className="text-sm text-destructive">
                   {errors.root.message as string}
                 </p>
               )}

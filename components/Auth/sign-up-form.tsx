@@ -16,6 +16,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
+import { useTranslations } from "next-intl";
 
 export function SignUpForm({
   className,
@@ -29,6 +30,7 @@ export function SignUpForm({
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+  const t = useTranslations("Profile");
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,7 +39,7 @@ export function SignUpForm({
     setError(null);
 
     if (password !== repeatPassword) {
-      setError("Passwords do not match");
+      setError(t("passwordsDoNotMatch"));
       setIsLoading(false);
       return;
     }
@@ -59,7 +61,7 @@ export function SignUpForm({
       if (error) throw error;
       router.push("/auth/sign-up-success");
     } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : "An error occurred");
+      setError(error instanceof Error ? error.message : t("errorOccurred"));
     } finally {
       setIsLoading(false);
     }
@@ -69,15 +71,15 @@ export function SignUpForm({
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
         <CardHeader>
-          <CardTitle className="text-2xl">Sign up</CardTitle>
-          <CardDescription>Create a new account</CardDescription>
+          <CardTitle className="text-2xl">{t("signupTitle")}</CardTitle>
+          <CardDescription>{t("signupButton")}</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSignUp}>
             <div className="flex flex-col gap-6">
               <div className="grid gap-2">
                 <Label isRequired htmlFor="full-name">
-                  Full name
+                  {t("fullName")}
                 </Label>
                 <Input
                   id="full-name"
@@ -91,7 +93,7 @@ export function SignUpForm({
 
               <div className="grid gap-2">
                 <Label isRequired htmlFor="email">
-                  Email
+                  {t("email")}
                 </Label>
                 <Input
                   id="email"
@@ -106,7 +108,7 @@ export function SignUpForm({
               <div className="grid gap-2">
                 <div className="flex items-center">
                   <Label isRequired htmlFor="password">
-                    Password
+                    {t("password")}
                   </Label>
                 </div>
                 <Input
@@ -121,7 +123,7 @@ export function SignUpForm({
               <div className="grid gap-2">
                 <div className="flex items-center">
                   <Label isRequired htmlFor="repeat-password">
-                    Repeat Password
+                    {t("repeatPassword")}
                   </Label>
                 </div>
                 <Input
@@ -134,12 +136,11 @@ export function SignUpForm({
               </div>
 
               <div className="grid gap-2">
-                <Label htmlFor="website">Website</Label>
+                <Label htmlFor="website">{t("website")}</Label>
                 <Input
                   id="website"
                   type="text"
                   placeholder="https://example.com"
-                  required
                   value={website}
                   onChange={(e) => setWebsite(e.target.value)}
                 />
@@ -147,13 +148,13 @@ export function SignUpForm({
 
               {error && <p className="text-sm text-red-500">{error}</p>}
               <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? "Creating an account..." : "Sign up"}
+                {isLoading ? "creatingAccount" : t("signupButton")}
               </Button>
             </div>
             <div className="mt-4 text-center text-sm">
-              Already have an account?{" "}
+              {t("haveAccount")}{" "}
               <Link href="/auth/login" className="underline underline-offset-4">
-                Login
+                {t("loginButton")}
               </Link>
             </div>
           </form>

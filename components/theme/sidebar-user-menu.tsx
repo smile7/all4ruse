@@ -36,7 +36,7 @@ export function SidebarUserMenu() {
   });
 
   useEffect(() => {
-    (async () => {
+    const loadProfile = async () => {
       const { data: profile } = await getCurrentUserProfile(supabase);
 
       if (!profile) {
@@ -48,16 +48,30 @@ export function SidebarUserMenu() {
         fullName: profile.full_name || profile.email || null,
         avatarUrl: profile.avatar_url || null,
       });
-    })();
+    };
+
+    loadProfile();
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (!session) {
+        setUser({ fullName: null, avatarUrl: null });
+      } else {
+        loadProfile();
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, [supabase]);
 
   const { fullName, avatarUrl } = user;
 
   const handleLogout = async () => {
-    await fetch(`/${locale}/auth/signout`, {
-      method: "POST",
-      credentials: "include",
-    });
+    await supabase.auth.signOut();
+    setUser({ fullName: null, avatarUrl: null });
 
     router.replace(`/${locale}/auth/login`);
     router.refresh();
