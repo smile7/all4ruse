@@ -81,7 +81,7 @@ function ProfileForm({ defaultValues }: { defaultValues: ProfileFormValues }) {
     defaultValues,
   });
 
-  const { mutate, isPending, isSuccess, error } = useUpdateProfile();
+  const { mutate, isPending, error } = useUpdateProfile();
 
   const onSubmit = (values: ProfileFormValues) => {
     mutate(values);

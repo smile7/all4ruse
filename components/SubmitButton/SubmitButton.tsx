@@ -13,15 +13,14 @@ export function SubmitButton({
   children = "Създай",
   className,
   disabled,
+  isLoading,
   ...props
 }: SubmitButtonProps) {
-  const { pending } = useFormStatus();
-
   return (
     <Button
       type="submit"
-      isLoading={pending}
-      disabled={pending || disabled}
+      isLoading={isLoading}
+      disabled={isLoading || disabled}
       className={cn(className)}
       {...props}
     >

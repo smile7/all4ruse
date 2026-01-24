@@ -7,7 +7,6 @@ import {
   type Editor,
   useEditor,
   type UseEditorOptions,
-  useEditorState,
 } from "@tiptap/react";
 import { StarterKit } from "@tiptap/starter-kit";
 
@@ -236,27 +235,7 @@ export const useMinimalTiptapEditor = ({
     onBlur: ({ editor }) => handleBlur(editor),
     ...props,
   });
-
-  const { editor: mainEditor } = useEditorState({
-    editor,
-    selector(context) {
-      if (!context.editor) {
-        return {
-          editor: null,
-          editorState: undefined,
-          canCommand: undefined,
-        };
-      }
-
-      return {
-        editor: context.editor,
-        editorState: context.editor.state,
-        canCommand: context.editor.can,
-      };
-    },
-  });
-
-  return mainEditor;
+  return editor;
 };
 
 export default useMinimalTiptapEditor;

@@ -51,7 +51,6 @@ export function EventsFilters({ filters }: EventsFiltersProps) {
     <Accordion
       type="single"
       collapsible
-      defaultValue="filters"
       className="rounded-md border bg-secondary"
     >
       <AccordionItem value="filters">
