@@ -1,3 +1,4 @@
+import { Typography } from "@/components/Typography";
 import {
   Card,
   CardContent,
@@ -6,25 +7,25 @@ import {
   CardTitle,
 } from "@/components/ui";
 
+import { useTranslations } from "next-intl";
+
 export default function Page() {
+  const t = useTranslations("Profile");
+
   return (
-    <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
-      <div className="w-full max-w-sm">
+    <div className="flex w-full items-center justify-center">
+      <div className="w-full max-w-lg">
         <div className="flex flex-col gap-6">
           <Card>
             <CardHeader>
               <CardTitle className="text-2xl">
-                Благодарим ви, че се регистрирахте!
+                {t("thankYouForSigningUp")}
               </CardTitle>
-              <CardDescription>
-                Проверете имейла си, за да потвърдите
-              </CardDescription>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-muted-foreground">
-                Успешно се регистрирахте. Моля, проверете имейла си, за да
-                потвърдите акаунта си, преди да влезете.
-              </p>
+              <Typography.P className="text-sm text-muted-foreground">
+                {t("pleaseCheckEmail")}
+              </Typography.P>
             </CardContent>
           </Card>
         </div>
