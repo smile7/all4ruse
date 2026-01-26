@@ -34,9 +34,11 @@ export default async function EventsPage({
             <Link href={`/${locale}/create`}>{t("createEvent")}</Link>
           </Button>
         )}
-        <div className="flex flex-col md:gap-2 order-2 md:order-1">
+        <div className="flex flex-col gap-2 order-2 md:order-1">
           <Typography.H1>{t("pageTitle")}</Typography.H1>
           <Typography.Small>{t("pageDescription")}</Typography.Small>
+          <hr className="my-1.5" />
+          <Typography.Small>{t("createProfileMsg")}</Typography.Small>
         </div>
       </div>
       <Events
