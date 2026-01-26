@@ -12,6 +12,7 @@ import StarterKit from "@tiptap/starter-kit";
 
 import { EventDateSelector } from "@/app/[locale]/_components";
 import { AspectRatio } from "@/components/AspectRatio";
+import { DrawerDialog } from "@/components/DialogDrawer";
 import { validateAndUploadEventImageClient } from "@/app/[locale]/actions";
 import { SubmitButton } from "@/components/SubmitButton";
 import { TimePopover } from "@/components/TimePopover";
@@ -388,11 +389,6 @@ export function EventForm({ mode, event }: EventFormProps) {
 
   const handleDelete = async () => {
     if (mode !== "edit" || !event?.id) return;
-
-    const confirmed = window.confirm(
-      t("confirmDeleteEvent") ?? "Are you sure you want to delete this event?",
-    );
-    if (!confirmed) return;
 
     await deleteEventMutate(event.id);
     router.push("/");
@@ -821,17 +817,39 @@ export function EventForm({ mode, event }: EventFormProps) {
 
             <div className="flex justify-end gap-3">
               {mode === "edit" && event?.id && (
-                <Button
-                  type="button"
-                  variant="outline"
-                  disabled={isPending}
-                  onClick={handleDelete}
-                  className="border-destructive text-destructive hover:bg-destructive/10"
+                <DrawerDialog
+                  title={t("deleteEventTitle")}
+                  description={t("confirmDeleteEvent")}
+                  showDrawerCancel
+                  trigger={
+                    <Button
+                      type="button"
+                      variant="outline"
+                      disabled={isPending}
+                      isLoading={isPending}
+                      className="border-destructive text-destructive hover:bg-destructive/10"
+                    >
+                      {t("deleteEventButton")}
+                    </Button>
+                  }
                 >
-                  {t("deleteEventButton")}
-                </Button>
+                  <div className="flex justify-end gap-3 pb-4">
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      disabled={isPending}
+                      isLoading={isPending}
+                      onClick={handleDelete}
+                    >
+                      {t("deleteEventButton")}
+                    </Button>
+                  </div>
+                </DrawerDialog>
               )}
-              <SubmitButton disabled={form.formState.isSubmitting || isPending}>
+              <SubmitButton
+                disabled={form.formState.isSubmitting || isPending}
+                isLoading={isPending}
+              >
                 {t("submitButton")}
               </SubmitButton>
             </div>

@@ -82,7 +82,8 @@
     "error": "An error occurred. Please try again later.",
     "noTagsAvailable": "No tags available",
     "tags": "Tags",
-    "deleteEventButton": "Delete Event",
+    "deleteEventTitle": "Delete Event",
+    "deleteEventButton": "Delete",
     "confirmDeleteEvent": "Are you sure you want to delete this event? This action cannot be undone.",
     "eventDeleted": "Event deleted successfully."
   },

@@ -16,7 +16,7 @@ export default function EditEventPage() {
 
   // TODO: add skeleton loader
   if (isLoading) return <p>Loading...</p>;
-  if (error) return <ErrorAlert error={error.message} />;
+  if (error) return <ErrorAlert error="">{t("error")}</ErrorAlert>;
   if (!data) return <Typography.P>{t("eventNotFound")}</Typography.P>;
 
   return <EventForm mode="edit" event={data} />;

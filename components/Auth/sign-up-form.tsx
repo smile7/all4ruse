@@ -147,8 +147,13 @@ export function SignUpForm({
               </div>
 
               {error && <p className="text-sm text-red-500">{error}</p>}
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? "creatingAccount" : t("signupButton")}
+              <Button
+                type="submit"
+                className="w-full"
+                disabled={isLoading}
+                isLoading={isLoading}
+              >
+                {t("signupButton")}
               </Button>
             </div>
             <div className="mt-4 text-center text-sm">
