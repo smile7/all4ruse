@@ -1,3 +1,4 @@
+import { notFound } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
 
 import { EventDetailsCard } from "@/components/EventDetailsCard";
@@ -9,6 +10,7 @@ import { Card, CardContent, CardTitle, ErrorAlert } from "@/components/ui";
 import { TAG_LABELS_BG } from "@/constants";
 import { getEventBySlug, type Tag } from "@/lib/api";
 import { createClient } from "@/lib/supabase/server";
+import { getEventTemporalStatus } from "../_components/FilterByTime";
 
 import "@/components/ui/minimal-tiptap/styles/index.css";
 
@@ -17,13 +19,14 @@ export default async function EventPage(props: {
 }) {
   const { params } = props;
   const t = await getTranslations("SingleEvent");
+  const tHome = await getTranslations("HomePage");
   const locale = await getLocale();
   const supabase = await createClient();
   const { slug } = await params;
-  const { data: event, error } = await getEventBySlug(supabase, slug);
+  const { data: event } = await getEventBySlug(supabase, slug);
 
-  if (Boolean(error) || !event) {
-    return <ErrorAlert error={t("error")} />;
+  if (!event) {
+    notFound();
   }
 
   // Load tags for this event with the join table
@@ -48,12 +51,30 @@ export default async function EventPage(props: {
     ? event.images.filter((x): x is string => typeof x === "string")
     : [];
 
+  const isPast = getEventTemporalStatus(event) === "past";
+
   return (
     <div className="flex flex-col gap-6">
-      {event.image && <EventHeroImage src={event.image} alt={event.title} />}
+      {event.image && (
+        <EventHeroImage src={event.image} alt={event.title} isPast={isPast} />
+      )}
 
       <Card>
         <CardContent className="flex flex-col gap-6 p-6">
+          {isPast && (
+            <div className="flex justify-center">
+              <span
+                className="px-6 py-2 text-xl uppercase rounded-md font-bold shadow-lg whitespace-nowrap"
+                style={{
+                  background: "var(--color-secondary)",
+                  color: "var(--color-destructive)",
+                  border: "2px solid var(--color-destructive)",
+                }}
+              >
+                {tHome("pastEvent")}
+              </span>
+            </div>
+          )}
           <div className="flex items-center flex-col md:flex-row md:justify-between gap-4">
             <Typography.H1 className="text-center flex-1">
               {event.title}

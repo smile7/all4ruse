@@ -118,6 +118,11 @@
   @apply pl-6;
 }
 
+.minimal-tiptap-editor ol,
+.minimal-tiptap-editor ul {
+  @apply pl-6;
+}
+
 .minimal-tiptap-editor .ProseMirror blockquote,
 .minimal-tiptap-editor .ProseMirror dl,
 .minimal-tiptap-editor .ProseMirror ol,

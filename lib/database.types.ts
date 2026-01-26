@@ -52,6 +52,7 @@ export type Database = {
           description: string
           endDate: string
           endTime: string
+          fbLink: string | null
           id: number
           image: string | null
           images: Json | null
@@ -73,6 +74,7 @@ export type Database = {
           description: string
           endDate: string
           endTime: string
+          fbLink?: string | null
           id?: number
           image?: string | null
           images?: Json | null
@@ -94,6 +96,7 @@ export type Database = {
           description?: string
           endDate?: string
           endTime?: string
+          fbLink?: string | null
           id?: number
           image?: string | null
           images?: Json | null
