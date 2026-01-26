@@ -1,5 +1,6 @@
 import * as React from "react";
 import { TextStyle } from "@tiptap/extension-text-style";
+import { TextAlign } from "@tiptap/extension-text-align";
 import { Typography } from "@tiptap/extension-typography";
 import { Placeholder, Selection } from "@tiptap/extensions";
 import {
@@ -80,6 +81,9 @@ const createExtensions = ({
     // text
     // underline
     // trailingNode
+  }),
+  TextAlign.configure({
+    types: ["heading", "paragraph"],
   }),
   // Image.configure({
   //   allowedMimeTypes: ["image/jpeg", "image/png", "image/gif"],

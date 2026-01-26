@@ -4,6 +4,7 @@ import {
   BuildingIcon,
   CalendarDaysIcon,
   ClockIcon,
+  FacebookIcon,
   PhoneIcon,
   ReceiptEuroIcon,
   TicketIcon,
@@ -99,6 +100,20 @@ export function EventDetailsCard({ event }: { event: Event }) {
       </Card>
       <Card className="bg-accent border-2 shadow-xl">
         <CardContent className="space-y-3">
+          {event.fbLink?.trim() && (
+            <div className="flex items-center gap-2 border-b pb-2 border-foreground/20">
+              <FacebookIcon className="size-4 shrink-0 text-primary" />
+              <a
+                href={event.fbLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary underline"
+              >
+                {t("facebook")}
+              </a>
+            </div>
+          )}
+
           {event.ticketsLink?.trim() && (
             <div className="flex items-center gap-2 border-b pb-2 border-foreground/20">
               <TicketIcon className="size-4 shrink-0 text-primary" />

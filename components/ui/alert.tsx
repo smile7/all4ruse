@@ -1,6 +1,6 @@
 import * as React from "react";
 import { cva, type VariantProps } from "class-variance-authority";
-import { AlertCircleIcon } from "lucide-react";
+import { AlertCircleIcon, AlertTriangleIcon } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
@@ -12,12 +12,14 @@ const alertVariants = cva(
         default: "bg-card text-card-foreground",
         destructive:
           "border-destructive/50 text-destructive-foreground bg-destructive dark:border-destructive [&>svg]:text-current",
+        warning:
+          "border-amber-400/60 bg-amber-50 text-amber-900 dark:border-amber-300/60 dark:bg-amber-950/40 dark:text-amber-50 [&>svg]:text-current",
       },
     },
     defaultVariants: {
       variant: "default",
     },
-  }
+  },
 );
 
 function Alert({
@@ -41,7 +43,7 @@ function AlertTitle({ className, ...props }: React.ComponentProps<"div">) {
       data-slot="alert-title"
       className={cn(
         "col-start-2 line-clamp-1 leading-tight font-medium tracking-tight",
-        className
+        className,
       )}
       {...props}
     />
@@ -57,7 +59,7 @@ function AlertDescription({
       data-slot="alert-description"
       className={cn(
         "col-start-2 grid justify-items-start gap-1 text-sm [&_p]:leading-relaxed",
-        className
+        className,
       )}
       {...props}
     />
@@ -76,5 +78,17 @@ function ErrorAlert({
     </Alert>
   );
 }
+function WarningAlert({
+  warning,
+  ...rest
+}: React.ComponentProps<"div"> & { warning: string }) {
+  return (
+    <Alert {...rest} variant="warning">
+      <AlertTriangleIcon className="size-4" />
+      {/* <AlertTitle></AlertTitle> */}
+      <AlertDescription>{warning}</AlertDescription>
+    </Alert>
+  );
+}
 
-export { Alert, AlertDescription, AlertTitle, ErrorAlert };
+export { Alert, AlertDescription, AlertTitle, ErrorAlert, WarningAlert };

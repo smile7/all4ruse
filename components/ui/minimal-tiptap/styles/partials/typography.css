@@ -10,12 +10,12 @@
 
 .minimal-tiptap-editor .ProseMirror h1,
 .minimal-tiptap-editor h1 {
-  @apply mt-[46px] mb-4 text-[3rem] leading-7 tracking-[-0.004375rem];
+  @apply mt-[46px] mb-4 text-[2rem] leading-7 tracking-[-0.004375rem];
 }
 
 .minimal-tiptap-editor .ProseMirror h2,
 .minimal-tiptap-editor h2 {
-  @apply mt-8 mb-3.5 text-[2rem] leading-7 tracking-[0.003125rem];
+  @apply mt-8 mb-3.5 text-[1.75rem] leading-7 tracking-[0.003125rem];
 }
 
 .minimal-tiptap-editor .ProseMirror h3,

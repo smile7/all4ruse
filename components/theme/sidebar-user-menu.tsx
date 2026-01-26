@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { ListIcon, LogOutIcon, MoreVerticalIcon, UserIcon } from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 
@@ -17,6 +18,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
   SidebarMenuButton,
+  useSidebar,
 } from "../ui";
 
 type SidebarUser = {
@@ -30,6 +32,7 @@ export function SidebarUserMenu() {
 
   const router = useRouter();
   const supabase = createClient();
+  const { isMobile, setOpenMobile } = useSidebar();
   const [user, setUser] = useState<SidebarUser>({
     fullName: "",
     avatarUrl: "",
@@ -75,12 +78,27 @@ export function SidebarUserMenu() {
 
     router.replace(`/${locale}/auth/login`);
     router.refresh();
+
+    if (isMobile) {
+      setOpenMobile(false);
+    }
+  };
+
+  const handleNavigate = (path: string) => {
+    router.push(path);
+
+    if (isMobile) {
+      setOpenMobile(false);
+    }
   };
 
   return (
     <DropdownMenu modal={false}>
       <DropdownMenuTrigger asChild>
-        <SidebarMenuButton className="ring-primary h-auto flex gap-2 items-center justify-center cursor-pointer">
+        <SidebarMenuButton
+          className="ring-primary h-auto flex gap-2 items-center justify-center cursor-pointer"
+          closeOnMobile={false}
+        >
           <Avatar>
             <AvatarImage
               src={avatarUrl || DEFAULT_AVATAR}
@@ -99,15 +117,31 @@ export function SidebarUserMenu() {
       >
         {fullName ? (
           <>
-            <DropdownMenuItem
-              onClick={() => router.push(`/${locale}/published-events`)}
-            >
-              <ListIcon className="mr-2" />
-              {t("publishedEvents")}
+            <DropdownMenuItem asChild>
+              <Link
+                href={`/${locale}/published-events`}
+                onClick={() => {
+                  if (isMobile) {
+                    setOpenMobile(false);
+                  }
+                }}
+              >
+                <ListIcon className="mr-2" />
+                {t("publishedEvents")}
+              </Link>
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => router.push(`/${locale}/profile`)}>
-              <UserIcon className="mr-2" />
-              {t("account")}
+            <DropdownMenuItem asChild>
+              <Link
+                href={`/${locale}/profile`}
+                onClick={() => {
+                  if (isMobile) {
+                    setOpenMobile(false);
+                  }
+                }}
+              >
+                <UserIcon className="mr-2" />
+                {t("account")}
+              </Link>
             </DropdownMenuItem>
             <DropdownMenuItem onClick={handleLogout}>
               <LogOutIcon className="text-destructive mr-2" />
@@ -115,10 +149,17 @@ export function SidebarUserMenu() {
             </DropdownMenuItem>
           </>
         ) : (
-          <DropdownMenuItem
-            onClick={() => router.push(`/${locale}/auth/login`)}
-          >
-            {t("loginSignup")}
+          <DropdownMenuItem asChild>
+            <Link
+              href={`/${locale}/auth/login`}
+              onClick={() => {
+                if (isMobile) {
+                  setOpenMobile(false);
+                }
+              }}
+            >
+              {t("loginSignup")}
+            </Link>
           </DropdownMenuItem>
         )}
       </DropdownMenuContent>
