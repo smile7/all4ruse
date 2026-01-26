@@ -8,7 +8,6 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { zodResolver } from "@hookform/resolvers/zod";
-import StarterKit from "@tiptap/starter-kit";
 
 import { EventDateSelector } from "@/app/[locale]/_components";
 import { AspectRatio } from "@/components/AspectRatio";
@@ -32,6 +31,7 @@ import {
   Popover,
   PopoverContent,
   PopoverTrigger,
+  WarningAlert,
 } from "@/components/ui";
 import { MinimalTiptapEditor } from "@/components/ui/minimal-tiptap";
 import { EVENTS_BUCKET, TAG_LABELS_BG } from "@/constants";
@@ -58,12 +58,18 @@ type EventImageItem = {
   isNew: boolean;
 };
 
+const MAX_IMAGES = 10;
+
 export function EventForm({ mode, event }: EventFormProps) {
   const t = useTranslations("CreateEvent");
   const locale = useLocale();
 
   const [authChecked, setAuthChecked] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
+  const [imagesLimitExceeded, setImagesLimitExceeded] = useState(false);
+  const [imageSizeExceeded, setImageSizeExceeded] = useState(false);
+  const [showLeaveDialog, setShowLeaveDialog] = useState(false);
+  const [nextUrl, setNextUrl] = useState<string | null>(null);
 
   const [images, setImages] = useState<EventImageItem[]>(() => {
     if (mode !== "edit" || !event) return [];
@@ -87,7 +93,7 @@ export function EventForm({ mode, event }: EventFormProps) {
       });
     }
 
-    return initial;
+    return initial.slice(0, MAX_IMAGES);
   });
 
   const router = useRouter();
@@ -124,6 +130,7 @@ export function EventForm({ mode, event }: EventFormProps) {
         endTime: event.endTime ?? "",
         organizers: (event.organizers as Host[]) ?? [{ name: "", link: "" }],
         ticketsLink: event.ticketsLink ?? "",
+        fbLink: event.fbLink ?? "",
         price: event.price ?? "",
         phoneNumber: event.phoneNumber ?? "",
         image: undefined,
@@ -142,6 +149,7 @@ export function EventForm({ mode, event }: EventFormProps) {
         endTime: "",
         organizers: [{ name: "", link: "" }],
         ticketsLink: "",
+        fbLink: "",
         price: "",
         phoneNumber: "",
         image: undefined,
@@ -167,11 +175,34 @@ export function EventForm({ mode, event }: EventFormProps) {
   }, [form, images]);
 
   const onDrop = useCallback(
-    (acceptedFiles: File[]) => {
+    (acceptedFiles: File[], fileRejections: any[]) => {
       setImages((prev) => {
+        const availableSlots = MAX_IMAGES - prev.length;
+        if (availableSlots <= 0) {
+          setImagesLimitExceeded(true);
+          return prev;
+        }
+
+        const filesToAdd = acceptedFiles.slice(0, availableSlots);
+
+        if (acceptedFiles.length > filesToAdd.length) {
+          setImagesLimitExceeded(true);
+        } else {
+          setImagesLimitExceeded(false);
+        }
+
+        // Size warning: if any rejected file was too large, show warning,
+        // otherwise clear it when this drop has no size issues.
+        const hasTooLarge = fileRejections?.some((rejection) =>
+          rejection.errors?.some(
+            (error: { code: string }) => error.code === "file-too-large",
+          ),
+        );
+        setImageSizeExceeded(Boolean(hasTooLarge));
+
         const next: EventImageItem[] = [
           ...prev,
-          ...acceptedFiles.map((file, index) => ({
+          ...filesToAdd.map((file, index) => ({
             id: `new-${Date.now()}-${prev.length + index}`,
             url: URL.createObjectURL(file),
             file,
@@ -179,7 +210,9 @@ export function EventForm({ mode, event }: EventFormProps) {
           })),
         ];
 
-        const newFiles = next
+        const capped = next.slice(0, MAX_IMAGES);
+
+        const newFiles = capped
           .filter((i) => i.isNew && i.file)
           .map((i) => i.file as File);
 
@@ -188,7 +221,7 @@ export function EventForm({ mode, event }: EventFormProps) {
           form.setValue("image", newFiles[0]);
         }
 
-        return next;
+        return capped;
       });
     },
     [form],
@@ -204,6 +237,10 @@ export function EventForm({ mode, event }: EventFormProps) {
         }
 
         const next = prev.filter((_, i) => i !== idx);
+
+        if (next.length < MAX_IMAGES) {
+          setImagesLimitExceeded(false);
+        }
 
         const newFiles = next
           .filter((i) => i.isNew && i.file)
@@ -310,7 +347,7 @@ export function EventForm({ mode, event }: EventFormProps) {
     }
 
     const orderedUrls: string[] = [];
-    for (const item of images) {
+    for (const item of images.slice(0, MAX_IMAGES)) {
       if (item.isNew) {
         const url = uploadMap.get(item.id);
         if (url) orderedUrls.push(url);
@@ -319,8 +356,9 @@ export function EventForm({ mode, event }: EventFormProps) {
       }
     }
 
-    const coverUrl = orderedUrls[0] ?? null;
-    const galleryUrls = orderedUrls.slice(1);
+    const limitedUrls = orderedUrls.slice(0, MAX_IMAGES);
+    const coverUrl = limitedUrls[0] ?? null;
+    const galleryUrls = limitedUrls.slice(1);
 
     const basePayload = {
       title: values.title,
@@ -334,6 +372,7 @@ export function EventForm({ mode, event }: EventFormProps) {
       endTime: values.endTime,
       organizers: values.organizers,
       ticketsLink: values.ticketsLink || null,
+      fbLink: values.fbLink || null,
       price: values.price || null,
       phoneNumber: values.phoneNumber || null,
       image: coverUrl,
@@ -399,6 +438,38 @@ export function EventForm({ mode, event }: EventFormProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [images]);
 
+  useEffect(() => {
+    const handleDocumentClick = (event: MouseEvent) => {
+      if (showLeaveDialog) return;
+      if (isPending) return;
+      if (!form.formState.isDirty) return;
+
+      const target = event.target as HTMLElement | null;
+      if (!target) return;
+
+      const link = target.closest("a");
+      if (!link) return;
+
+      const href = link.getAttribute("href");
+      if (!href || !href.startsWith("/")) return;
+
+      const linkTarget = link.getAttribute("target");
+      if (linkTarget && linkTarget !== "_self") return;
+
+      event.preventDefault();
+      event.stopPropagation();
+
+      setNextUrl(href);
+      setShowLeaveDialog(true);
+    };
+
+    document.addEventListener("click", handleDocumentClick, true);
+
+    return () => {
+      document.removeEventListener("click", handleDocumentClick, true);
+    };
+  }, [form.formState.isDirty, isPending, showLeaveDialog]);
+
   if (!authChecked) return null;
 
   return (
@@ -445,7 +516,6 @@ export function EventForm({ mode, event }: EventFormProps) {
                       placeholder={t("enterDescription")}
                       editable
                       editorClassName="focus:outline-hidden h-80 overflow-auto"
-                      extensions={[StarterKit]}
                     />
                   </FormControl>
                   <FormMessage />
@@ -669,7 +739,7 @@ export function EventForm({ mode, event }: EventFormProps) {
               <FormMessage />
             </FormItem>
 
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-6 md:grid-cols-2">
               <FormField
                 control={form.control}
                 name="ticketsLink"
@@ -686,12 +756,12 @@ export function EventForm({ mode, event }: EventFormProps) {
 
               <FormField
                 control={form.control}
-                name="price"
+                name="fbLink"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t("price")}</FormLabel>
+                    <FormLabel>{t("fbLink")}</FormLabel>
                     <FormControl>
-                      <Input placeholder={t("enterPrice")} {...field} />
+                      <Input placeholder={t("enterFbLink")} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -706,6 +776,20 @@ export function EventForm({ mode, event }: EventFormProps) {
                     <FormLabel>{t("phoneNumber")}</FormLabel>
                     <FormControl>
                       <Input placeholder={t("enterPhoneNumber")} {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="price"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("price")}</FormLabel>
+                    <FormControl>
+                      <Input placeholder={t("enterPrice")} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -729,10 +813,25 @@ export function EventForm({ mode, event }: EventFormProps) {
                   {isDragActive ? (
                     <Typography.P>{t("uploadImageDrop")}</Typography.P>
                   ) : (
-                    <Typography.P>{t("uploadImages")}</Typography.P>
+                    <>
+                      <Typography.P>{t("uploadImages")}</Typography.P>
+                      <Typography.Small className="mt-2 block text-muted-foreground">
+                        {t("uploadImagesInfo")}
+                      </Typography.Small>
+                    </>
                   )}
                 </div>
               </FormControl>
+              {(imagesLimitExceeded || imageSizeExceeded) && (
+                <WarningAlert
+                  className="mt-3"
+                  warning={
+                    imagesLimitExceeded
+                      ? t("maxImagesExceeded")
+                      : t("maxImageSizeExceeded")
+                  }
+                />
+              )}
 
               {images.length > 0 && (
                 <div className="mt-6 space-y-4">
@@ -829,7 +928,7 @@ export function EventForm({ mode, event }: EventFormProps) {
                       isLoading={isPending}
                       className="border-destructive text-destructive hover:bg-destructive/10"
                     >
-                      {t("deleteEventButton")}
+                      {t("deleteEventTitle")}
                     </Button>
                   }
                 >
@@ -841,7 +940,7 @@ export function EventForm({ mode, event }: EventFormProps) {
                       isLoading={isPending}
                       onClick={handleDelete}
                     >
-                      {t("deleteEventButton")}
+                      {t("deleteEventTitle")}
                     </Button>
                   </div>
                 </DrawerDialog>
@@ -855,6 +954,40 @@ export function EventForm({ mode, event }: EventFormProps) {
             </div>
           </form>
         </Form>
+
+        <DrawerDialog
+          open={showLeaveDialog}
+          setOpen={setShowLeaveDialog}
+          title={t("unsavedChangesTitle")}
+          description={t("unsavedChangesDescription")}
+        >
+          <div className="flex justify-end gap-2 pb-4">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => {
+                setShowLeaveDialog(false);
+                setNextUrl(null);
+              }}
+            >
+              {t("unsavedChangesCancel")}
+            </Button>
+            <Button
+              type="button"
+              variant="destructive"
+              onClick={() => {
+                setShowLeaveDialog(false);
+                if (!nextUrl) return;
+
+                const destination = nextUrl;
+                setNextUrl(null);
+                router.push(destination);
+              }}
+            >
+              {t("unsavedChangesConfirm")}
+            </Button>
+          </div>
+        </DrawerDialog>
       </CardContent>
     </Card>
   );

@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import { EmojiButton } from "./components/emoji-button";
 import { LinkBubbleMenu } from "./components/bubble-menu/link-bubble-menu";
 import { MeasuredContainer } from "./components/measured-container";
+import { AlignSection } from "./components/section/align";
 import { SectionFive } from "./components/section/five";
 import { SectionFour } from "./components/section/four";
 import { SectionOne } from "./components/section/one";
@@ -43,6 +44,10 @@ const Toolbar = ({ editor }: { editor: Editor }) => (
       {/* <Separator orientation="vertical" className="mx-2" /> */}
 
       {/* <SectionThree editor={editor} /> */}
+
+      <Separator orientation="vertical" className="mx-2" />
+
+      <AlignSection editor={editor} />
 
       <Separator orientation="vertical" className="mx-2" />
 

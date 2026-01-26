@@ -35,13 +35,6 @@ const formatActions: TextStyle[] = [
     shortcuts: ["mod", "alt", "0"],
   },
   {
-    label: "Heading 1",
-    element: "h1",
-    level: 1,
-    className: "m-0 grow text-3xl font-extrabold",
-    shortcuts: ["mod", "alt", "1"],
-  },
-  {
     label: "Heading 2",
     element: "h2",
     level: 2,
@@ -85,7 +78,7 @@ interface SectionOneProps extends VariantProps<typeof toggleVariants> {
 
 export const SectionOne: React.FC<SectionOneProps> = ({
   editor,
-  activeLevels = [1, 2, 3, 4, 5, 6],
+  activeLevels = [2, 3, 4, 5, 6],
   size,
   variant,
 }) => {

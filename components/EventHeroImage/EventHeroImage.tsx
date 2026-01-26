@@ -4,14 +4,18 @@ import React, { useEffect, useState } from "react";
 import { XIcon } from "lucide-react";
 import Image from "next/image";
 
+import { cn } from "@/lib/utils";
+
 type EventHeroImageProps = {
   src: string;
   alt?: string;
+  isPast?: boolean;
 };
 
 export default function EventHeroImage({
   src,
   alt = "Event image",
+  isPast = false,
 }: EventHeroImageProps) {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -26,7 +30,10 @@ export default function EventHeroImage({
   return (
     <>
       <div
-        className="group relative w-full overflow-hidden cursor-zoom-in rounded-md shadow-md hover:shadow-lg transition"
+        className={cn(
+          "group relative w-full overflow-hidden cursor-zoom-in rounded-md shadow-md hover:shadow-lg transition",
+          isPast && "grayscale opacity-60",
+        )}
         onClick={() => setIsOpen(true)}
       >
         {/* Image */}
@@ -51,7 +58,6 @@ export default function EventHeroImage({
           className="fixed inset-0 z-[9999] bg-black/80 backdrop-blur-sm animate-fadeIn flex items-center justify-center"
           onClick={() => setIsOpen(false)}
         >
-          {/* Close button */}
           <button
             onClick={(e) => {
               e.stopPropagation();
@@ -63,7 +69,6 @@ export default function EventHeroImage({
             <XIcon size={20} />
           </button>
 
-          {/* Image */}
           <div className="relative max-w-6xl w-full h-auto max-h-[90vh]">
             <Image
               src={src}

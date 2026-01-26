@@ -126,9 +126,11 @@ export function EventsGrid({
                   )}
 
                   {day !== null && (
-                    <div className="absolute left-3 top-3 z-20 flex flex-col items-center rounded-lg bg-white/95 px-3 py-2 font-semibold uppercase tracking-wide text-slate-800 shadow-md">
-                      <span className="text-lg leading-none">{day}</span>
-                      <span className="text-[9px] leading-none">{month}</span>
+                    <div className="absolute left-3 top-3 z-20 flex flex-col items-center rounded-xl bg-white/95 px-4 py-3 font-semibold uppercase tracking-wide text-slate-800 shadow-md">
+                      <span className="text-2xl leading-none">{day}</span>
+                      <span className="text-[11px] leading-tight mt-0.5">
+                        {month}
+                      </span>
                     </div>
                   )}
 
