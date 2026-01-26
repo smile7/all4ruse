@@ -2,8 +2,8 @@
   "HomePage": {
     "createEvent": "Create an Event",
     "pageTitle": "Events in Ruse",
-    "pageDescription": "All cultural and noncultural events in Ruse and the surrounding area",
-    "createProfileMsg": "Create a profile to create an event!",
+    "pageDescription": "All cultural and non-cultural events in Ruse and the surrounding area",
+    "createProfileMsg": "Create a profile to create your own event!",
     "filters": "Filters",
     "noEvents": "No events found.",
     "fromDate": "From Date",
