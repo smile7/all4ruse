@@ -1,3 +1,5 @@
+"use client";
+
 import {
   BuildingIcon,
   CalendarDaysIcon,
@@ -11,6 +13,7 @@ import { PersonIcon } from "@radix-ui/react-icons";
 
 import { Typography } from "@/components/Typography";
 import { Card, CardContent } from "@/components/ui/card";
+import { Map } from "@/components/Map";
 import { Event, Host } from "@/lib/api";
 import { formatLongDate, formatTimeRange, formatWeekday } from "@/lib/utils";
 import { useLocale, useTranslations } from "next-intl";
@@ -44,6 +47,10 @@ export function EventDetailsCard({ event }: { event: Event }) {
   const t = useTranslations("SingleEvent");
   const locale = useLocale();
   const localeCode = locale === "bg" ? "bg" : "en";
+
+  const fullAddress = [event.place, event.address, event.town]
+    .filter(Boolean)
+    .join(", ");
 
   return (
     <div className="flex flex-col gap-4">
@@ -90,7 +97,6 @@ export function EventDetailsCard({ event }: { event: Event }) {
           )}
         </CardContent>
       </Card>
-
       <Card className="bg-accent border-2 shadow-xl">
         <CardContent className="space-y-3">
           {event.ticketsLink?.trim() && (
@@ -129,6 +135,7 @@ export function EventDetailsCard({ event }: { event: Event }) {
           )}
         </CardContent>
       </Card>
+      <Map address={fullAddress} />
     </div>
   );
 }
