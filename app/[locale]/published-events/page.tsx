@@ -38,11 +38,6 @@ export default function PublishedEventsPage() {
     [userEvents],
   );
 
-  // TODO: skeleton
-  if (isProfileLoading || isEventsLoading) {
-    return <p>Loading...</p>;
-  }
-
   if (!events) {
     return <Typography.P>{t("noEventsFound")}</Typography.P>;
   }
