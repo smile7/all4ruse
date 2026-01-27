@@ -44,6 +44,7 @@ export default async function EventsLayout({
       <SidebarProvider>
         <Analytics />
         <CookieConsentProvider initialConsent="unknown">
+          <AnalyticsWithConsent />
           <FavoritesProvider>
             <SidebarLeft />
             <SidebarInset>
@@ -71,7 +72,6 @@ export default async function EventsLayout({
             </SidebarInset>
           </FavoritesProvider>
         </CookieConsentProvider>
-        <AnalyticsWithConsent />
         {/* <SidebarRight /> */}
       </SidebarProvider>
     </NextIntlClientProvider>

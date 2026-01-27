@@ -50,6 +50,7 @@ export type Database = {
           created_at: string
           createdBy: string | null
           description: string
+          email: string | null
           endDate: string
           endTime: string
           fbLink: string | null
@@ -73,6 +74,7 @@ export type Database = {
           created_at?: string
           createdBy?: string | null
           description: string
+          email?: string | null
           endDate: string
           endTime: string
           fbLink?: string | null
@@ -96,6 +98,7 @@ export type Database = {
           created_at?: string
           createdBy?: string | null
           description?: string
+          email?: string | null
           endDate?: string
           endTime?: string
           fbLink?: string | null
