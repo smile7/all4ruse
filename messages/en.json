@@ -188,8 +188,9 @@
     "cookiesDescr": "We use cookies to make the site better. If you accept all cookies, you will be able to save events to favorites.",
     "onlyNecessary": "Only necessary",
     "acceptAll": "Accept all",
+    "acceptCookies": "Accept cookies",
     "cookiePreferences": "Manage cookies",
-    "favoritesAvailability": "To save an event as a favorite, please allow cookie storage in your browser. You can do this through the sidebar menu -> Manage cookies."
+    "favoritesAvailability": "To save an event as a favorite, please allow cookie storage in your browser."
   },
   "NotFound": {
     "badge": "Page not found",

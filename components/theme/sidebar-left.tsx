@@ -19,7 +19,7 @@ import {
 } from "../ui";
 
 import { SidebarUserMenu } from "./sidebar-user-menu";
-import { NavCookiePreferences, NavFavorites, NavLegal } from ".";
+import { NavFavorites, NavLegal } from ".";
 
 export function SidebarLeft() {
   const { theme, systemTheme } = useTheme();
@@ -57,7 +57,6 @@ export function SidebarLeft() {
           <SidebarCustomMenu />
           <NavFavorites />
           <div className="mt-auto flex flex-col gap-2">
-            <NavCookiePreferences />
             <NavLegal />
           </div>
         </SidebarContent>

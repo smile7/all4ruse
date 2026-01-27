@@ -5,6 +5,7 @@ import {
   CalendarDaysIcon,
   ClockIcon,
   FacebookIcon,
+  MailIcon,
   PhoneIcon,
   ReceiptEuroIcon,
   TicketIcon,
@@ -98,7 +99,7 @@ export function EventDetailsCard({ event }: { event: Event }) {
           )}
           {event.email?.trim() && (
             <div className="flex items-center gap-2 border-b pb-2 border-foreground/20">
-              <UsersIcon className="size-4 shrink-0 text-primary" />
+              <MailIcon className="size-4 shrink-0 text-primary" />
               <Typography.P>
                 <a
                   href={`mailto:${event.email}`}
