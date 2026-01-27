@@ -170,7 +170,7 @@ function ProfileForm({ defaultValues }: { defaultValues: ProfileFormValues }) {
                         <FormControl>
                           <Input
                             id="website"
-                            placeholder="https://example.com"
+                            placeholder="https://all4ruse.com"
                             {...field}
                           />
                         </FormControl>

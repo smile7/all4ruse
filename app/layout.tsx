@@ -40,7 +40,7 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            <Toaster richColors />
+            <Toaster richColors toastOptions={{ duration: 6000 }} />
             <TooltipProvider>{children}</TooltipProvider>
           </ThemeProvider>
         </QueryProvider>

@@ -35,6 +35,7 @@ export async function getEvents(
   const { data, error } = await client
     .from("events")
     .select("*")
+    .eq("isEventActive", true)
     .order("startDate", { ascending: true });
 
   return { data: data ?? [], error };
@@ -48,6 +49,7 @@ export async function getEventBySlug(
     .from("events")
     .select("*")
     .eq("slug", slug)
+    .eq("isEventActive", true)
     .maybeSingle();
 
   return { data: data ?? null, error };

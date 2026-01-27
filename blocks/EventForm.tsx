@@ -125,9 +125,9 @@ export function EventForm({ mode, event }: EventFormProps) {
         place: event.place ?? "",
         town: event.town ?? "Русе",
         startDate: event.startDate ?? "",
-        startTime: event.startTime ?? "",
+        startTime: (event.startTime ?? "").slice(0, 5),
         endDate: event.endDate ?? "",
-        endTime: event.endTime ?? "",
+        endTime: (event.endTime ?? "").slice(0, 5),
         organizers: (event.organizers as Host[]) ?? [{ name: "", link: "" }],
         ticketsLink: event.ticketsLink ?? "",
         fbLink: event.fbLink ?? "",
@@ -373,6 +373,7 @@ export function EventForm({ mode, event }: EventFormProps) {
       organizers: values.organizers,
       ticketsLink: values.ticketsLink || null,
       fbLink: values.fbLink || null,
+      isEventActive: false,
       price: values.price || null,
       phoneNumber: values.phoneNumber || null,
       image: coverUrl,
@@ -1027,7 +1028,7 @@ function OrganizersFieldArray({ disabled }: { disabled?: boolean }) {
               <FormLabel>{t("organizerLink")}</FormLabel>
               <FormControl>
                 <Input
-                  placeholder="https://example.com"
+                  placeholder="https://all4ruse.com"
                   disabled={disabled}
                   {...register(`organizers.${index}.link`)}
                 />
