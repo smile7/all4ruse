@@ -23,6 +23,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "../ui";
+import { useTranslations } from "next-intl";
 
 type CaptureHandler = (v: boolean) => boolean;
 
@@ -35,7 +36,7 @@ type DialogDrawerContextState = {
 };
 
 const DialogDrawerContext = createContext<DialogDrawerContextState | undefined>(
-  undefined
+  undefined,
 );
 
 export type DialogDrawerProps = React.PropsWithChildren<{
@@ -62,6 +63,7 @@ export function DrawerDialog({
 }: DialogDrawerProps) {
   const [localOpen, setLocalOpen] = useState(false);
   const isLargerThanMd = useMediaQuery(getMinWidth("--breakpoint-md"));
+  const t = useTranslations("Profile");
 
   const resolvedOpen = open ?? localOpen;
   const setResolvedOpen = setOpen ?? setLocalOpen;
@@ -131,7 +133,7 @@ export function DrawerDialog({
             {showDrawerCancel && (
               <DrawerFooter className="pt-0">
                 <DrawerClose asChild>
-                  <Button variant="outline">Cancel</Button>
+                  <Button variant="outline">{t("cancel")}</Button>
                 </DrawerClose>
               </DrawerFooter>
             )}
@@ -146,7 +148,7 @@ export function useDialogDrawerContext() {
   const context = useContext(DialogDrawerContext);
   if (!context) {
     throw new Error(
-      "useDialogDrawerContext must be used inside a DialogDrawer"
+      "useDialogDrawerContext must be used inside a DialogDrawer",
     );
   }
   return context;

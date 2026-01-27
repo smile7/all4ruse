@@ -147,7 +147,10 @@
     "changePassword": "Change Password",
     "resetPassword": "Reset Password",
     "deleteAccount": "Delete Account",
-    "deleteAccountDescr": "If you delete your account, it cannot be recovered. Please be sure you want to delete your account before proceeding.",
+    "deleteAccountDescr": "If you delete your account, it cannot be recovered.",
+    "deleteAccountIrreversibleWarning": "Are you sure you want to delete your account? All events you have created will also be permanently deleted. This action cannot be undone.",
+    "confirmDeleteAccount": "Yes, delete my account",
+    "cancel": "Cancel",
     "passwordUpdatedSuccessfully": "Password updated successfully.",
     "newPassword": "New Password",
     "repeatPassword": "Repeat Password",
@@ -175,7 +178,8 @@
     "profileUpdatedSuccessfully": "Profile updated successfully.",
     "eventCreatedSuccessfully": "Event created successfully.",
     "eventUpdatedSuccessfully": "Event updated successfully.",
-    "eventDeletedSuccessfully": "Event deleted successfully."
+    "eventDeletedSuccessfully": "Event deleted successfully.",
+    "accountDeletedSuccessfully": "Account deleted successfully."
   },
   "NotFound": {
     "badge": "Page not found",
