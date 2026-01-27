@@ -1,8 +1,9 @@
 "use client";
 
-import { createContext, useContext, useMemo } from "react";
+import { createContext, useContext, useEffect, useMemo } from "react";
 
 import { useLocalStorage } from "@/hooks";
+import { useCookieConsent } from "@/components/CookieConsentProvider";
 
 export type FavoriteItem = {
   id: number;
@@ -25,13 +26,26 @@ const FavoritesContext = createContext<FavoritesContextValue | undefined>(
 const STORAGE_KEY = "all4ruse:favorites";
 
 export function FavoritesProvider({ children }: { children: React.ReactNode }) {
-  const [favorites, setFavorites] = useLocalStorage<FavoriteItem[]>(
+  const [storedFavorites, setStoredFavorites] = useLocalStorage<FavoriteItem[]>(
     STORAGE_KEY,
     [],
   );
 
+  const { consent } = useCookieConsent();
+  const isAllowed = consent === "all";
+
+  useEffect(() => {
+    if (consent === "necessary" && storedFavorites.length > 0) {
+      setStoredFavorites([]);
+    }
+  }, [consent, storedFavorites.length, setStoredFavorites]);
+
+  const favorites = isAllowed ? storedFavorites : [];
+
   const toggleFavorite = (item: FavoriteItem) => {
-    setFavorites((prev) => {
+    if (!isAllowed) return;
+
+    setStoredFavorites((prev) => {
       const exists = prev.some((fav) => fav.id === item.id);
       if (exists) {
         return prev.filter((fav) => fav.id !== item.id);
@@ -41,10 +55,13 @@ export function FavoritesProvider({ children }: { children: React.ReactNode }) {
   };
 
   const removeFavorite = (id: number) => {
-    setFavorites((prev) => prev.filter((fav) => fav.id !== id));
+    if (!isAllowed) return;
+
+    setStoredFavorites((prev) => prev.filter((fav) => fav.id !== id));
   };
 
-  const isFavorite = (id: number) => favorites.some((fav) => fav.id === id);
+  const isFavorite = (id: number) =>
+    isAllowed && favorites.some((fav) => fav.id === id);
 
   const value = useMemo(
     () => ({ favorites, toggleFavorite, removeFavorite, isFavorite }),

@@ -36,12 +36,15 @@ export function NavLegal() {
   ];
 
   return (
-    <SidebarGroup className="group-data-[collapsible=icon]:hidden mt-auto">
+    <SidebarGroup className="group-data-[collapsible=icon]:hidden">
       <DropdownMenu modal={false}>
         <DropdownMenuTrigger asChild>
-          <SidebarMenuButton className="h-auto flex gap-2 items-center justify-start cursor-pointer">
+          <SidebarMenuButton
+            className="h-auto flex gap-2 items-center justify-start cursor-pointer"
+            closeOnMobile={false}
+          >
             <ScaleIcon className="size-4" />
-            <span className="text-small">{t("legal")}</span>
+            <span className="text-xs">{t("legal")}</span>
           </SidebarMenuButton>
         </DropdownMenuTrigger>
         <DropdownMenuContent
