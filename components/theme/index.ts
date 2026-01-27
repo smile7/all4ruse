@@ -1,6 +1,7 @@
 export * from "./calendars";
 export * from "./date-picker";
 export * from "./favorites-provider";
+export * from "./nav-cookie-preferences";
 export * from "./nav-favorites";
 export * from "./nav-legal";
 export * from "./nav-main";

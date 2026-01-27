@@ -6,6 +6,7 @@ import BackButton from "@/components/BackButton/BackButton";
 import LanguageSwitcher from "@/components/LanguageSwitcher/LanguageSwitcher";
 import { MobileLogo } from "@/components/MobileLogo";
 import { Analytics } from "@vercel/analytics/next";
+import { CookieConsentProvider } from "@/components/CookieConsentProvider";
 import {
   FavoritesProvider,
   SidebarLeft,
@@ -41,32 +42,34 @@ export default async function EventsLayout({
     <NextIntlClientProvider>
       <SidebarProvider>
         <Analytics />
-        <FavoritesProvider>
-          <SidebarLeft />
-          <SidebarInset>
-            <header className="bg-background sticky top-0 flex h-18 shrink-0 z-100 items-center justify-between px-2 mb-6">
-              <div className="flex items-center gap-2">
-                <SidebarTrigger className="-ml-1" />
-                <Separator
-                  orientation="vertical"
-                  className="data-[orientation=vertical]:h-6"
-                />
-                <BackButton />
-              </div>
-              <MobileLogo />
-              <div className="flex items-center gap-2">
-                <ThemeToggle />
-                <LanguageSwitcher />
-              </div>
-            </header>
+        <CookieConsentProvider initialConsent="unknown">
+          <FavoritesProvider>
+            <SidebarLeft />
+            <SidebarInset>
+              <header className="bg-background sticky top-0 flex h-18 shrink-0 z-100 items-center justify-between px-2 mb-6">
+                <div className="flex items-center gap-2">
+                  <SidebarTrigger className="-ml-1" />
+                  <Separator
+                    orientation="vertical"
+                    className="data-[orientation=vertical]:h-6"
+                  />
+                  <BackButton />
+                </div>
+                <MobileLogo />
+                <div className="flex items-center gap-2">
+                  <ThemeToggle />
+                  <LanguageSwitcher />
+                </div>
+              </header>
 
-            <div className="p-6 pt-0">
-              <div className="mx-auto w-full max-w-(--breakpoint-xl) pb-16">
-                {children}
+              <div className="p-6 pt-0">
+                <div className="mx-auto w-full max-w-(--breakpoint-xl) pb-16">
+                  {children}
+                </div>
               </div>
-            </div>
-          </SidebarInset>
-        </FavoritesProvider>
+            </SidebarInset>
+          </FavoritesProvider>
+        </CookieConsentProvider>
         {/* <SidebarRight /> */}
       </SidebarProvider>
     </NextIntlClientProvider>

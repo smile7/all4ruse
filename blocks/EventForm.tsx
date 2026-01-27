@@ -373,7 +373,6 @@ export function EventForm({ mode, event }: EventFormProps) {
       organizers: values.organizers,
       ticketsLink: values.ticketsLink || null,
       fbLink: values.fbLink || null,
-      isEventActive: false,
       price: values.price || null,
       phoneNumber: values.phoneNumber || null,
       image: coverUrl,
@@ -385,6 +384,7 @@ export function EventForm({ mode, event }: EventFormProps) {
     if (mode === "create") {
       const result = await createEventMutate({
         ...basePayload,
+        isEventActive: false,
         slug: slugify(values.title),
         createdBy: userId,
       });
