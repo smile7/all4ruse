@@ -131,6 +131,7 @@ export function EventForm({ mode, event }: EventFormProps) {
         organizers: (event.organizers as Host[]) ?? [{ name: "", link: "" }],
         ticketsLink: event.ticketsLink ?? "",
         fbLink: event.fbLink ?? "",
+        email: event.email ?? "",
         price: event.price ?? "",
         phoneNumber: event.phoneNumber ?? "",
         image: undefined,
@@ -150,6 +151,7 @@ export function EventForm({ mode, event }: EventFormProps) {
         organizers: [{ name: "", link: "" }],
         ticketsLink: "",
         fbLink: "",
+        email: "",
         price: "",
         phoneNumber: "",
         image: undefined,
@@ -373,6 +375,7 @@ export function EventForm({ mode, event }: EventFormProps) {
       organizers: values.organizers,
       ticketsLink: values.ticketsLink || null,
       fbLink: values.fbLink || null,
+      email: values.email || null,
       price: values.price || null,
       phoneNumber: values.phoneNumber || null,
       image: coverUrl,
@@ -573,7 +576,7 @@ export function EventForm({ mode, event }: EventFormProps) {
               name="tags"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t("tags")}</FormLabel>
+                  <FormLabel isRequired>{t("tags")}</FormLabel>
                   {(() => {
                     const selectedIds: number[] = field.value ?? [];
                     const selectedTags = allTags.filter((tag) =>
@@ -768,7 +771,9 @@ export function EventForm({ mode, event }: EventFormProps) {
                   </FormItem>
                 )}
               />
+            </div>
 
+            <div className="grid gap-6 md:grid-cols-3">
               <FormField
                 control={form.control}
                 name="phoneNumber"
@@ -782,7 +787,19 @@ export function EventForm({ mode, event }: EventFormProps) {
                   </FormItem>
                 )}
               />
-
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("email")}</FormLabel>
+                    <FormControl>
+                      <Input placeholder={t("enterEmail")} {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
               <FormField
                 control={form.control}
                 name="price"
