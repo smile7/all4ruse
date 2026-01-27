@@ -1,7 +1,9 @@
 import { useMemo } from "react";
 
-import type { Event } from "@/lib/api";
+import type { Event, Tag } from "@/lib/api";
 import { toTimestamp } from "@/lib/utils";
+import { useTags } from "@/hooks/query";
+import { TAG_LABELS_BG } from "@/constants";
 
 type BasicFilters = {
   title: string;
@@ -16,6 +18,59 @@ export function useFilteredEvents(
   eventTags?: Record<number, number[]>,
 ) {
   const { title, from, to, tagIds } = filters;
+  const { data: allTags = [] } = useTags();
+
+  const tagsById = useMemo(() => {
+    const map = new Map<number, Tag>();
+    for (const tag of allTags) {
+      map.set(tag.id, tag);
+    }
+    return map;
+  }, [allTags]);
+
+  const normalizeTagSearchTokens = (tag: Tag): string[] => {
+    const raw = (tag.title ?? "").trim();
+    if (!raw) return [];
+
+    const base = raw.toUpperCase();
+
+    // Find canonical key: either the English code key or the key
+    // whose Bulgarian label matches the stored title.
+    let canonical = base;
+    if (Object.prototype.hasOwnProperty.call(TAG_LABELS_BG, base)) {
+      canonical = base;
+    } else {
+      const entry = Object.entries(TAG_LABELS_BG).find(
+        ([, bgLabel]) => bgLabel.toUpperCase() === base,
+      );
+      if (entry) {
+        canonical = entry[0];
+      }
+    }
+
+    const tokens = new Set<string>();
+
+    // English-style code (e.g. "COMEDY")
+    tokens.add(canonical.toLowerCase());
+
+    // English human label (e.g. "Comedy")
+    const englishPretty = canonical
+      .toLowerCase()
+      .replace(/_/g, " ")
+      .replace(/\b\w/g, (c) => c.toUpperCase());
+    tokens.add(englishPretty.toLowerCase());
+
+    // Bulgarian label if available
+    const bgLabel = TAG_LABELS_BG[canonical];
+    if (bgLabel) {
+      tokens.add(bgLabel.toLowerCase());
+    }
+
+    // Raw stored title as a fallback
+    tokens.add(raw.toLowerCase());
+
+    return Array.from(tokens);
+  };
 
   const filteredEvents = useMemo(() => {
     const query = title.trim().toLowerCase();
@@ -26,7 +81,23 @@ export function useFilteredEvents(
       .filter((e) => {
         if (query) {
           const t = (e.title ?? "").toLowerCase();
-          if (!t.includes(query)) return false;
+          let matches = t.includes(query);
+
+          // Also allow matching by tag labels (both EN/BG variants)
+          if (!matches && eventTags && tagsById.size) {
+            const tagsForEvent = eventTags[e.id as number] ?? [];
+            for (const tagId of tagsForEvent) {
+              const tag = tagsById.get(tagId);
+              if (!tag) continue;
+              const tokens = normalizeTagSearchTokens(tag);
+              if (tokens.some((token) => token.includes(query))) {
+                matches = true;
+                break;
+              }
+            }
+          }
+
+          if (!matches) return false;
         }
         if (fromTs || toTs) {
           const start = toTimestamp(e.startDate);
@@ -49,7 +120,16 @@ export function useFilteredEvents(
         if (bT === null) return -1;
         return aT - bT;
       });
-  }, [events, title, from, to, tagIds, eventTags]);
+  }, [
+    events,
+    title,
+    from,
+    to,
+    tagIds,
+    eventTags,
+    tagsById,
+    normalizeTagSearchTokens,
+  ]);
 
   return {
     filteredEvents,

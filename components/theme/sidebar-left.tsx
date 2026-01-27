@@ -19,7 +19,7 @@ import {
 } from "../ui";
 
 import { SidebarUserMenu } from "./sidebar-user-menu";
-import { NavFavorites } from ".";
+import { NavFavorites, NavLegal } from ".";
 
 export function SidebarLeft() {
   const { theme, systemTheme } = useTheme();
@@ -56,6 +56,7 @@ export function SidebarLeft() {
         <SidebarContent className="mt-8 md:mt-0">
           <SidebarCustomMenu />
           <NavFavorites />
+          <NavLegal />
         </SidebarContent>
         <SidebarFooter>
           <SidebarMenu>
