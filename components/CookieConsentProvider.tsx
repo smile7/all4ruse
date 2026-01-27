@@ -118,9 +118,6 @@ function CookieBanner({
       description={t("cookiesDescr")}
     >
       <div className="px-6 pb-4 flex flex-col gap-3">
-        <Typography.P className="text-muted-foreground text-xs md:text-sm">
-          {t("cookiesDescr")}
-        </Typography.P>
         <div className="flex flex-col w-full md:flex-row justify-end gap-4 mt-2">
           <Button
             variant="outline"
