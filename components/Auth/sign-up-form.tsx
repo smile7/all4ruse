@@ -98,7 +98,7 @@ export function SignUpForm({
                 <Input
                   id="email"
                   type="email"
-                  placeholder="m@example.com"
+                  placeholder="person@all4ruse.com"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -140,7 +140,7 @@ export function SignUpForm({
                 <Input
                   id="website"
                   type="text"
-                  placeholder="https://example.com"
+                  placeholder="https://all4ruse.com"
                   value={website}
                   onChange={(e) => setWebsite(e.target.value)}
                 />

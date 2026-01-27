@@ -40,7 +40,7 @@ export const ImageEditBlock: React.FC<ImageEditBlockProps> = ({
       await insertImages();
       close();
     },
-    [editor, close]
+    [editor, close],
   );
 
   const handleSubmit = React.useCallback(
@@ -53,7 +53,7 @@ export const ImageEditBlock: React.FC<ImageEditBlockProps> = ({
         close();
       }
     },
-    [editor, link, close]
+    [editor, link, close],
   );
 
   return (
@@ -65,7 +65,7 @@ export const ImageEditBlock: React.FC<ImageEditBlockProps> = ({
             id="image-link"
             type="url"
             required
-            placeholder="https://example.com"
+            placeholder="https://all4ruse.com"
             value={link}
             className="grow"
             onChange={(e: React.ChangeEvent<HTMLInputElement>) =>

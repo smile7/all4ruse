@@ -82,7 +82,7 @@
     "endTimeAfterStartTime": "End time must be after start time",
     "addOrganizer": "Add an Organizer",
     "organizerName": "Host Name",
-    "enterOrganizerName": "Puppet Theater Ruse",
+    "enterOrganizerName": "All4Ruse",
     "organizerLink": "Organizer Link",
     "fbLink": "Facebook Link",
     "enterFbLink": "Facebook event or page URL",
@@ -176,7 +176,7 @@
   },
   "General": {
     "profileUpdatedSuccessfully": "Profile updated successfully.",
-    "eventCreatedSuccessfully": "Event created successfully.",
+    "eventCreatedSuccessfully": "Event created successfully and is pending administrator approval.",
     "eventUpdatedSuccessfully": "Event updated successfully.",
     "eventDeletedSuccessfully": "Event deleted successfully.",
     "accountDeletedSuccessfully": "Account deleted successfully."

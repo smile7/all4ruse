@@ -56,6 +56,7 @@ export type Database = {
           id: number
           image: string | null
           images: Json | null
+          isEventActive: boolean
           organizers: Json | null
           phoneNumber: string | null
           place: string | null
@@ -78,6 +79,7 @@ export type Database = {
           id?: number
           image?: string | null
           images?: Json | null
+          isEventActive: boolean
           organizers?: Json | null
           phoneNumber?: string | null
           place?: string | null
@@ -100,6 +102,7 @@ export type Database = {
           id?: number
           image?: string | null
           images?: Json | null
+          isEventActive?: boolean
           organizers?: Json | null
           phoneNumber?: string | null
           place?: string | null
