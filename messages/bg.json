@@ -70,7 +70,7 @@
     "enterPlace": "Доходно здание",
     "ticketsLink": "Линк за билети",
     "enterTicketsLink": "https://",
-    "price": "Цена",
+    "price": "Цена в евро",
     "enterPrice": "0",
     "phoneNumber": "Телефон за контакти",
     "enterPhoneNumber": "08ХХ ХХХ ХХХ",
@@ -179,7 +179,13 @@
     "eventCreatedSuccessfully": "Събитието е създадено успешно и чака одобрение от администратор.",
     "eventUpdatedSuccessfully": "Събитието е актуализирано успешно.",
     "eventDeletedSuccessfully": "Събитието е изтрито успешно.",
-    "accountDeletedSuccessfully": "Акаунтът е изтрит успешно."
+    "accountDeletedSuccessfully": "Акаунтът е изтрит успешно.",
+    "cookies": "Бисквитки",
+    "cookiesDescr": "Използваме бисквитки, за да направим сайта по-добър. Ако приемете всички бисквитки, ще можете да запазвате събития в любими.",
+    "onlyNecessary": "Само необходими",
+    "acceptAll": "Приеми всички",
+    "cookiePreferences": "Управление на бисквитки",
+    "favoritesAvailability": "За да запазите събитие като любимо, моля позволете съхранение на бисквитки в браузъра си. Можете да направите това през страничното меню -> Бисквитки."
   },
   "NotFound": {
     "badge": "Страницата не е намерена",
