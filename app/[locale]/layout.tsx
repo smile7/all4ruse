@@ -7,6 +7,7 @@ import LanguageSwitcher from "@/components/LanguageSwitcher/LanguageSwitcher";
 import { MobileLogo } from "@/components/MobileLogo";
 import { Analytics } from "@vercel/analytics/next";
 import { CookieConsentProvider } from "@/components/CookieConsentProvider";
+import { AnalyticsWithConsent } from "@/components/AnalyticsWithConsent";
 import {
   FavoritesProvider,
   SidebarLeft,
@@ -70,6 +71,7 @@ export default async function EventsLayout({
             </SidebarInset>
           </FavoritesProvider>
         </CookieConsentProvider>
+        <AnalyticsWithConsent />
         {/* <SidebarRight /> */}
       </SidebarProvider>
     </NextIntlClientProvider>
