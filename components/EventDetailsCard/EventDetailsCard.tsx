@@ -96,6 +96,19 @@ export function EventDetailsCard({ event }: { event: Event }) {
               </Typography.P>
             </div>
           )}
+          {event.email?.trim() && (
+            <div className="flex items-center gap-2 border-b pb-2 border-foreground/20">
+              <UsersIcon className="size-4 shrink-0 text-primary" />
+              <Typography.P>
+                <a
+                  href={`mailto:${event.email}`}
+                  className="text-primary hover:underline"
+                >
+                  {event.email}
+                </a>
+              </Typography.P>
+            </div>
+          )}
         </CardContent>
       </Card>
       <Card className="bg-accent border-2 shadow-xl">

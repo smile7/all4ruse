@@ -29,11 +29,16 @@ export const createEventSchema = (t: (key: string) => string) =>
       organizers: z.array(organizerSchema(t)).min(1, t("atLeastOneOrganizer")),
       ticketsLink: z.string().optional().or(z.literal("")),
       fbLink: z.string().optional().or(z.literal("")),
+      email: z
+        .string()
+        .email({ message: t("invalidEmail") })
+        .optional()
+        .or(z.literal("")),
       price: z.string().optional().or(z.literal("")),
       phoneNumber: z.string().optional().or(z.literal("")),
       image: z.instanceof(File).optional(),
       images: z.array(z.instanceof(File)).optional(),
-      tags: z.array(z.number()).default([]),
+      tags: z.array(z.number()).min(1, t("atLeastOneTag")).default([]),
     })
     .superRefine((data, ctx) => {
       if (data.endDate < data.startDate) {
@@ -70,6 +75,7 @@ export const defaultEventValues = (): CreateEventSchemaType => ({
   organizers: [{ name: "", link: "" }],
   ticketsLink: "",
   fbLink: "",
+  email: "",
   price: "",
   phoneNumber: "",
   image: undefined,
