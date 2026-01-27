@@ -8,9 +8,11 @@ import {
   useState,
 } from "react";
 
-import { Button, Card } from "@/components/ui";
-import { Typography } from "./Typography";
 import { useTranslations } from "next-intl";
+
+import { Button } from "@/components/ui";
+import { DrawerDialog } from "@/components/DialogDrawer";
+import { Typography } from "./Typography";
 
 type ConsentLevel = "unknown" | "necessary" | "all";
 
@@ -106,34 +108,44 @@ function CookieBanner({
 }) {
   const t = useTranslations("General");
 
+  const [open, setOpen] = useState(true);
+
   return (
-    <div className="fixed inset-x-0 bottom-0 z-50 flex justify-center px-4 pb-4">
-      <Card className="max-w-3xl w-full border shadow-lg bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
-        <div className="flex flex-col gap-2 px-4 md:items-center md:justify-center">
-          <Typography.P className="font-medium">{t("cookies")}</Typography.P>
-          <Typography.P className="text-muted-foreground text-xs md:text-sm">
-            {t("cookiesDescr")}
-          </Typography.P>
-          <div className="flex flex-col w-full md:flex-row justify-end gap-4 px-4 mt-2">
-            <Button
-              variant="outline"
-              size="sm"
-              type="button"
-              onClick={onAcceptNecessary}
-            >
-              {t("onlyNecessary")}
-            </Button>
-            <Button
-              variant="default"
-              size="sm"
-              type="button"
-              onClick={onAcceptAll}
-            >
-              {t("acceptAll")}
-            </Button>
-          </div>
+    <DrawerDialog
+      open={open}
+      setOpen={setOpen}
+      title={t("cookies")}
+      description={t("cookiesDescr")}
+    >
+      <div className="px-6 pb-4 flex flex-col gap-3">
+        <Typography.P className="text-muted-foreground text-xs md:text-sm">
+          {t("cookiesDescr")}
+        </Typography.P>
+        <div className="flex flex-col w-full md:flex-row justify-end gap-4 mt-2">
+          <Button
+            variant="outline"
+            size="sm"
+            type="button"
+            onClick={() => {
+              onAcceptNecessary();
+              setOpen(false);
+            }}
+          >
+            {t("onlyNecessary")}
+          </Button>
+          <Button
+            variant="default"
+            size="sm"
+            type="button"
+            onClick={() => {
+              onAcceptAll();
+              setOpen(false);
+            }}
+          >
+            {t("acceptAll")}
+          </Button>
         </div>
-      </Card>
-    </div>
+      </div>
+    </DrawerDialog>
   );
 }
