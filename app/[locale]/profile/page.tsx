@@ -21,10 +21,7 @@ export default function ProfilePage() {
           <div className="flex flex-col items-center gap-6 md:flex-row md:items-start">
             <div className="relative">
               <Avatar className="h-24 w-24">
-                <AvatarImage
-                  src={data.avatar_url || DEFAULT_AVATAR}
-                  alt="avatar"
-                />
+                <AvatarImage src={DEFAULT_AVATAR} alt="avatar" />
               </Avatar>
             </div>
             <div className="flex-1 space-y-2">
