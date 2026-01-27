@@ -1,10 +1,12 @@
 "use client";
 
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Key, Trash2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 import { UpdatePasswordForm } from "@/components/Auth";
+import { DrawerDialog } from "@/components/DialogDrawer";
 import {
   Badge,
   Button,
@@ -32,7 +34,13 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/ui";
-import { ProfileFormValues, useProfile, useUpdateProfile } from "@/hooks/query";
+import {
+  ProfileFormValues,
+  useDeleteAccount,
+  useProfile,
+  useUpdateProfile,
+} from "@/hooks/query";
+import { Typography } from "@/components/Typography";
 
 export default function ProfileContent() {
   const t = useTranslations("Profile");
@@ -77,11 +85,15 @@ export default function ProfileContent() {
 function ProfileForm({ defaultValues }: { defaultValues: ProfileFormValues }) {
   const t = useTranslations("Profile");
 
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+
   const form = useForm<ProfileFormValues>({
     defaultValues,
   });
 
   const { mutate, isPending, error } = useUpdateProfile();
+  const { mutate: deleteAccount, isPending: isDeletingAccount } =
+    useDeleteAccount();
 
   const onSubmit = (values: ProfileFormValues) => {
     mutate(values);
@@ -242,10 +254,47 @@ function ProfileForm({ defaultValues }: { defaultValues: ProfileFormValues }) {
                   {t("deleteAccountDescr")}
                 </p>
               </div>
-              <Button variant="destructive" type="button">
-                <Trash2 className="mr-2 h-4 w-4" />
-                {t("deleteAccount")}
-              </Button>
+              <DrawerDialog
+                title={t("deleteAccount")}
+                open={isDeleteDialogOpen}
+                setOpen={setIsDeleteDialogOpen}
+                showDrawerCancel
+                trigger={
+                  <Button
+                    variant="destructive"
+                    type="button"
+                    disabled={isDeletingAccount}
+                    isLoading={isDeletingAccount}
+                  >
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    {t("deleteAccount")}
+                  </Button>
+                }
+              >
+                <Typography.P className="mb-4 px-4 md:px-0">
+                  {t("deleteAccountIrreversibleWarning")}
+                </Typography.P>
+                <div className="mt-4 flex flex-col w-full md:flex-row justify-end gap-4 px-4 md:mb-6 md:px-0">
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setIsDeleteDialogOpen(false);
+                    }}
+                    className="hidden md:inline-flex"
+                  >
+                    {t("cancel")}
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    disabled={isDeletingAccount}
+                    isLoading={isDeletingAccount}
+                    onClick={() => deleteAccount()}
+                  >
+                    {t("confirmDeleteAccount")}
+                  </Button>
+                </div>
+              </DrawerDialog>
             </div>
           </CardContent>
         </Card>

@@ -145,8 +145,11 @@
     "passwordDescr": "Последна промяна преди 3 месеца",
     "passwordLength": "Паролата трябва да е поне 6 символа.",
     "changePassword": "Смени парола",
-    "deleteAccount": "Изтрий акаунта",
-    "deleteAccountDescr": "Ако изтриете вашият акаунт, той няма да може да бъде възстановен. Моля, бъдете сигурни, че искате да изтриете акаунта си, преди да продължите.",
+    "deleteAccount": "Изтриване на акаунта",
+    "deleteAccountDescr": "Ако изтриете акаунта си, той няма да може да бъде възстановен.",
+    "deleteAccountIrreversibleWarning": "Сигурни ли сте, че искате да изтриете акаунта си? Всички събития, които сте създали, също ще бъдат изтрити завинаги. Това действие е необратимо.",
+    "confirmDeleteAccount": "Да, изтрий акаунта ми",
+    "cancel": "Отказ",
     "passwordUpdatedSuccessfully": "Паролата е актуализирана успешно.",
     "newPassword": "Нова парола",
     "repeatPassword": "Повтори паролата",
@@ -175,7 +178,8 @@
     "profileUpdatedSuccessfully": "Профилът е актуализиран успешно.",
     "eventCreatedSuccessfully": "Събитието е създадено успешно.",
     "eventUpdatedSuccessfully": "Събитието е актуализирано успешно.",
-    "eventDeletedSuccessfully": "Събитието е изтрито успешно."
+    "eventDeletedSuccessfully": "Събитието е изтрито успешно.",
+    "accountDeletedSuccessfully": "Акаунтът е изтрит успешно."
   },
   "NotFound": {
     "badge": "Страницата не е намерена",

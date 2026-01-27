@@ -34,8 +34,8 @@ export function SidebarUserMenu() {
   const supabase = createClient();
   const { isMobile, setOpenMobile } = useSidebar();
   const [user, setUser] = useState<SidebarUser>({
-    fullName: "",
-    avatarUrl: "",
+    fullName: null,
+    avatarUrl: DEFAULT_AVATAR,
   });
 
   useEffect(() => {
@@ -43,13 +43,13 @@ export function SidebarUserMenu() {
       const { data: profile } = await getCurrentUserProfile(supabase);
 
       if (!profile) {
-        setUser({ fullName: null, avatarUrl: null });
+        setUser({ fullName: null, avatarUrl: DEFAULT_AVATAR });
         return;
       }
 
       setUser({
         fullName: profile.full_name || profile.email || null,
-        avatarUrl: profile.avatar_url || null,
+        avatarUrl: profile.avatar_url || DEFAULT_AVATAR,
       });
     };
 
@@ -59,7 +59,7 @@ export function SidebarUserMenu() {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
       if (!session) {
-        setUser({ fullName: null, avatarUrl: null });
+        setUser({ fullName: null, avatarUrl: DEFAULT_AVATAR });
       } else {
         loadProfile();
       }
@@ -74,7 +74,7 @@ export function SidebarUserMenu() {
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
-    setUser({ fullName: null, avatarUrl: null });
+    setUser({ fullName: null, avatarUrl: DEFAULT_AVATAR });
 
     router.replace(`/${locale}/auth/login`);
     router.refresh();
@@ -100,10 +100,7 @@ export function SidebarUserMenu() {
           closeOnMobile={false}
         >
           <Avatar>
-            <AvatarImage
-              src={avatarUrl || DEFAULT_AVATAR}
-              alt={fullName || "Avatar"}
-            />
+            <AvatarImage src={DEFAULT_AVATAR} alt={fullName || "Avatar"} />
           </Avatar>
           <span className="inline-flex flex-col gap-1 truncate">
             <span className="truncate">{fullName || t("guest")}</span>

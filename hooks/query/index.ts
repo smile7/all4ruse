@@ -2,6 +2,8 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+import { useLocale, useTranslations } from "next-intl";
 
 import {
   createEvent,
@@ -13,12 +15,12 @@ import {
   getEventBySlug,
   getEvents,
   getTags,
+  type Profile,
   updateCurrentUserProfile,
   updateEvent,
   type Tag,
 } from "@/lib/api";
 import { createClient } from "@/lib/supabase/client";
-import { useTranslations } from "next-intl";
 
 // -------------------- Profile --------------------
 
@@ -70,6 +72,42 @@ export function useUpdateProfile() {
       queryClient.invalidateQueries({
         queryKey: profileQueryKeys.all(),
       });
+    },
+  });
+}
+
+export function useDeleteAccount() {
+  const queryClient = useQueryClient();
+  const router = useRouter();
+  const locale = useLocale();
+  const t = useTranslations("General");
+
+  return useMutation({
+    mutationFn: async () => {
+      const response = await fetch("/api/delete-account", {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        const body = await response.json().catch(() => null);
+        const message = body?.error || "Failed to delete account";
+        throw new Error(message);
+      }
+
+      return true as const;
+    },
+    onSuccess: async () => {
+      const supabase = createClient();
+      await supabase.auth.signOut();
+
+      toast.success(t("accountDeletedSuccessfully"));
+      queryClient.clear();
+      router.replace(`/${locale}`);
+      router.refresh();
+    },
+    onError: (error: any) => {
+      console.error(error);
+      toast.error(error?.message ?? "Failed to delete account");
     },
   });
 }
