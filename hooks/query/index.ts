@@ -132,6 +132,7 @@ export function useEvents() {
       if (error) throw error;
       return data;
     },
+    staleTime: 5 * 60 * 1000, // 5 minutes
   });
 }
 
@@ -186,6 +187,7 @@ export function useEvent(slug: string) {
       return data;
     },
     enabled: !!slug,
+    staleTime: 5 * 60 * 1000, // 5 minutes
   });
 }
 
