@@ -120,6 +120,17 @@ function CookieBanner({
       <div className="px-6 pb-4 flex flex-col gap-3">
         <div className="flex flex-col w-full md:flex-row justify-end gap-4 mt-2">
           <Button
+            variant="default"
+            size="sm"
+            type="button"
+            onClick={() => {
+              onAcceptAll();
+              setOpen(false);
+            }}
+          >
+            {t("acceptCookies")}
+          </Button>
+          <Button
             variant="outline"
             size="sm"
             type="button"
@@ -129,17 +140,6 @@ function CookieBanner({
             }}
           >
             {t("onlyNecessary")}
-          </Button>
-          <Button
-            variant="default"
-            size="sm"
-            type="button"
-            onClick={() => {
-              onAcceptAll();
-              setOpen(false);
-            }}
-          >
-            {t("acceptAll")}
           </Button>
         </div>
       </div>
