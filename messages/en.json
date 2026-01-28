@@ -176,7 +176,8 @@
     "userAlreadyExists": "User with this email already exists.",
     "errorOccurred": "An error occurred. Please try again later.",
     "thankYouForSigningUp": "Thank you for signing up!",
-    "pleaseCheckEmail": "Please check your email to confirm your registration."
+    "pleaseCheckEmail": "Please check your email to confirm your registration.",
+    "rememberMe": "Remember me"
   },
   "General": {
     "profileUpdatedSuccessfully": "Profile updated successfully.",
@@ -187,7 +188,6 @@
     "cookies": "Cookies",
     "cookiesDescr": "We use cookies to make the site better. If you accept all cookies, you will be able to save events to favorites.",
     "onlyNecessary": "Only necessary",
-    "acceptAll": "Accept all",
     "acceptCookies": "Accept cookies",
     "cookiePreferences": "Manage cookies",
     "favoritesAvailability": "To save an event as a favorite, please allow cookie storage in your browser."

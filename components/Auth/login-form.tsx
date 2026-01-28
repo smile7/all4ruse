@@ -26,6 +26,7 @@ export function LoginForm({
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
   const router = useRouter();
   const t = useTranslations("Profile");
 
@@ -86,8 +87,23 @@ export function LoginForm({
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                 />
+                <div className="flex items-center mt-4 gap-2">
+                  <input
+                    id="rememberMe"
+                    type="checkbox"
+                    checked={rememberMe}
+                    onChange={(e) => setRememberMe(e.target.checked)}
+                    className="size-4 accent-primary rounded focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-colors duration-150"
+                  />
+                  <Label
+                    htmlFor="rememberMe"
+                    className="text-base cursor-pointer select-none"
+                  >
+                    {t("rememberMe")}
+                  </Label>
+                </div>
               </div>
-              {error && <p className="text-sm text-red-500">{error}</p>}
+              {error && <p className="text-sm text-destructive">{error}</p>}
               <Button
                 type="submit"
                 className="w-full"
