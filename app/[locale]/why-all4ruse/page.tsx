@@ -36,8 +36,8 @@ export default function WhyAll4RusePage() {
             all4ruse – твоето място за събития в Русе
           </span>
         </div>
-        <Typography.H1 className="mb-4 animate-fade-in delay-100 drop-shadow-lg">
-          За да не изпускаш нищо важно.
+        <Typography.H1 className="mb-4 animate-fade-in text-pretty delay-100 drop-shadow-lg">
+          Не изпускай интересните събития!
         </Typography.H1>
         <Typography.P className="text-muted-foreground animate-fade-in delay-200 text-lg">
           Присъедини се към общността!
@@ -52,7 +52,7 @@ export default function WhyAll4RusePage() {
               src="/author.jpg"
               alt="Силвена - създател на all4ruse"
               fill
-              className="rounded-2xl border-4 border-primary shadow-lg object-cover"
+              className="rounded-2xl border-4 border-primary shadow-lg object-contain"
               priority
             />
           </AspectRatio>
