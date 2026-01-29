@@ -33,12 +33,11 @@ export default function WhyAll4RusePage() {
         <div className="inline-flex items-center gap-2 rounded-lg px-5 py-2 text-base font-semibold text-white bg-primary/85 shadow-lg mb-8 animate-fade-in">
           <Sparkles className="size-5" />
           <span className="text-pretty">
-            all4ruse – твоят гид за събития в Русе
+            all4ruse – твоето място за събития в Русе
           </span>
         </div>
         <Typography.H1 className="mb-4 animate-fade-in delay-100 drop-shadow-lg">
-          Мястото, където събираме на едно място всички събития в града, за да
-          не изпускаш нищо важно.
+          За да не изпускаш нищо важно.
         </Typography.H1>
         <Typography.P className="text-muted-foreground animate-fade-in delay-200 text-lg">
           Присъедини се към общността!
@@ -50,7 +49,7 @@ export default function WhyAll4RusePage() {
         <div className="flex-shrink-0 w-[160px] md:w-[180px]">
           <AspectRatio ratio={3 / 5}>
             <Image
-              src="/author.jpeg"
+              src="/author.jpg"
               alt="Силвена - създател на all4ruse"
               fill
               className="rounded-2xl border-4 border-primary shadow-lg object-cover"

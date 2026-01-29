@@ -111,9 +111,9 @@ export function EventsGrid({
                       className="w-full object-cover"
                       draggable={false}
                     />
-                    <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-opacity" />
+                    <div className="absolute inset-0 transition-opacity" />
                   </div>
-                  <div className="pointer-events-none absolute inset-0 z-10 bg-gradient-to-t from-black/70 via-black/25 to-transparent transition-opacity duration-300 group-hover:from-black/80" />
+                  <div className="pointer-events-none absolute inset-0 z-10 bg-gradient-to-t from-black/70 via-black/25 to-transparent transition-opacity duration-300" />
 
                   {!isEditMode && typeof e.id === "number" && (
                     <div className="absolute bottom-3 right-3 z-20">

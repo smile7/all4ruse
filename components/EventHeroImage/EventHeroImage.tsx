@@ -48,7 +48,7 @@ export default function EventHeroImage({
             draggable={false}
           />
           {/* Dark overlay layer */}
-          <div className="absolute inset-0 bg-black/30 group-hover:bg-black/20 transition-opacity" />
+          <div className="absolute inset-0 bg-black/10 group-hover:bg-black/0 transition-opacity" />
         </div>
       </div>
 
