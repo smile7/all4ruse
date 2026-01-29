@@ -31,27 +31,31 @@ export type EventRow = Omit<Tables<"events">, "organizers"> & {
 
 export async function getEvents(
   client: SupabaseClient,
+  options?: { all?: boolean },
 ): Promise<ServiceResult<Event[]>> {
-  const { data, error } = await client
+  let query = client
     .from("events")
     .select("*")
-    .eq("isEventActive", true)
     .order("startDate", { ascending: true });
 
+  if (!options?.all) {
+    query = query.eq("isEventActive", true);
+  }
+
+  const { data, error } = await query;
   return { data: data ?? [], error };
 }
 
 export async function getEventBySlug(
   client: SupabaseClient,
   slug: string,
+  options?: { all?: boolean },
 ): Promise<ServiceResult<EventRow | null>> {
-  const { data, error } = await client
-    .from("events")
-    .select("*")
-    .eq("slug", slug)
-    .eq("isEventActive", true)
-    .maybeSingle();
-
+  let query = client.from("events").select("*").eq("slug", slug);
+  if (!options?.all) {
+    query = query.eq("isEventActive", true);
+  }
+  const { data, error } = await query.maybeSingle();
   return { data: data ?? null, error };
 }
 

@@ -42,7 +42,8 @@
     "more": "More",
     "clear": "Clear Filters",
     "events": "events",
-    "publishedEvents": "Published Events",
+    "publishedEvents": "My Events",
+    "waitingForApproval": "Waiting for approval",
     "noEventsFound": "No events found.",
     "error": "An error occurred. Please try again later."
   },

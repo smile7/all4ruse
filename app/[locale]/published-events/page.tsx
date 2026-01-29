@@ -15,27 +15,32 @@ export default function PublishedEventsPage() {
   const { data: profile, isLoading: isProfileLoading } = useProfile();
   const { data: events, isLoading: isEventsLoading, error } = useEvents();
 
-  const userEvents = useMemo(() => {
+  const { waitingApprovalEvents, activeUserEvents } = useMemo(() => {
     if (!events || !profile) {
-      return [];
+      return { waitingApprovalEvents: [], activeUserEvents: [] };
     }
-
-    return events.filter((e) => e.createdBy === profile?.id);
+    const waitingApprovalEvents = events.filter(
+      (e) => e.createdBy === profile?.id && e.isEventActive === false,
+    );
+    const activeUserEvents = events.filter(
+      (e) => e.createdBy === profile?.id && e.isEventActive === true,
+    );
+    return { waitingApprovalEvents, activeUserEvents };
   }, [events, profile]);
 
   const upcomingEvents = useMemo(
-    () => filterEventsByTime(userEvents, "upcoming"),
-    [userEvents],
+    () => filterEventsByTime(activeUserEvents, "upcoming"),
+    [activeUserEvents],
   );
 
   const currentEvents = useMemo(
-    () => filterEventsByTime(userEvents, "current"),
-    [userEvents],
+    () => filterEventsByTime(activeUserEvents, "current"),
+    [activeUserEvents],
   );
 
   const pastEvents = useMemo(
-    () => filterEventsByTime(userEvents, "past"),
-    [userEvents],
+    () => filterEventsByTime(activeUserEvents, "past"),
+    [activeUserEvents],
   );
 
   if (!events) {
@@ -45,6 +50,15 @@ export default function PublishedEventsPage() {
   return (
     <div className="flex flex-col gap-6">
       {Boolean(error) && <ErrorAlert error="">{t("error")}</ErrorAlert>}
+
+      <Card className="space-y-4 p-6 border-orange-400">
+        <CardTitle>
+          <Typography.H2>{t("waitingForApproval")}</Typography.H2>
+        </CardTitle>
+        <CardContent className="p-0">
+          <EventsGrid events={waitingApprovalEvents} isEditMode />
+        </CardContent>
+      </Card>
 
       <Card className="space-y-4 p-6">
         <CardTitle>
