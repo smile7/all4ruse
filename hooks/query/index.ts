@@ -128,7 +128,8 @@ export function useEvents() {
   return useQuery({
     queryKey: eventQueryKeys.list(),
     queryFn: async (): Promise<Event[]> => {
-      const { data, error } = await getEvents(supabase);
+      // Fetch all events (active and pending) for the user events page
+      const { data, error } = await getEvents(supabase, { all: true });
       if (error) throw error;
       return data;
     },
@@ -182,7 +183,10 @@ export function useEvent(slug: string) {
   return useQuery({
     queryKey: eventQueryKeys.bySlug(slug),
     queryFn: async () => {
-      const { data, error } = await getEventBySlug(supabase, slug);
+      // Fetch event regardless of isEventActive for editing
+      const { data, error } = await getEventBySlug(supabase, slug, {
+        all: true,
+      });
       if (error) throw error;
       return data;
     },
