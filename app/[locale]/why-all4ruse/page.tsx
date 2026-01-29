@@ -28,19 +28,18 @@ export default function WhyAll4RusePage() {
   return (
     <div className="min-h-screen bg-gradient-to-b rounded-xl from-primary/10 via-background to-background flex flex-col gap-16 items-center py-10">
       {/* Header */}
-      <section className="w-full max-w-4xl text-center relative pb-8">
+      <section className="w-full max-w-4xl text-center relative pb-8 px-4">
         <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-primary/30 via-primary/10 to-transparent blur-2xl opacity-60 -z-10" />
-        <div className="inline-flex items-center gap-2 rounded-full px-5 py-2 text-base font-semibold text-white bg-primary/85 shadow-lg mb-6 animate-fade-in">
+        <div className="inline-flex items-center gap-2 rounded-full px-5 py-2 text-base font-semibold text-white bg-primary/85 shadow-lg mb-8 animate-fade-in">
           <Sparkles className="size-5" />
-          all4ruse – твоят гид за събития в Русе
+          <span className="text-pretty">
+            all4ruse – твоят гид за събития в Русе
+          </span>
         </div>
         <Typography.H1 className="mb-4 animate-fade-in delay-100 drop-shadow-lg">
           Мястото, където събираме на едно място всички събития в града, за да
           не изпускаш нищо важно.
         </Typography.H1>
-        <Typography.P className="text-muted-foreground animate-fade-in delay-200 text-lg">
-          По-малко скролване, повече истински преживявания.{" "}
-        </Typography.P>
         <Typography.P className="text-muted-foreground animate-fade-in delay-200 text-lg">
           Присъедини се към общността!
         </Typography.P>
@@ -48,7 +47,7 @@ export default function WhyAll4RusePage() {
 
       {/* About Me */}
       <section className="w-full max-w-3xl border-2 border-primary/30 bg-background/80 rounded-lg shadow-xl p-8 flex flex-col md:flex-row gap-8 items-center animate-fade-in delay-300">
-        <div className="flex-shrink-0 w-[120px] md:w-[180px]">
+        <div className="flex-shrink-0 w-[160px] md:w-[180px]">
           <AspectRatio ratio={3 / 5}>
             <Image
               src="/author.jpeg"
@@ -61,15 +60,15 @@ export default function WhyAll4RusePage() {
         </div>
         <div className="flex-1 text-left">
           <Typography.H2 className="mb-2">За мен</Typography.H2>
-          <Typography.P>
-            Виновникът за този нов русенски сайт съм аз, <b>Силвена</b> - върл
+          <Typography.P className="text-justify">
+            Виновникът за този нов русенски сайт съм аз, <b>Силвена</b>, върл
             оптимист, който вярва, че с достатъчно желание можем да направим
             града ни още по-добро място за живеене.
-            <br />
-            <br />
-            Обичам Русе, обичам да ходя по събития, но ми липсваше едно ясно,
-            подредено място, където да видя какво се случва тази седмица, без да
-            скролвам през безкрайни Facebook страници.
+          </Typography.P>
+          <Typography.P className="mt-6 text-justify">
+            Обичам Русе, обичам да ходя по събития, но ми липсваше едно
+            подредено място, където да видя какво се случва тази седмица без да
+            скролвам през множество Facebook страници.
           </Typography.P>
         </div>
       </section>
@@ -78,21 +77,21 @@ export default function WhyAll4RusePage() {
       <section className="w-full max-w-3xl animate-fade-in delay-400">
         <div className="bg-background/90 border-2 border-primary/30 shadow-xl rounded-3xl p-8 flex flex-col gap-4">
           <Typography.H2 className="mb-2">Защо създадох all4ruse</Typography.H2>
-          <Typography.P>
+          <Typography.P className="text-justify">
             Русе е богат на културни събития – концерти, театри, работилници,
-            събития за деца, спорт, срещи на общности – но информацията за тях е
+            събития за деца, спорт, срещи на общности, но информацията за тях е
             разпръсната в различни фейсбук страници и сайтове.
           </Typography.P>
-          <Typography.P className="mt-5">
-            Много често ми се случва да разбера за някое много интересно събитие
-            след като е минало, а вероятно за други изобщо не съм разбрала, че
-            са се случили.
+          <Typography.P className="mt-6 text-justify">
+            Много често ми се случва да разбера за някое интересно събитие след
+            като е минало, а вероятно за други изобщо не съм разбрала, че са се
+            случили.
           </Typography.P>
           <div className="mt-6 flex flex-col items-center">
             <div className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-primary shadow-lg">
               <span className="font-bold text-center text-lg text-white tracking-wide">
-                Целта ни е да съберем на едно място най-интересното, което се
-                случва в Русе и околността и да го направим лесно за откриване.
+                Целта ми е да събера на едно място най-интересното, което се
+                случва в Русе и околността и да го направя лесно за откриване.
               </span>
             </div>
           </div>
@@ -115,15 +114,17 @@ export default function WhyAll4RusePage() {
                 Търсене и Филтри
               </span>
               <span className="text-muted-foreground text-sm text-center">
-                Търси по ключова дума, дати и теми (театър, работилници, деца и
-                др.)
+                Търсене по ключова дума, дати и теми (театър, работилници, деца
+                и др.)
               </span>
             </div>
             <div className="rounded-2xl bg-gradient-to-br from-primary/20 to-background p-6 flex flex-col items-center shadow-md">
               <CheckCircle className="size-8 text-primary mb-2" />
-              <span className="font-semibold text-lg mb-1">Чист Интерфейс</span>
+              <span className="font-semibold text-lg mb-1">
+                Изчистен Интерфейс
+              </span>
               <span className="text-muted-foreground text-sm text-center">
-                Без реклами, без излишен шум, фокус само върху Русе и региона
+                Без реклами и излишен шум, фокус само върху Русе и региона
               </span>
             </div>
           </div>
@@ -151,8 +152,8 @@ export default function WhyAll4RusePage() {
             събития.
           </Typography.P>
           <Typography.P className="mt-6 text-center text-lg font-semibold text-primary">
-            Ако видиш нещо, което според теб не е ок, винаги можеш да ми пишеш –
-            реагирам и коригирам.
+            Ако видиш нещо, което според теб не е ок, винаги можеш да ми пишеш и
+            аз ще го проверя.
           </Typography.P>
         </div>
       </section>
@@ -185,7 +186,8 @@ export default function WhyAll4RusePage() {
             </div>
           </div>
           <Typography.P className="mt-6 text-center text-lg font-semibold text-primary">
-            Всеки имейл с идея или критика помага този сайт да става по-добър.
+            Всяко съобщение към мен с вашето мнение помага този сайт да става
+            по-добър.
           </Typography.P>
         </div>
       </section>
@@ -194,7 +196,7 @@ export default function WhyAll4RusePage() {
       <section className="w-full max-w-3xl animate-fade-in delay-800">
         <div className="bg-background/90 border-2 border-primary/30 shadow-xl rounded-3xl p-8 flex flex-col gap-4">
           <Typography.H2 className="mb-2">Контакт</Typography.H2>
-          <Typography.P>
+          <Typography.P className="text-justify">
             Ако искаш да предложиш нова идея, да дадеш критика или просто да
             кажеш „Здрасти, харесва ми, че го правиш“, можеш да ми пишеш на:
           </Typography.P>
