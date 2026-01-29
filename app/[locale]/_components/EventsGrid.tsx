@@ -142,7 +142,7 @@ export function EventsGrid({
                 </div>
               </AspectRatio>
               <CardContent className="flex flex-col gap-2 p-4 pt-0">
-                <Typography.Lead className="leading-tight mb-1 text-center">
+                <Typography.Lead className="leading-tight mb-1">
                   {e.title}
                 </Typography.Lead>
 
