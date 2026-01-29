@@ -30,7 +30,7 @@ export default function WhyAll4RusePage() {
       {/* Header */}
       <section className="w-full max-w-4xl text-center relative pb-8 px-4">
         <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-primary/30 via-primary/10 to-transparent blur-2xl opacity-60 -z-10" />
-        <div className="inline-flex items-center gap-2 rounded-full px-5 py-2 text-base font-semibold text-white bg-primary/85 shadow-lg mb-8 animate-fade-in">
+        <div className="inline-flex items-center gap-2 rounded-lg px-5 py-2 text-base font-semibold text-white bg-primary/85 shadow-lg mb-8 animate-fade-in">
           <Sparkles className="size-5" />
           <span className="text-pretty">
             all4ruse – твоят гид за събития в Русе
@@ -110,7 +110,7 @@ export default function WhyAll4RusePage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="rounded-2xl bg-gradient-to-br from-primary/20 to-background p-6 flex flex-col items-center shadow-md">
               <Filter className="size-8 text-primary mb-2" />
-              <span className="font-semibold text-lg mb-1">
+              <span className="font-semibold text-center text-lg mb-1">
                 Търсене и Филтри
               </span>
               <span className="text-muted-foreground text-sm text-center">
@@ -120,7 +120,7 @@ export default function WhyAll4RusePage() {
             </div>
             <div className="rounded-2xl bg-gradient-to-br from-primary/20 to-background p-6 flex flex-col items-center shadow-md">
               <CheckCircle className="size-8 text-primary mb-2" />
-              <span className="font-semibold text-lg mb-1">
+              <span className="font-semibold text-center text-lg mb-1">
                 Изчистен Интерфейс
               </span>
               <span className="text-muted-foreground text-sm text-center">
