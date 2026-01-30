@@ -20,8 +20,10 @@ import {
 
 import { SidebarUserMenu } from "./sidebar-user-menu";
 import { NavFavorites, NavLegal } from ".";
+import { useLocale } from "next-intl";
 
 export function SidebarLeft() {
+  const locale = useLocale();
   const { theme, systemTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
@@ -38,7 +40,7 @@ export function SidebarLeft() {
       <Sidebar className="border-r h-full">
         <SidebarHeader>
           <Link
-            href="/"
+            href={`/${locale}`}
             aria-label="All4Ruse Home"
             className={cn("hidden md:flex items-center justify-center mt-4")}
           >
