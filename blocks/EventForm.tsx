@@ -332,6 +332,13 @@ export function EventForm({ mode, event }: EventFormProps) {
   const onSubmit = async (values: CreateEventSchemaType) => {
     if (!userId) return;
 
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("is_confirmed")
+      .eq("id", userId)
+      .maybeSingle();
+    const isConfirmed = profile?.is_confirmed === true;
+
     const newItems = images.filter((i) => i.isNew && i.file);
     const uploadMap = new Map<string, string>();
 
@@ -387,7 +394,7 @@ export function EventForm({ mode, event }: EventFormProps) {
     if (mode === "create") {
       const result = await createEventMutate({
         ...basePayload,
-        isEventActive: false,
+        isEventActive: isConfirmed,
         slug: slugify(values.title),
         createdBy: userId,
       });

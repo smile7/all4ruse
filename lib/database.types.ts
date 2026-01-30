@@ -131,8 +131,12 @@ export type Database = {
         Row: {
           avatar_url: string | null
           email: string | null
+          fb: string | null
           full_name: string | null
           id: string
+          instagram: string | null
+          is_confirmed: boolean | null
+          tiktok: string | null
           updated_at: string | null
           username: string | null
           website: string | null
@@ -140,8 +144,12 @@ export type Database = {
         Insert: {
           avatar_url?: string | null
           email?: string | null
+          fb?: string | null
           full_name?: string | null
           id: string
+          instagram?: string | null
+          is_confirmed?: boolean | null
+          tiktok?: string | null
           updated_at?: string | null
           username?: string | null
           website?: string | null
@@ -149,8 +157,12 @@ export type Database = {
         Update: {
           avatar_url?: string | null
           email?: string | null
+          fb?: string | null
           full_name?: string | null
           id?: string
+          instagram?: string | null
+          is_confirmed?: boolean | null
+          tiktok?: string | null
           updated_at?: string | null
           username?: string | null
           website?: string | null

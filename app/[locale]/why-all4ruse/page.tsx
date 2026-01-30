@@ -49,10 +49,10 @@ export default function WhyAll4RusePage() {
         <div className="flex-shrink-0 w-[160px] md:w-[180px]">
           <AspectRatio ratio={3 / 5}>
             <Image
-              src="/author.jpg"
+              src="/author2.jpeg"
               alt="Силвена - създател на all4ruse"
               fill
-              className="rounded-2xl border-4 border-primary shadow-lg object-contain"
+              className="rounded-2xl border-4 border-primary shadow-lg object-cover"
               priority
             />
           </AspectRatio>
