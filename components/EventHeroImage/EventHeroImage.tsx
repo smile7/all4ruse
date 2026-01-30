@@ -69,13 +69,25 @@ export default function EventHeroImage({
             <XIcon size={20} />
           </button>
 
-          <div className="relative max-w-6xl w-full h-auto max-h-[90vh]">
+          <div
+            className="flex items-center justify-center w-full h-full"
+            style={{ maxHeight: '90vh', maxWidth: '96vw' }}
+          >
             <Image
               src={src}
               alt={alt}
-              width={1920} // helps Next optimizations
+              width={1920}
               height={1080}
-              className="object-contain w-full h-auto rounded-md"
+              className="object-contain rounded-md"
+              style={{
+                maxHeight: '90vh',
+                maxWidth: '96vw',
+                width: 'auto',
+                height: 'auto',
+                display: 'block',
+                margin: 'auto',
+                background: 'black',
+              }}
               draggable={false}
               onClick={(e) => e.stopPropagation()}
             />

@@ -299,7 +299,7 @@ export function EventForm({ mode, event }: EventFormProps) {
       "image/webp": [],
       "image/gif": [],
     },
-    maxSize: 1 * 1024 * 1024, // 1MB
+    maxSize: 2 * 1024 * 1024, // 2MB
     multiple: true,
   });
 
