@@ -32,15 +32,13 @@ export default function WhyAll4RusePage() {
         <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-primary/30 via-primary/10 to-transparent blur-2xl opacity-60 -z-10" />
         <div className="inline-flex items-center gap-2 rounded-lg px-5 py-2 text-base font-semibold text-white bg-primary/85 shadow-lg mb-8 animate-fade-in">
           <Sparkles className="size-5" />
-          <span className="text-pretty">
-            all4ruse – твоето място за събития в Русе
-          </span>
+          <span className="text-pretty">{t("headerTagline")}</span>
         </div>
         <Typography.H1 className="mb-4 animate-fade-in text-pretty delay-100 drop-shadow-lg">
-          Не изпускай интересните събития!
+          {t("mainHeadline")}
         </Typography.H1>
         <Typography.P className="text-muted-foreground animate-fade-in delay-200 text-lg">
-          Присъедини се към общността!
+          {t("mainSubheadline")}
         </Typography.P>
       </section>
 
@@ -58,16 +56,10 @@ export default function WhyAll4RusePage() {
           </AspectRatio>
         </div>
         <div className="flex-1 text-left">
-          <Typography.H2 className="mb-2">За мен</Typography.H2>
-          <Typography.P className="text-justify">
-            Виновникът за този нов русенски сайт съм аз, <b>Силвена</b>, върл
-            оптимист, който вярва, че с достатъчно желание можем да направим
-            града ни още по-добро място за живеене.
-          </Typography.P>
+          <Typography.H2 className="mb-2">{t("aboutMeHeader")}</Typography.H2>
+          <Typography.P className="text-justify">{t("aboutMe")}</Typography.P>
           <Typography.P className="mt-6 text-justify">
-            Обичам Русе, обичам да ходя по събития, но ми липсваше едно
-            подредено място, където да видя какво се случва тази седмица без да
-            скролвам през множество Facebook страници.
+            {t("aboutMe2")}
           </Typography.P>
         </div>
       </section>
@@ -75,22 +67,19 @@ export default function WhyAll4RusePage() {
       {/* Why Created */}
       <section className="w-full max-w-3xl animate-fade-in delay-400">
         <div className="bg-background/90 border-2 border-primary/30 shadow-xl rounded-3xl p-8 flex flex-col gap-4">
-          <Typography.H2 className="mb-2">Защо създадох all4ruse</Typography.H2>
+          <Typography.H2 className="mb-2">
+            {t("whyCreatedHeadline")}
+          </Typography.H2>
           <Typography.P className="text-justify">
-            Русе е богат на културни събития – концерти, театри, работилници,
-            събития за деца, спорт, срещи на общности, но информацията за тях е
-            разпръсната в различни фейсбук страници и сайтове.
+            {t("whyCreated")}
           </Typography.P>
           <Typography.P className="mt-6 text-justify">
-            Много често ми се случва да разбера за някое интересно събитие след
-            като е минало, а вероятно за други изобщо не съм разбрала, че са се
-            случили.
+            {t("whyCreated2")}
           </Typography.P>
           <div className="mt-6 flex flex-col items-center">
             <div className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-primary shadow-lg">
               <span className="font-bold text-center text-lg text-white tracking-wide">
-                Целта ми е да събера на едно място най-интересното, което се
-                случва в Русе и околността и да го направя лесно за откриване.
+                {t("whyCreated3")}
               </span>
             </div>
           </div>
@@ -101,34 +90,33 @@ export default function WhyAll4RusePage() {
       <section className="w-full max-w-3xl animate-fade-in delay-500">
         <div className="bg-background/90 border-2 border-primary/30 shadow-xl rounded-3xl p-8 flex flex-col gap-4">
           <Typography.H2 className="mb-2">
-            Какво прави този сайт различен
+            {t("whatMakesDifferentHeadline")}
           </Typography.H2>
           <Typography.P className="mb-4">
-            Facebook е добър, но не е създаден за подреден календар. Тук имате:
+            {t("whatMakesDifferent")}
           </Typography.P>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="rounded-2xl bg-gradient-to-br from-primary/20 to-background p-6 flex flex-col items-center shadow-md">
               <Filter className="size-8 text-primary mb-2" />
               <span className="font-semibold text-center text-lg mb-1">
-                Търсене и Филтри
+                {t("searchAndFilters")}
               </span>
               <span className="text-muted-foreground text-sm text-center">
-                Търсене по ключова дума, дати и теми (театър, работилници, деца
-                и др.)
+                {t("searchAndFiltersDesc")}
               </span>
             </div>
             <div className="rounded-2xl bg-gradient-to-br from-primary/20 to-background p-6 flex flex-col items-center shadow-md">
               <CheckCircle className="size-8 text-primary mb-2" />
               <span className="font-semibold text-center text-lg mb-1">
-                Изчистен Интерфейс
+                {t("cleanInterface")}
               </span>
               <span className="text-muted-foreground text-sm text-center">
-                Без реклами и излишен шум, фокус само върху Русе и региона
+                {t("cleanInterfaceDesc")}
               </span>
             </div>
           </div>
           <Typography.P className="mt-6 text-center text-lg font-semibold text-primary">
-            По-малко скролване, повече истински преживявания.
+            {t("lessScrollingMoreExperiences")}
           </Typography.P>
         </div>
       </section>
@@ -137,22 +125,17 @@ export default function WhyAll4RusePage() {
       <section className="w-full max-w-3xl animate-fade-in delay-500">
         <div className="bg-background/90 border-2 border-primary/30 shadow-xl rounded-3xl p-8 flex flex-col gap-4">
           <Typography.H2 className="mb-2">
-            Как събитията попадат тук
+            {t("howEventsAreAddedHeadline")}
           </Typography.H2>
-          <Typography.P>
-            Събитията се качват от организаторите след регистрация в сайта.
+          <Typography.P>{t("howEventsAreAdded")}</Typography.P>
+          <Typography.P className="mt-4">
+            {t("howEventsAreAdded2")}
           </Typography.P>
           <Typography.P className="mt-4">
-            Всяко събитие минава през одобрение от администратор, преди да бъде
-            публикувано.
-          </Typography.P>
-          <Typography.P className="mt-4">
-            Не се публикуват незаконни, подвеждащи, хазартни или рекламни
-            събития.
+            {t("howEventsAreAdded3")}
           </Typography.P>
           <Typography.P className="mt-6 text-center text-lg font-semibold text-primary">
-            Ако видиш нещо, което според теб не е ок, винаги можеш да ми пишеш и
-            аз ще го проверя.
+            {t("howEventsAreAdded4")}
           </Typography.P>
         </div>
       </section>
@@ -160,33 +143,38 @@ export default function WhyAll4RusePage() {
       {/* How You Can Help */}
       <section className="w-full max-w-3xl animate-fade-in delay-700">
         <div className="bg-background/90 border-2 border-primary/30 shadow-xl rounded-3xl p-8 flex flex-col gap-4">
-          <Typography.H2 className="mb-2">Как можеш да помогнеш</Typography.H2>
+          <Typography.H2 className="mb-2">
+            {t("howYouCanHelpHeadline")}
+          </Typography.H2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
             <div className="flex flex-col items-center bg-gradient-to-br from-primary/10 to-background rounded-xl p-4 shadow-sm">
               <Send className="h-7 w-7 text-primary mb-2" />
-              <span className="font-semibold text-center">Изпрати събитие</span>
+              <span className="font-semibold text-center">
+                {t("sendEvent")}
+              </span>
               <span className="text-xs text-muted-foreground text-center">
-                Дори да не си организатор, можеш да споделиш за важно събитие.
+                {t("sendEventDesc")}
               </span>
             </div>
             <div className="flex flex-col items-center bg-gradient-to-br from-primary/10 to-background rounded-xl p-4 shadow-sm">
               <AlertCircle className="h-7 w-7 text-primary mb-2" />
-              <span className="font-semibold text-center">Сигнализирай</span>
+              <span className="font-semibold text-center">
+                {t("reportIssue")}
+              </span>
               <span className="text-xs text-muted-foreground text-center">
-                Помогни да поддържаме информацията актуална и вярна.
+                {t("reportIssueDesc")}
               </span>
             </div>
             <div className="flex flex-col items-center bg-gradient-to-br from-primary/10 to-secondary/10 rounded-xl p-4 shadow-sm">
               <PlusCircle className="h-7 w-7 text-primary mb-2" />
-              <span className="font-semibold text-center">Нови идеи</span>
+              <span className="font-semibold text-center">{t("newIdeas")}</span>
               <span className="text-xs text-muted-foreground text-center">
-                Тагове, филтри и функционалности, които биха ти били полезни.
+                {t("newIdeasDesc")}
               </span>
             </div>
           </div>
           <Typography.P className="mt-6 text-center text-lg font-semibold text-primary">
-            Всяко съобщение към мен с вашето мнение помага този сайт да става
-            по-добър.
+            {t("yourFeedbackMatters")}
           </Typography.P>
         </div>
       </section>
@@ -194,15 +182,14 @@ export default function WhyAll4RusePage() {
       {/* Contact */}
       <section className="w-full max-w-3xl animate-fade-in delay-800">
         <div className="bg-background/90 border-2 border-primary/30 shadow-xl rounded-3xl p-8 flex flex-col gap-4">
-          <Typography.H2 className="mb-2">Контакт</Typography.H2>
+          <Typography.H2 className="mb-2">{t("contactHeadline")}</Typography.H2>
           <Typography.P className="text-justify">
-            Ако искаш да предложиш нова идея, да дадеш критика или просто да
-            кажеш „Здрасти, харесва ми, че го правиш“, можеш да ми пишеш на:
+            {t("contactInfo")}
           </Typography.P>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="flex flex-col items-center bg-gradient-to-br from-primary/10 to-background rounded-xl p-6 shadow-sm">
               <Mail className="h-8 w-8 text-primary mb-2" />
-              <span className="font-semibold text-lg mb-1">Имейл</span>
+              <span className="font-semibold text-lg mb-1">{t("email")}</span>
               <a
                 href="mailto:silvena@all4ruse.com"
                 className="text-primary underline text-base font-medium"
@@ -213,7 +200,7 @@ export default function WhyAll4RusePage() {
             <div className="flex flex-col items-center bg-gradient-to-br from-primary/10 to-background rounded-xl p-6 shadow-sm">
               <Facebook className="h-8 w-8 text-primary mb-2" />
               <span className="font-semibold text-lg mb-1">
-                Фейсбук страница
+                {t("facebookPage")}
               </span>
               <a
                 href="https://www.facebook.com/profile.php?id=61586926929594"
@@ -226,8 +213,7 @@ export default function WhyAll4RusePage() {
             </div>
           </div>
           <Typography.P className="mt-6 text-center text-lg font-semibold text-primary">
-            Ще се радвам да ми разкажеш какво би искал да виждаш повече в Русе –
-            и в сайта, и в града.
+            {t("lookingForwardToHearingFromYou")}
           </Typography.P>
         </div>
       </section>

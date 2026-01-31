@@ -13,6 +13,9 @@ import { createClient } from "@/lib/supabase/server";
 import { getEventTemporalStatus } from "../_components/FilterByTime";
 
 import "@/components/ui/minimal-tiptap/styles/index.css";
+import EventDescriptionWrapper from "@/components/EventDescriptionWrapper";
+import { translateText } from "@/lib/translateText";
+import EventTitleClient from "./EventTitleClient";
 
 export default async function EventPage(props: {
   params: Promise<{ slug: string }>;
@@ -53,10 +56,25 @@ export default async function EventPage(props: {
 
   const isPast = getEventTemporalStatus(event) === "past";
 
+  let translatedTitle = event.title;
+  let translatedDescription = event.description;
+  if (locale !== "bg") {
+    try {
+      translatedTitle = await translateText(event.title, locale);
+      translatedDescription = await translateText(event.description, locale);
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
   return (
     <div className="flex flex-col gap-6">
       {event.image && (
-        <EventHeroImage src={event.image} alt={event.title} isPast={isPast} />
+        <EventHeroImage
+          src={event.image}
+          alt={translatedTitle}
+          isPast={isPast}
+        />
       )}
 
       <Card>
@@ -76,9 +94,8 @@ export default async function EventPage(props: {
             </div>
           )}
           <div className="flex items-center flex-col md:flex-row md:justify-between gap-4">
-            <Typography.H1 className="text-center flex-1">
-              {event.title}
-            </Typography.H1>
+            {/* Replace the server-rendered title with the client component */}
+            <EventTitleClient fallback={event.title} />
             {typeof event.id === "number" && (
               <FavoriteButton
                 id={event.id}
@@ -111,14 +128,10 @@ export default async function EventPage(props: {
 
           <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
             <div className="lg:col-span-8 space-y-6">
-              <div className="minimal-tiptap-editor">
-                <div
-                  className="whitespace-pre-wrap text-pretty"
-                  dangerouslySetInnerHTML={{
-                    __html: event.description || "",
-                  }}
-                />
-              </div>
+              <EventDescriptionWrapper
+                description={event.description}
+                locale={locale}
+              />
             </div>
             <div className="lg:col-span-4">
               <EventDetailsCard event={event} />
