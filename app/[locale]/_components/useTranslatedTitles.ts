@@ -1,17 +1,32 @@
 import { useEffect, useState } from "react";
 import { translateText } from "@/lib/translateText";
 
-export function useTranslatedTitles(events, locale) {
-  const [translatedTitles, setTranslatedTitles] = useState({});
+interface Event {
+  id: string | number;
+  title: string;
+  [key: string]: any;
+}
+
+interface TranslatedTitles {
+  [id: string]: string;
+}
+
+export function useTranslatedTitles(
+  events: Event[],
+  locale: string,
+): TranslatedTitles {
+  const [translatedTitles, setTranslatedTitles] = useState<TranslatedTitles>(
+    {},
+  );
   useEffect(() => {
     let isMounted = true;
     async function translateAll() {
       if (locale === "bg") return;
-      const results = await Promise.all(
+      const results: [string | number, string][] = await Promise.all(
         events.map((e) =>
           translateText(e.title, locale)
-            .then((t) => [e.id, t])
-            .catch(() => [e.id, e.title]),
+            .then((t: string) => [e.id, t] as [string | number, string])
+            .catch(() => [e.id, e.title] as [string | number, string]),
         ),
       );
       if (isMounted) {
