@@ -15,6 +15,7 @@ import { formatShortDate, formatTimeTZ } from "@/lib/utils";
 
 import { EventTimeFilter } from "./FilterByTime";
 import type { EventTagsMap } from "@/hooks/useEventTagsMap";
+import { useTranslatedTitles } from "./useTranslatedTitles";
 
 export function EventsGrid({
   events,
@@ -30,6 +31,10 @@ export function EventsGrid({
   const t = useTranslations("HomePage");
   const locale = useLocale();
   const { data: allTags = [] } = useTags();
+  const translatedTitles: { [key: number]: string } = useTranslatedTitles(
+    events,
+    locale,
+  );
 
   const tagsById = new Map<number, Tag>();
   for (const tag of allTags) {
@@ -66,11 +71,14 @@ export function EventsGrid({
         return (
           <Link
             key={e.id}
-            href={
-              isEditMode
+            href={{
+              pathname: isEditMode
                 ? `/${locale}/edit-event/${e.slug}`
-                : `/${locale}/${e.slug}`
-            }
+                : `/${locale}/${e.slug}`,
+              query: translatedTitles[e.id]
+                ? { translatedTitle: translatedTitles[e.id] }
+                : undefined,
+            }}
             aria-label={`Отвори събитие: ${e.title}`}
             className="group"
           >
@@ -143,7 +151,7 @@ export function EventsGrid({
               </AspectRatio>
               <CardContent className="flex flex-col gap-2 p-4 pt-0">
                 <Typography.Lead className="leading-tight mb-1">
-                  {e.title}
+                  {translatedTitles[e.id] || e.title}
                 </Typography.Lead>
 
                 {tagIds.length > 0 && (
@@ -162,7 +170,9 @@ export function EventsGrid({
                   {formatTimeTZ(e.startTime)}
                 </div> */}
 
-                <span className="sr-only">{e.title}</span>
+                <span className="sr-only">
+                  {translatedTitles[e.id] || e.title}
+                </span>
               </CardContent>
             </Card>
           </Link>
