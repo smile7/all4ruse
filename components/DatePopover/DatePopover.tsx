@@ -48,7 +48,7 @@ export function DatePopover({
         <PopoverTrigger asChild>
           <Button
             variant="outline"
-            className="flex h-9 w-full justify-start px-3 text-left font-normal select-none border-input bg-transparent dark:bg-input/30"
+            className="flex h-9 w-full justify-start px-3 text-left font-normal select-none border-input bg-white dark:bg-input/30"
             id={id}
           >
             <CalendarIcon className="pointer-events-none shrink-0 opacity-50" />

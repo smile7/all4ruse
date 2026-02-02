@@ -126,7 +126,9 @@
     "error": "An error occurred. Please try again later.",
     "gallery": "Gallery",
     "euros": "euros",
-    "hosts": "Hosts"
+    "hosts": "Hosts",
+    "translate": "Translate to",
+    "chooseLanguage": "Choose language"
   },
   "CurrentEvents": {
     "createEvent": "Create an Event",

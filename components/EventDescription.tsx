@@ -2,6 +2,14 @@
 import { useState } from "react";
 import { translateText } from "@/lib/translateText";
 import { Typography } from "@/components/Typography";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui";
+import { useTranslations } from "next-intl";
 
 interface EventDescriptionProps {
   description: string;
@@ -12,17 +20,24 @@ export default function EventDescription({
   description,
   locale,
 }: EventDescriptionProps) {
+  const t = useTranslations("SingleEvent");
   const [translated, setTranslated] = useState<{
     description: string;
   } | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [target, setTarget] = useState<"" | "en" | "ro" | "ua">("");
 
-  const handleTranslate = async () => {
+  const handleChangeTarget = async (value: string) => {
+    const nextTarget = value as "en" | "ro" | "ua";
+    setTarget(nextTarget);
     setLoading(true);
     setError(null);
     try {
-      const translatedDescription = await translateText(description, locale);
+      const translatedDescription = await translateText(
+        description,
+        nextTarget,
+      );
       setTranslated({
         description: translatedDescription,
       });
@@ -35,14 +50,28 @@ export default function EventDescription({
 
   return (
     <div className="space-y-4">
-      {locale !== "bg" && !translated && (
-        <button
-          className="px-4 py-2 bg-primary text-white rounded hover:bg-primary/80"
-          onClick={handleTranslate}
-          disabled={loading}
-        >
-          {loading ? "Translating..." : "Translate"}
-        </button>
+      {locale !== "bg" && (
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
+          <Typography.Small className="text-muted-foreground">
+            {t("translate")}
+          </Typography.Small>
+          <div className="w-full max-w-xs">
+            <Select
+              value={target}
+              onValueChange={handleChangeTarget}
+              disabled={loading}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder={t("chooseLanguage")} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="en">English</SelectItem>
+                <SelectItem value="ro">Română</SelectItem>
+                <SelectItem value="ua">Українська</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
       )}
       {error && <div className="text-red-500">{error}</div>}
       <div
