@@ -62,7 +62,7 @@ export default function EventDescription({
               disabled={loading}
             >
               <SelectTrigger>
-                <SelectValue placeholder="Choose language" />
+                <SelectValue placeholder={t("chooseLanguage")} />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="en">English</SelectItem>
