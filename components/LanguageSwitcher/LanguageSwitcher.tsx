@@ -20,8 +20,10 @@ export default function LanguageSwitcher() {
   const t = useTranslations("HomePage");
 
   const locales = [
-    { code: "en", label: t("english"), flag: "/flags/en.svg" },
-    { code: "bg", label: t("bulgarian"), flag: "/flags/bg.svg" },
+    { code: "en", label: "English", flag: "/flags/en.svg" },
+    { code: "bg", label: "Български", flag: "/flags/bg.svg" },
+    { code: "ro", label: "Română", flag: "/flags/ro.svg" },
+    { code: "ua", label: "Українська", flag: "/flags/ua.svg" },
   ];
 
   const handleChange = (value: string) => {

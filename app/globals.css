@@ -279,13 +279,13 @@
 
   html {
     scroll-behavior: smooth;
-    scrollbar-gutter: stable;
+    /* scrollbar-gutter: stable; */
   }
 
   body {
     @apply bg-background text-foreground selection:bg-foreground selection:text-background;
     overflow-y: scroll;
-    scrollbar-gutter: stable;
+    /* scrollbar-gutter: stable; */
   }
 
   .dark {
