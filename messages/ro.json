@@ -127,7 +127,8 @@
     "gallery": "Galerie",
     "euros": "euro",
     "hosts": "Gazde",
-    "translate": "Tradu în"
+    "translate": "Tradu în",
+    "chooseLanguage": "Alege limba"
   },
   "CurrentEvents": {
     "createEvent": "Creează un eveniment",

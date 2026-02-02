@@ -127,7 +127,8 @@
     "gallery": "Галерея",
     "euros": "євро",
     "hosts": "Організатори",
-    "translate": "Перевести на"
+    "translate": "Перевести на",
+    "chooseLanguage": "Оберіть мову"
   },
   "CurrentEvents": {
     "createEvent": "Створити подію",

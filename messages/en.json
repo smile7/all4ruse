@@ -127,7 +127,8 @@
     "gallery": "Gallery",
     "euros": "euros",
     "hosts": "Hosts",
-    "translate": "Translate to"
+    "translate": "Translate to",
+    "chooseLanguage": "Choose language"
   },
   "CurrentEvents": {
     "createEvent": "Create an Event",
