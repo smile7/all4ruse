@@ -183,7 +183,11 @@
     "errorOccurred": "Възникна грешка. Моля опитайте отново по-късно.",
     "thankYouForSigningUp": "Благодарим ви, че се регистрирахте!",
     "pleaseCheckEmail": "Моля, проверете имейла си, за да потвърдите регистрацията си.",
-    "rememberMe": "Запомни ме"
+    "rememberMe": "Запомни ме",
+    "acceptTerms": "Запознат съм и приемам Общите условия.",
+    "acceptTermsPrefix": "Запознат съм и приемам ",
+    "acceptTermsLink": "Общите условия",
+    "acceptTermsRequired": "Трябва да приемете Общите условия, за да се регистрирате."
   },
   "General": {
     "profileUpdatedSuccessfully": "Профилът е актуализиран успешно.",

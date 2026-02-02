@@ -183,7 +183,11 @@
     "errorOccurred": "Сталася помилка. Спробуйте пізніше.",
     "thankYouForSigningUp": "Дякуємо за реєстрацію!",
     "pleaseCheckEmail": "Перевірте свою електронну пошту, щоб підтвердити реєстрацію.",
-    "rememberMe": "Запамʼятати мене"
+    "rememberMe": "Запамʼятати мене",
+    "acceptTerms": "Я ознайомився й приймаю Умови користування.",
+    "acceptTermsPrefix": "Я ознайомився й приймаю ",
+    "acceptTermsLink": "Умови користування",
+    "acceptTermsRequired": "Щоб зареєструватися, потрібно прийняти Умови користування."
   },
   "General": {
     "profileUpdatedSuccessfully": "Профіль успішно оновлено.",

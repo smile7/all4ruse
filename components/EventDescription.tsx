@@ -73,7 +73,7 @@ export default function EventDescription({
           </div>
         </div>
       )}
-      {error && <div className="text-red-500">{error}</div>}
+      {error && <div className="text-destructive">{error}</div>}
       <div
         className="whitespace-pre-wrap text-pretty minimal-tiptap-editor"
         dangerouslySetInnerHTML={{

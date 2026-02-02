@@ -16,6 +16,7 @@ import "@/components/ui/minimal-tiptap/styles/index.css";
 import EventDescriptionWrapper from "@/components/EventDescriptionWrapper";
 import { translateText } from "@/lib/translateText";
 import EventTitleClient from "./EventTitleClient";
+import { ScrollToTopOnMount } from "@/components/ScrollToTopOnMount";
 
 export default async function EventPage(props: {
   params: Promise<{ slug: string }>;
@@ -69,6 +70,7 @@ export default async function EventPage(props: {
 
   return (
     <div className="flex flex-col gap-6">
+      <ScrollToTopOnMount />
       {event.image && (
         <EventHeroImage
           src={event.image}

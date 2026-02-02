@@ -27,6 +27,7 @@ export function SignUpForm({
   const [password, setPassword] = useState("");
   const [repeatPassword, setRepeatPassword] = useState("");
   const [website, setWebsite] = useState("");
+  const [acceptTerms, setAcceptTerms] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
@@ -37,6 +38,12 @@ export function SignUpForm({
     const supabase = createClient();
     setIsLoading(true);
     setError(null);
+
+    if (!acceptTerms) {
+      setError(t("acceptTermsRequired"));
+      setIsLoading(false);
+      return;
+    }
 
     if (password !== repeatPassword) {
       setError(t("passwordsDoNotMatch"));
@@ -146,7 +153,30 @@ export function SignUpForm({
                 />
               </div>
 
-              {error && <p className="text-sm text-red-500">{error}</p>}
+              <div className="flex items-center mt-2 gap-2">
+                <input
+                  id="acceptTerms"
+                  type="checkbox"
+                  checked={acceptTerms}
+                  onChange={(e) => setAcceptTerms(e.target.checked)}
+                  className="size-4 accent-primary rounded focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-colors duration-150"
+                />
+                <Label
+                  htmlFor="acceptTerms"
+                  className="text-base cursor-pointer select-none"
+                >
+                  {t("acceptTermsPrefix")}
+                  <Link
+                    href="/legal"
+                    className="underline underline-offset-4"
+                    target="_blank"
+                  >
+                    {t("acceptTermsLink")}
+                  </Link>
+                </Label>
+              </div>
+
+              {error && <p className="text-sm text-destructive">{error}</p>}
               <Button
                 type="submit"
                 className="w-full"
