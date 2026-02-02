@@ -22,7 +22,17 @@ type EventsFiltersProps = {
   filters: ReturnType<typeof useEventFilters>;
 };
 
-export function EventsFilters({ filters }: EventsFiltersProps) {
+type ControlledAccordionProps = {
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+};
+
+export function EventsFilters({
+  filters,
+  open,
+  onOpenChange,
+  inDialog,
+}: EventsFiltersProps & ControlledAccordionProps & { inDialog?: boolean }) {
   const {
     title,
     setTitle,
@@ -51,19 +61,39 @@ export function EventsFilters({ filters }: EventsFiltersProps) {
     <Accordion
       type="single"
       collapsible
-      className="rounded-md border bg-secondary"
+      value={open !== undefined ? (open ? "filters" : undefined) : undefined}
+      onValueChange={(val) => {
+        if (onOpenChange) {
+          onOpenChange(Boolean(val));
+        }
+      }}
+      className={`rounded-md border bg-secondary ${
+        inDialog ? "md:border-none md:bg-background" : ""
+      }`}
     >
       <AccordionItem value="filters">
-        <AccordionTrigger className="p-4 hover:cursor-pointer">
-          <span className="inline-flex items-center gap-2">
-            <FilterIcon className="size-4" />
-            {t("filters")}{" "}
-            {appliedFiltersCount ? ` (${appliedFiltersCount})` : ""}
-          </span>
-        </AccordionTrigger>
+        {!inDialog && (
+          <AccordionTrigger
+            className={`p-4 hover:cursor-pointer ${
+              inDialog ? "md:[&_svg]:hidden" : ""
+            }`}
+          >
+            <span className="inline-flex items-center gap-2">
+              <FilterIcon className="size-4" />
+              {t("filters")}
+              {appliedFiltersCount ? ` (${appliedFiltersCount})` : ""}
+            </span>
+          </AccordionTrigger>
+        )}
         <AccordionContent className="grid border-t p-4 gap-4">
-          <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_10rem_10rem_auto]">
-            <div className="relative">
+          <div
+            className={
+              inDialog
+                ? "grid gap-4 md:grid-cols-3"
+                : "grid gap-4 md:grid-cols-[minmax(0,1fr)_10rem_10rem_auto]"
+            }
+          >
+            <div className={`relative ${inDialog ? "md:col-span-3" : ""}`}>
               <Label
                 htmlFor="events-title"
                 className="text-xs text-muted-foreground"
