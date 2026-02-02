@@ -15,7 +15,7 @@ export function MobileLogo() {
 
   const currentTheme = theme === "system" ? systemTheme : theme;
   const logoSrc =
-    currentTheme === "dark" ? "/logo_white.png" : "/logo_black.png";
+    currentTheme === "dark" ? "/all4ruse_white.png" : "/all4ruse_black.png";
 
   return (
     <div className="flex justify-center my-4">

@@ -33,7 +33,7 @@ export function SidebarLeft() {
 
   const currentTheme = theme === "system" ? systemTheme : theme;
   const logoSrc =
-    currentTheme === "dark" ? "/logo_white.png" : "/logo_black.png";
+    currentTheme === "dark" ? "/all4ruse_white.png" : "/all4ruse_black.png";
 
   return (
     <aside aria-label="Primary" className="h-screen">

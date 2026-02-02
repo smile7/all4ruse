@@ -123,6 +123,14 @@ export function EventsGrid({
                   </div>
                   <div className="pointer-events-none absolute inset-0 z-10 bg-gradient-to-t from-black/70 via-black/25 to-transparent transition-opacity duration-300" />
 
+                  {isEditMode && (
+                    <div className="absolute inset-0 z-30 flex items-center justify-center bg-white/20 group-hover:bg-white/35">
+                      <div className="rounded-full bg-primary px-5 py-2 text-sm font-semibold uppercase tracking-wide text-primary-foreground shadow-lg">
+                        {t("edit")}
+                      </div>
+                    </div>
+                  )}
+
                   {!isEditMode && typeof e.id === "number" && (
                     <div className="absolute bottom-3 right-3 z-20">
                       <FavoriteButton
