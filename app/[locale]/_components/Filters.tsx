@@ -105,7 +105,7 @@ export function EventsFilters({
                 placeholder={t("searchTitle")}
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className="pr-10"
+                className={`pr-10 ${inDialog ? "bg-white" : ""}`}
               />
               <Button
                 type="button"
