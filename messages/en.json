@@ -183,7 +183,11 @@
     "errorOccurred": "An error occurred. Please try again later.",
     "thankYouForSigningUp": "Thank you for signing up!",
     "pleaseCheckEmail": "Please check your email to confirm your registration.",
-    "rememberMe": "Remember me"
+    "rememberMe": "Remember me",
+    "acceptTerms": "I have read and accept the Terms of Use.",
+    "acceptTermsPrefix": "I have read and accept the ",
+    "acceptTermsLink": "Terms of Use",
+    "acceptTermsRequired": "You must accept the Terms of Use to register."
   },
   "General": {
     "profileUpdatedSuccessfully": "Profile updated successfully.",

@@ -183,7 +183,11 @@
     "errorOccurred": "A apărut o eroare. Te rugăm să încerci din nou mai târziu.",
     "thankYouForSigningUp": "Îți mulțumim pentru înregistrare!",
     "pleaseCheckEmail": "Te rugăm să îți verifici e-mailul pentru a-ți confirma înregistrarea.",
-    "rememberMe": "Ține-mă minte"
+    "rememberMe": "Ține-mă minte",
+    "acceptTerms": "Am citit și accept Termenii de utilizare.",
+    "acceptTermsPrefix": "Am citit și accept ",
+    "acceptTermsLink": "Termenii de utilizare",
+    "acceptTermsRequired": "Trebuie să accepți Termenii de utilizare pentru a te înregistra."
   },
   "General": {
     "profileUpdatedSuccessfully": "Profil actualizat cu succes.",
