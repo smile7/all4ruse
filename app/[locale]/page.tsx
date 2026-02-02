@@ -29,7 +29,7 @@ export default async function EventsPage({
         {user && (
           <Button
             asChild
-            className="order-1 md:order-2 self-end md:self-center md:ml-auto"
+            className="order-1 md:order-2 self-end md:self-center md:ml-auto w-full md:w-auto"
           >
             <Link href={`/${locale}/create`}>{t("createEvent")}</Link>
           </Button>
