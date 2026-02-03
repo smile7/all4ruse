@@ -4,6 +4,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 
 import { EventDetailsCard } from "@/components/EventDetailsCard";
 import EventHeroImage from "@/components/EventHeroImage/EventHeroImage";
+import { EventShareButton } from "@/components/EventShareButton";
 import { FavoriteButton } from "@/components/FavoriteButton";
 import { ImagesGallery } from "@/components/ImagesGallery";
 import { Typography } from "@/components/Typography";
@@ -205,13 +206,19 @@ export default async function EventPage(props: {
             <Typography.H1 className="text-center flex-1">
               {translatedTitle}
             </Typography.H1>
-            {typeof event.id === "number" && (
-              <FavoriteButton
-                id={event.id}
-                name={event.title ?? ""}
-                url={`/${locale}/${slug}`}
+            <div className="flex items-center gap-2">
+              {typeof event.id === "number" && (
+                <FavoriteButton
+                  id={event.id}
+                  name={event.title ?? ""}
+                  url={`/${locale}/${slug}`}
+                />
+              )}
+              <EventShareButton
+                url={eventUrl}
+                title={translatedTitle ?? event.title ?? ""}
               />
-            )}
+            </div>
           </div>
 
           {(tags.length > 0 || isFree) && (

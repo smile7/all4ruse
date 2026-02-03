@@ -60,12 +60,14 @@ export default function PublishedEventsPage() {
       {Boolean(error) && <ErrorAlert error="">{t("error")}</ErrorAlert>}
 
       <div className="flex flex-col md:flex-row w-full gap-4 md:items-center md:justify-between items-center text-center md:text-left">
-        <Button
-          asChild
-          className="order-1 md:order-2 self-end md:self-center md:ml-auto w-full md:w-auto"
-        >
-          <Link href={`/${locale}/create`}>{t("createEvent")}</Link>
-        </Button>
+        {profile && (
+          <Button
+            asChild
+            className="order-1 md:order-2 self-end md:self-center md:ml-auto w-full md:w-auto"
+          >
+            <Link href={`/${locale}/create`}>{t("createEvent")}</Link>
+          </Button>
+        )}
       </div>
 
       <Card className="space-y-4 p-6 border-orange-400">

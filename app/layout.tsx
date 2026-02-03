@@ -63,8 +63,7 @@ export const metadata: Metadata = {
     default: "All4Ruse – събития в Русе",
     template: "%s | All4Ruse",
   },
-  description:
-    "Открий и споделяй културни събития в Русе – концерти, театър, работилници, събития за деца, спорт и още на едно място.",
+  description: "Твоето място за събития в Русе.",
   icons: {
     icon: [
       { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
@@ -76,8 +75,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: "All4Ruse – събития в Русе",
-    description:
-      "Открий и споделяй културни събития в Русе – концерти, театър, работилници, събития за деца, спорт и още на едно място.",
+    description: "Твоето място за събития в Русе.",
     url: siteUrl,
     siteName: "All4Ruse",
     type: "website",
@@ -93,8 +91,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "All4Ruse – събития в Русе",
-    description:
-      "Открий и споделяй културни събития в Русе – концерти, театър, работилници, събития за деца, спорт и още на едно място.",
+    description: "Твоето място за събития в Русе.",
     images: ["/all4ruse_white.png"],
   },
 };
