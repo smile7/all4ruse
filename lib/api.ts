@@ -155,8 +155,22 @@ export async function getCurrentUserProfile(client: SupabaseClient): Promise<
     .maybeSingle();
 
   if (profileError || !profile) {
+    const fallbackProfile: Profile & { email?: string | null } = {
+      id: user.id,
+      avatar_url: null,
+      email: user.email ?? null,
+      fb: null,
+      full_name: null,
+      instagram: null,
+      is_confirmed: null,
+      tiktok: null,
+      updated_at: null,
+      username: null,
+      website: null,
+    };
+
     return {
-      data: profile ? { ...profile, email: user.email ?? null } : null,
+      data: fallbackProfile,
       error: profileError,
     };
   }
