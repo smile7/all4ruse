@@ -202,16 +202,31 @@ export function useCreateEvent() {
 
   return useMutation({
     mutationFn: async (body: CreateNewEvent) => {
-      return await createEvent(supabase, body);
-      //   const { data, error } = await createEvent(supabase, body);
-      //   if (error) throw error;
-      //   return data;
+      const result = await createEvent(supabase, body);
+      if (result.error) {
+        throw result.error;
+      }
+      return result;
     },
-    onSuccess: () => {
-      toast.success(t("eventCreatedSuccessfully"));
+    onSuccess: (result) => {
+      const createdEvent = (
+        result as { data?: { isEventActive?: boolean } | null }
+      ).data;
+      const isActive = createdEvent?.isEventActive === true;
+
+      toast.success(
+        t(
+          isActive
+            ? "eventCreatedSuccessfullyActive"
+            : "eventCreatedSuccessfully",
+        ),
+      );
       queryClient.invalidateQueries({
         queryKey: eventQueryKeys.list(),
       });
+    },
+    onError: (error) => {
+      console.error("Error creating event", error);
     },
     onSettled: () => {
       queryClient.invalidateQueries({

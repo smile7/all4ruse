@@ -10,6 +10,7 @@ type BasicFilters = {
   from: string | null;
   to: string | null;
   tagIds: number[];
+  freeOnly: boolean;
 };
 
 export function useFilteredEvents(
@@ -17,7 +18,7 @@ export function useFilteredEvents(
   filters: BasicFilters,
   eventTags?: Record<number, number[]>,
 ) {
-  const { title, from, to, tagIds } = filters;
+  const { title, from, to, tagIds, freeOnly } = filters;
   const { data: allTags = [] } = useTags();
 
   const tagsById = useMemo(() => {
@@ -103,6 +104,10 @@ export function useFilteredEvents(
           const start = toTimestamp(e.startDate);
           if (fromTs && start && start < fromTs) return false;
           if (toTs && start && start > toTs) return false;
+        }
+        if (freeOnly) {
+          const price = (e.price ?? "").trim();
+          if (price !== "0") return false;
         }
         if (tagIds.length && eventTags) {
           const tagsForEvent = eventTags[e.id as number] ?? [];

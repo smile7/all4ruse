@@ -36,6 +36,11 @@ export function SidebarCustomMenu() {
     url: `/${locale}/why-all4ruse`,
     emoji: "💡",
   };
+  const facebookPageItem = {
+    name: `${t("facebookPage")}`,
+    url: "https://www.facebook.com/profile.php?id=61586926929594",
+    emoji: "ⓕ",
+  };
 
   return (
     <>
@@ -45,7 +50,9 @@ export function SidebarCustomMenu() {
             <SidebarMenuItem key={item.name}>
               <SidebarMenuButton asChild>
                 <Link href={item.url} title={item.name}>
-                  <span>{item.emoji}</span>
+                  <span className="inline-flex w-6 justify-center">
+                    {item.emoji}
+                  </span>
                   <span>{item.name}</span>
                 </Link>
               </SidebarMenuButton>
@@ -63,8 +70,25 @@ export function SidebarCustomMenu() {
           <SidebarMenuItem key={whyAll4RuseItem.name}>
             <SidebarMenuButton asChild>
               <Link href={whyAll4RuseItem.url} title={whyAll4RuseItem.name}>
-                <span>{whyAll4RuseItem.emoji}</span>
+                <span className="inline-flex w-6 justify-center">
+                  {whyAll4RuseItem.emoji}
+                </span>
                 <span>{whyAll4RuseItem.name}</span>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+          <SidebarMenuItem key={facebookPageItem.name}>
+            <SidebarMenuButton asChild>
+              <Link
+                href={facebookPageItem.url}
+                title={facebookPageItem.name}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <span className="inline-flex w-6 justify-center">
+                  {facebookPageItem.emoji}
+                </span>
+                <span>{facebookPageItem.name}</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
