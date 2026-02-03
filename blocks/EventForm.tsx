@@ -395,7 +395,7 @@ export function EventForm({ mode, event }: EventFormProps) {
       const result = await createEventMutate({
         ...basePayload,
         isEventActive: isConfirmed,
-        slug: slugify(values.title),
+        slug: `${slugify(values.title)}-${Math.random().toString(36).slice(2, 8)}`,
         createdBy: userId,
       });
 

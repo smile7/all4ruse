@@ -42,6 +42,8 @@ export function EventsFilters({
     setTo,
     tagIds,
     setTagIds,
+    freeOnly,
+    setFreeOnly,
     hasFilters,
     appliedFiltersCount,
     clear,
@@ -164,39 +166,49 @@ export function EventsFilters({
             </div>
           </div>
 
-          {allTags.length > 0 && (
-            <div className="mt-2">
-              <p className="mb-2 text-xs text-muted-foreground">
-                {tCreate("tags")}
-                {tagIds.length ? ` (${tagIds.length})` : ""}
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {allTags.map((tag) => {
-                  const selected = tagIds.includes(tag.id);
-                  return (
-                    <button
-                      key={tag.id}
-                      type="button"
-                      onClick={() => {
-                        if (selected) {
-                          setTagIds(tagIds.filter((id) => id !== tag.id));
-                        } else {
-                          setTagIds([...tagIds, tag.id]);
-                        }
-                      }}
-                      className={`inline-flex items-center gap-1 rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-wide shadow-sm transition-colors ${
-                        selected
-                          ? "border-primary bg-primary text-primary-foreground"
-                          : "border-primary/30 bg-primary/5 text-primary hover:bg-primary/10 hover:border-primary/60"
-                      }`}
-                    >
-                      <span>#{formatLabel(tag)}</span>
-                    </button>
-                  );
-                })}
-              </div>
+          <div className="mt-2">
+            <p className="mb-2 text-xs text-muted-foreground">
+              {tCreate("tags")}
+              {tagIds.length ? ` (${tagIds.length})` : ""}
+            </p>
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={() => setFreeOnly(!freeOnly)}
+                className={`inline-flex items-center gap-1 rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-wide shadow-sm transition-colors ${
+                  freeOnly
+                    ? "border-primary bg-primary text-primary-foreground"
+                    : "border-primary/30 bg-primary/5 text-primary hover:bg-primary/10 hover:border-primary/60"
+                }`}
+              >
+                <span>#{t("freeEvent")}</span>
+              </button>
+
+              {allTags.map((tag) => {
+                const selected = tagIds.includes(tag.id);
+                return (
+                  <button
+                    key={tag.id}
+                    type="button"
+                    onClick={() => {
+                      if (selected) {
+                        setTagIds(tagIds.filter((id) => id !== tag.id));
+                      } else {
+                        setTagIds([...tagIds, tag.id]);
+                      }
+                    }}
+                    className={`inline-flex items-center gap-1 rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-wide shadow-sm transition-colors ${
+                      selected
+                        ? "border-primary bg-primary text-primary-foreground"
+                        : "border-primary/30 bg-primary/5 text-primary hover:bg-primary/10 hover:border-primary/60"
+                    }`}
+                  >
+                    <span>#{formatLabel(tag)}</span>
+                  </button>
+                );
+              })}
             </div>
-          )}
+          </div>
         </AccordionContent>
       </AccordionItem>
     </Accordion>

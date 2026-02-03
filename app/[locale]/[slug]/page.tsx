@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
 
@@ -8,6 +9,7 @@ import { ImagesGallery } from "@/components/ImagesGallery";
 import { Typography } from "@/components/Typography";
 import { Card, CardContent, CardTitle, ErrorAlert } from "@/components/ui";
 import { TAG_LABELS_BG } from "@/constants";
+import { routing } from "@/i18n/routing";
 import { getEventBySlug, type Tag } from "@/lib/api";
 import { createClient } from "@/lib/supabase/server";
 import { getEventTemporalStatus } from "../_components/FilterByTime";
@@ -15,11 +17,73 @@ import { getEventTemporalStatus } from "../_components/FilterByTime";
 import "@/components/ui/minimal-tiptap/styles/index.css";
 import EventDescriptionWrapper from "@/components/EventDescriptionWrapper";
 import { translateText } from "@/lib/translateText";
-import EventTitleClient from "./EventTitleClient";
 import { ScrollToTopOnMount } from "@/components/ScrollToTopOnMount";
 
+type EventPageParams = { slug: string };
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<EventPageParams>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const locale = await getLocale();
+  const supabase = await createClient();
+  const { data: event } = await getEventBySlug(supabase, slug);
+
+  if (!event) {
+    return {};
+  }
+
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://all4ruse.com";
+  const url = `${siteUrl}/${locale}/${slug}`;
+
+  const title = event.title ?? "All4Ruse";
+  const description =
+    event.description?.replace(/<[^>]+>/g, " ").slice(0, 160) ||
+    "Събитие в Русе в All4Ruse.";
+  const imageUrl = event.image
+    ? new URL(event.image, siteUrl).toString()
+    : undefined;
+
+  const languages = Object.fromEntries(
+    routing.locales.map((loc) => [loc, `${siteUrl}/${loc}/${slug}`]),
+  );
+
+  return {
+    title,
+    description,
+    alternates: {
+      canonical: url,
+      languages,
+    },
+    openGraph: {
+      title,
+      description,
+      url,
+      type: "article",
+      locale,
+      siteName: "All4Ruse",
+      images: imageUrl
+        ? [
+            {
+              url: imageUrl,
+              alt: title,
+            },
+          ]
+        : undefined,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: imageUrl ? [imageUrl] : undefined,
+    },
+  };
+}
+
 export default async function EventPage(props: {
-  params: Promise<{ slug: string }>;
+  params: Promise<EventPageParams>;
 }) {
   const { params } = props;
   const t = await getTranslations("SingleEvent");
@@ -56,6 +120,7 @@ export default async function EventPage(props: {
     : [];
 
   const isPast = getEventTemporalStatus(event) === "past";
+  const isFree = (event.price ?? "").trim() === "0";
 
   let translatedTitle = event.title;
   let translatedDescription = event.description;
@@ -68,8 +133,49 @@ export default async function EventPage(props: {
     }
   }
 
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://all4ruse.com";
+  const eventUrl = `${siteUrl}/${locale}/${slug}`;
+
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Event",
+    name: translatedTitle ?? event.title,
+    description:
+      translatedDescription?.replace(/<[^>]+>/g, " ") ||
+      event.description?.replace(/<[^>]+>/g, " ") ||
+      undefined,
+    url: eventUrl,
+    image: event.image || (images.length > 0 ? images[0] : undefined),
+    startDate: `${event.startDate}T${(event.startTime ?? "00:00").slice(0, 5)}:00`,
+    endDate: `${event.endDate}T${(event.endTime ?? "00:00").slice(0, 5)}:00`,
+    eventStatus: isPast
+      ? "https://schema.org/EventCompleted"
+      : "https://schema.org/EventScheduled",
+    location: {
+      "@type": "Place",
+      name: event.place ?? undefined,
+      address: {
+        "@type": "PostalAddress",
+        streetAddress: event.address ?? undefined,
+        addressLocality: event.town ?? undefined,
+        addressCountry: "BG",
+      },
+    },
+    offers: {
+      "@type": "Offer",
+      url: eventUrl,
+      price: event.price ?? (isFree ? "0" : undefined),
+      priceCurrency: "BGN",
+      availability: "https://schema.org/InStock",
+    },
+  };
+
   return (
     <div className="flex flex-col gap-6">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <ScrollToTopOnMount />
       {event.image && (
         <EventHeroImage
@@ -96,8 +202,9 @@ export default async function EventPage(props: {
             </div>
           )}
           <div className="flex items-center flex-col md:flex-row md:justify-between gap-4">
-            {/* Replace the server-rendered title with the client component */}
-            <EventTitleClient fallback={event.title} />
+            <Typography.H1 className="text-center flex-1">
+              {translatedTitle}
+            </Typography.H1>
             {typeof event.id === "number" && (
               <FavoriteButton
                 id={event.id}
@@ -107,7 +214,7 @@ export default async function EventPage(props: {
             )}
           </div>
 
-          {tags.length > 0 && (
+          {(tags.length > 0 || isFree) && (
             <div className="flex flex-wrap justify-center gap-2">
               {tags.map((tag) => {
                 const base = (tag.title ?? "").toUpperCase();
@@ -123,6 +230,12 @@ export default async function EventPage(props: {
                   </span>
                 );
               })}
+
+              {isFree && (
+                <span className="inline-flex items-center gap-1 rounded-full border border-primary/30 bg-primary/5 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-primary shadow-sm">
+                  <span># {tHome("freeEvent")}</span>
+                </span>
+              )}
             </div>
           )}
 

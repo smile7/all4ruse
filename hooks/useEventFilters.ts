@@ -24,6 +24,7 @@ export function useEventFilters() {
   );
   const [to, setTo] = useState<string | null>(() => searchParams.get("to"));
   const [tagIds, setTagIds] = useState<number[]>([]);
+  const [freeOnly, setFreeOnly] = useState(false);
   const debouncedTitle = useDebounce(title, DEBOUNCE_MS);
   const lastAppliedQSRef = useRef<string | null>(null);
 
@@ -51,16 +52,20 @@ export function useEventFilters() {
     setFrom(null);
     setTo(null);
     setTagIds([]);
+    setFreeOnly(false);
     lastAppliedQSRef.current = "";
     router.replace(pathname, { scroll: false });
   }, [pathname, router]);
 
-  const hasFilters = Boolean(title.trim() || from || to || tagIds.length);
+  const hasFilters = Boolean(
+    title.trim() || from || to || tagIds.length || freeOnly,
+  );
   const appliedFiltersCount = [
     title.trim(),
     from,
     to,
     tagIds.length ? "tags" : "",
+    freeOnly ? "free" : "",
   ].filter(Boolean).length;
 
   return {
@@ -72,6 +77,8 @@ export function useEventFilters() {
     setTo,
     tagIds,
     setTagIds,
+    freeOnly,
+    setFreeOnly,
     hasFilters,
     appliedFiltersCount,
     clear,
