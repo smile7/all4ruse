@@ -15,15 +15,15 @@ export function EventShareButton({ url, title }: EventShareButtonProps) {
   const label = t("shareOnFacebook");
 
   return (
-    <Button asChild variant="outline" size="sm">
+    <Button asChild variant="outline">
       <a
         href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}&quote=${encodeURIComponent(title)}`}
         target="_blank"
         rel="noopener noreferrer"
         aria-label={label}
       >
-        <Facebook className="h-4 w-4 mr-1" />
-        <span className="hidden sm:inline">{label}</span>
+        <Facebook className="size-4" />
+        <span className="inline">{label}</span>
       </a>
     </Button>
   );
