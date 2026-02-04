@@ -36,7 +36,7 @@
     "bulgarian": "Болгарська",
     "menuEvents": "Майбутні події",
     "menuPastEvents": "Минулі події",
-    "menuCurrentEvents": "Поточні події",
+    "menuCurrentEvents": "Актуальні події",
     "menuWhyAll4Ruse": "Чому all4ruse?",
     "menuWhyAll4RuseTitle": "Про нас",
     "facebookPage": "Сторінка Facebook",
@@ -134,8 +134,8 @@
   },
   "CurrentEvents": {
     "createEvent": "Створити подію",
-    "pageTitle": "Поточні події в Русе",
-    "pageDescription": "Усі поточні культурні та некультурні події в Русе та околицях"
+    "pageTitle": "Актуальні події в Русе",
+    "pageDescription": "Усі актуальні культурні та некультурні події в Русе та околицях"
   },
   "Profile": {
     "personal": "Дані",

@@ -38,11 +38,13 @@
   @apply mt-4 mb-2 text-[0.7rem] leading-6;
 }
 
-.minimal-tiptap-editor .ProseMirror a.link {
+.minimal-tiptap-editor .ProseMirror a.link,
+.minimal-tiptap-editor a {
   @apply text-primary underline;
 }
 
-.minimal-tiptap-editor .ProseMirror a.link:hover {
+.minimal-tiptap-editor .ProseMirror a.link:hover,
+.minimal-tiptap-editor a:hover {
   @apply underline;
 }
 
