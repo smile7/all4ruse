@@ -38,9 +38,22 @@ export function Events({
     eventTags,
   );
 
+  const totalCount = timeFiltered.length;
+  const filteredCount = filteredEvents.length;
+  const hasActiveFilters = filters.appliedFiltersCount > 0;
+
   return (
     <div className="flex flex-col gap-6">
       <EventsFilters filters={filters} />
+
+      <Typography.Small className="text-muted-foreground">
+        {hasActiveFilters
+          ? t("filteredEventsSummary", {
+              filtered: filteredCount,
+              total: totalCount,
+            })
+          : t("allEventsSummary", { count: totalCount })}
+      </Typography.Small>
 
       {Boolean(errorMessage) && <ErrorAlert error="">{t("error")}</ErrorAlert>}
 

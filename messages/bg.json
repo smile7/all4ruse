@@ -44,6 +44,8 @@
     "more": "Още",
     "clear": "Изчисти филтрите",
     "events": "събития",
+    "allEventsSummary": "Всички събития: {count}",
+    "filteredEventsSummary": "Филтрирани събития: {filtered}/{total}",
     "publishedEvents": "Моите Събития",
     "waitingForApproval": "Чакащи одобрение",
     "noEventsFound": "Няма намерени събития.",

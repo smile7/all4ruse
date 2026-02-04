@@ -44,6 +44,8 @@
     "more": "More",
     "clear": "Clear Filters",
     "events": "events",
+    "allEventsSummary": "All events: {count}",
+    "filteredEventsSummary": "Filtered events: {filtered}/{total}",
     "publishedEvents": "My Events",
     "waitingForApproval": "Waiting for approval",
     "noEventsFound": "No events found.",
