@@ -53,4 +53,5 @@ export const TAG_LABELS_BG: Record<string, string> = {
   MARCHMUSICALDAYS: "МАРТЕНСКИМУЗИКАЛНИДНИ",
   OPERA: "ОПЕРА",
   BOOKS: "КНИГИ",
+  PUPPETTHEATRE: "КУКЛЕНТЕАТЪР",
 };
