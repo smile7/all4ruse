@@ -44,6 +44,8 @@
     "more": "Ще",
     "clear": "Очистити фільтри",
     "events": "події",
+    "allEventsSummary": "Усі події: {count}",
+    "filteredEventsSummary": "Відібрані події: {filtered}/{total}",
     "publishedEvents": "Мої події",
     "waitingForApproval": "Очікують на підтвердження",
     "noEventsFound": "Подій не знайдено.",
