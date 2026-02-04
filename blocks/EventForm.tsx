@@ -324,10 +324,20 @@ export function EventForm({ mode, event }: EventFormProps) {
         router.replace("/auth/login");
       } else {
         setUserId(data.user.id);
+
+        if (mode === "create") {
+          const currentEmail = form.getValues("email") ?? "";
+          const userEmail = data.user.email ?? "";
+
+          if (!currentEmail && userEmail) {
+            form.setValue("email", userEmail);
+          }
+        }
+
         setAuthChecked(true);
       }
     });
-  }, [router, supabase]);
+  }, [router, supabase, mode, form]);
 
   const onSubmit = async (values: CreateEventSchemaType) => {
     if (!userId) return;
