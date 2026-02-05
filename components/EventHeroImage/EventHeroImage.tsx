@@ -42,6 +42,7 @@ export default function EventHeroImage({
             src={src}
             alt={alt}
             fill
+            unoptimized
             priority
             sizes="100vw"
             className="object-cover transition-transform duration-300 ease-out group-hover:scale-105"
@@ -71,22 +72,23 @@ export default function EventHeroImage({
 
           <div
             className="flex items-center justify-center w-full h-full"
-            style={{ maxHeight: '90vh', maxWidth: '96vw' }}
+            style={{ maxHeight: "90vh", maxWidth: "96vw" }}
           >
             <Image
               src={src}
               alt={alt}
               width={1920}
               height={1080}
+              unoptimized
               className="object-contain rounded-md"
               style={{
-                maxHeight: '90vh',
-                maxWidth: '96vw',
-                width: 'auto',
-                height: 'auto',
-                display: 'block',
-                margin: 'auto',
-                background: 'black',
+                maxHeight: "90vh",
+                maxWidth: "96vw",
+                width: "auto",
+                height: "auto",
+                display: "block",
+                margin: "auto",
+                background: "black",
               }}
               draggable={false}
               onClick={(e) => e.stopPropagation()}
