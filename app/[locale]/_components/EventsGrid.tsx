@@ -171,6 +171,7 @@ export function EventsGrid({
                             src={imageSrc}
                             alt={e.title || "Event image"}
                             fill
+                            unoptimized
                             sizes="28rem"
                             className="w-full object-cover"
                             draggable={false}
