@@ -75,7 +75,7 @@ export default function EventDescription({
       )}
       {error && <div className="text-destructive">{error}</div>}
       <div
-        className="whitespace-pre-wrap text-pretty minimal-tiptap-editor"
+        className="whitespace-pre-wrap text-pretty minimal-tiptap-viewer"
         dangerouslySetInnerHTML={{
           __html: translated ? translated.description : description,
         }}
