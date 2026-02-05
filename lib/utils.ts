@@ -128,3 +128,48 @@ export function slugify(title: string): string {
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");
 }
+
+export function normalizeSupabaseImageUrl(url: string): string {
+  if (url.startsWith("/storage/v1/render/image/")) {
+    const [path, query = ""] = url.split("?");
+    const newPath = path.replace(
+      "/storage/v1/render/image/",
+      "/storage/v1/object/",
+    );
+
+    if (!query) return newPath;
+
+    const params = new URLSearchParams(query);
+    params.delete("width");
+    params.delete("height");
+    params.delete("quality");
+    params.delete("resize");
+    params.delete("format");
+
+    const qs = params.toString();
+    return qs ? `${newPath}?${qs}` : newPath;
+  }
+
+  if (!url.startsWith("http")) return url;
+
+  try {
+    const parsed = new URL(url);
+
+    if (parsed.pathname.includes("/storage/v1/render/image/")) {
+      parsed.pathname = parsed.pathname.replace(
+        "/storage/v1/render/image/",
+        "/storage/v1/object/",
+      );
+
+      parsed.searchParams.delete("width");
+      parsed.searchParams.delete("height");
+      parsed.searchParams.delete("quality");
+      parsed.searchParams.delete("resize");
+      parsed.searchParams.delete("format");
+    }
+
+    return parsed.toString();
+  } catch {
+    return url;
+  }
+}

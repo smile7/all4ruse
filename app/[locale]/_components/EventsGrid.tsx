@@ -11,7 +11,11 @@ import { Card, CardContent } from "@/components/ui";
 import { FALLBACK_IMAGE, TAG_LABELS_BG } from "@/constants";
 import type { Event, Tag } from "@/lib/api";
 import { useTags } from "@/hooks/query";
-import { formatShortDate, formatTimeTZ } from "@/lib/utils";
+import {
+  formatShortDate,
+  formatTimeTZ,
+  normalizeSupabaseImageUrl,
+} from "@/lib/utils";
 
 import { EventTimeFilter } from "./FilterByTime";
 import type { EventTagsMap } from "@/hooks/useEventTagsMap";
@@ -116,6 +120,10 @@ export function EventsGrid({
                 day = dayPart;
                 month = monthPart;
               }
+              const imageSrc = normalizeSupabaseImageUrl(
+                e.image || FALLBACK_IMAGE,
+              );
+
               return (
                 <Link
                   key={e.id}
@@ -160,9 +168,10 @@ export function EventsGrid({
                       <div className="absolute inset-0 overflow-hidden">
                         <div className="absolute inset-0 transform-gpu will-change-transform transition-transform duration-500 ease-out group-hover:scale-[1.05]">
                           <Image
-                            src={e.image || FALLBACK_IMAGE}
+                            src={imageSrc}
                             alt={e.title || "Event image"}
                             fill
+                            unoptimized
                             sizes="28rem"
                             className="w-full object-cover"
                             draggable={false}
