@@ -202,3 +202,11 @@
 .minimal-tiptap-editor .ProseMirror .selection::selection {
   background: transparent;
 }
+
+/* Read-only viewer spacing: ensure comfortable gaps between lines/paragraphs */
+.minimal-tiptap-viewer p:not(:last-child),
+.minimal-tiptap-viewer ul:not(:last-child),
+.minimal-tiptap-viewer ol:not(:last-child),
+.minimal-tiptap-viewer li:not(:last-child) {
+  @apply mb-3;
+}
