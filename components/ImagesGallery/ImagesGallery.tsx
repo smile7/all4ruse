@@ -4,33 +4,11 @@ import lgThumbnail from "lightgallery/plugins/thumbnail";
 import lgZoom from "lightgallery/plugins/zoom";
 import LightGallery from "lightgallery/react";
 import Image from "next/image";
+import { normalizeSupabaseImageUrl } from "@/lib/utils";
 
 import "lightgallery/css/lightgallery.css";
 import "lightgallery/css/lg-zoom.css";
 import "lightgallery/css/lg-thumbnail.css";
-
-function normalizeSupabaseImageUrl(url: string): string {
-  try {
-    const parsed = new URL(url);
-
-    if (parsed.pathname.includes("/storage/v1/render/image/")) {
-      parsed.pathname = parsed.pathname.replace(
-        "/storage/v1/render/image/",
-        "/storage/v1/object/",
-      );
-
-      parsed.searchParams.delete("width");
-      parsed.searchParams.delete("height");
-      parsed.searchParams.delete("quality");
-      parsed.searchParams.delete("resize");
-      parsed.searchParams.delete("format");
-    }
-
-    return parsed.toString();
-  } catch {
-    return url;
-  }
-}
 
 export function ImagesGallery({
   images,
