@@ -111,7 +111,7 @@ export async function generateMetadata({
       locale,
       images: [
         {
-          url: "/og-home.png",
+          url: "/og-home.png?v=2",
           width: 1200,
           height: 630,
           alt: title,
@@ -122,7 +122,7 @@ export async function generateMetadata({
       card: "summary_large_image",
       title,
       description,
-      images: ["/og-home.png"],
+      images: ["/og-home.png?v=2"],
     },
   };
 }
