@@ -295,7 +295,7 @@ export default async function EventPage(props: {
                   title={translatedTitle ?? event.title ?? ""}
                 />
               </div>
-              {googleCalendarUrl && (
+              {/* {googleCalendarUrl && (
                 <Button
                   asChild
                   variant="outline"
@@ -311,7 +311,7 @@ export default async function EventPage(props: {
                     <span>Google Calendar</span>
                   </a>
                 </Button>
-              )}
+              )} */}
             </div>
           </div>
 
