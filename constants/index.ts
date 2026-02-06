@@ -47,7 +47,7 @@ export const TAG_LABELS_BG: Record<string, string> = {
   VOLUNTEERING: "ДОБРОВОЛЧЕСТВО",
   FAIR: "БАЗАР",
   OUTDOOR: "НА ОТКРИТО",
-  NETWORKING: "НЕТУЪРКИНГ",
+  NETWORKING: "СОЦИАЛИЗАЦИЯ",
   INFANTS: "БЕБЕТА",
   GAMES: "ИГРИ",
   MARCHMUSICALDAYS: "МАРТЕНСКИМУЗИКАЛНИДНИ",
