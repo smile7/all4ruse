@@ -169,7 +169,9 @@ export function EventsFilters({
           <div className="mt-2">
             <p className="mb-2 text-xs text-muted-foreground">
               {tCreate("tags")}
-              {tagIds.length ? ` (${tagIds.length})` : ""}
+              {tagIds.length || freeOnly
+                ? ` (${tagIds.length + (freeOnly ? 1 : 0)})`
+                : ""}
             </p>
             <div className="flex flex-wrap gap-2">
               <button
