@@ -153,7 +153,8 @@ export default async function EventPage(props: {
 
     const formatDateTime = (date?: string | null, time?: string | null) => {
       if (!date) return "";
-      const cleanDate = date.replace(/-/g, "");
+      const datePart = date.slice(0, 10); // ensure YYYY-MM-DD
+      const cleanDate = datePart.replace(/-/g, "");
       const baseTime = (time && time.trim()) || "00:00";
       const [hh = "00", mm = "00"] = baseTime.split(":");
       return `${cleanDate}T${hh}${mm}00`;
@@ -280,7 +281,7 @@ export default async function EventPage(props: {
           )}
 
           <div className="flex justify-center mt-2">
-            <div className="flex flex-col items-center gap-2">
+            <div className="flex flex-col items-center gap-2 sm:flex-row">
               <div className="flex items-center gap-2">
                 {typeof event.id === "number" && (
                   <FavoriteButton
@@ -293,20 +294,24 @@ export default async function EventPage(props: {
                   url={eventUrl}
                   title={translatedTitle ?? event.title ?? ""}
                 />
-                {googleCalendarUrl && (
-                  <Button asChild variant="outline">
-                    <a
-                      href={googleCalendarUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="flex items-center gap-2"
-                    >
-                      <CalendarDaysIcon className="size-4" />
-                      <span>Google Calendar</span>
-                    </a>
-                  </Button>
-                )}
               </div>
+              {googleCalendarUrl && (
+                <Button
+                  asChild
+                  variant="outline"
+                  className="w-full justify-center sm:w-auto"
+                >
+                  <a
+                    href={googleCalendarUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="flex items-center gap-2"
+                  >
+                    <CalendarDaysIcon className="size-4" />
+                    <span>Google Calendar</span>
+                  </a>
+                </Button>
+              )}
             </div>
           </div>
 
