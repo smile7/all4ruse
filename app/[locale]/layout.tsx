@@ -109,11 +109,20 @@ export async function generateMetadata({
       siteName: "All4Ruse",
       type: "website",
       locale,
+      images: [
+        {
+          url: "/og-home.png",
+          width: 1200,
+          height: 630,
+          alt: title,
+        },
+      ],
     },
     twitter: {
       card: "summary_large_image",
       title,
       description,
+      images: ["/og-home.png"],
     },
   };
 }
