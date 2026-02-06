@@ -82,7 +82,7 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: "/all4ruse_white.png",
+        url: "/og-home.png",
         width: 1200,
         height: 630,
         alt: "All4Ruse – събития в Русе",
@@ -93,7 +93,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "All4Ruse – събития в Русе",
     description: "Твоето място за събития в Русе.",
-    images: ["/all4ruse_white.png"],
+    images: ["/og-home.png"],
   },
 };
 
