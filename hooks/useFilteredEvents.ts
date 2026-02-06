@@ -105,16 +105,23 @@ export function useFilteredEvents(
           if (fromTs && start && start < fromTs) return false;
           if (toTs && start && start > toTs) return false;
         }
-        if (freeOnly) {
-          const price = (e.price ?? "").trim();
-          if (price !== "0") return false;
+        const price = (e.price ?? "").trim();
+        const tagsForEvent = eventTags ? (eventTags[e.id as number] ?? []) : [];
+
+        // Combine "free only" and "tags" with OR:
+        // - if only free is selected -> event must be free
+        // - if only tags are selected -> event must match at least one tag
+        // - if both are selected -> event can be either free OR have a selected tag
+        if (freeOnly || (tagIds.length && eventTags)) {
+          const isFreeMatch = freeOnly ? price === "0" : false;
+          const hasTagMatch =
+            tagIds.length && eventTags
+              ? tagsForEvent.some((id) => tagIds.includes(id))
+              : false;
+
+          if (!isFreeMatch && !hasTagMatch) return false;
         }
-        if (tagIds.length && eventTags) {
-          const tagsForEvent = eventTags[e.id as number] ?? [];
-          if (!tagsForEvent.length) return false;
-          const hasMatch = tagsForEvent.some((id) => tagIds.includes(id));
-          if (!hasMatch) return false;
-        }
+
         return true;
       })
       .sort((a, b) => {
