@@ -14,6 +14,7 @@ import {
 import { PersonIcon } from "@radix-ui/react-icons";
 
 import { Typography } from "@/components/Typography";
+import { Button } from "@/components/ui";
 import { Card, CardContent } from "@/components/ui/card";
 import { Map } from "@/components/Map";
 import { Event, Host } from "@/lib/api";

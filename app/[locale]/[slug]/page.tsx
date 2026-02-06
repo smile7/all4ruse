@@ -8,12 +8,19 @@ import { EventShareButton } from "@/components/EventShareButton";
 import { FavoriteButton } from "@/components/FavoriteButton";
 import { ImagesGallery } from "@/components/ImagesGallery";
 import { Typography } from "@/components/Typography";
-import { Card, CardContent, CardTitle, ErrorAlert } from "@/components/ui";
+import {
+  Button,
+  Card,
+  CardContent,
+  CardTitle,
+  ErrorAlert,
+} from "@/components/ui";
 import { TAG_LABELS_BG } from "@/constants";
 import { routing } from "@/i18n/routing";
 import { getEventBySlug, type Tag } from "@/lib/api";
 import { createClient } from "@/lib/supabase/server";
 import { getEventTemporalStatus } from "../_components/FilterByTime";
+import { CalendarDaysIcon } from "lucide-react";
 
 import "@/components/ui/minimal-tiptap/styles/index.css";
 import EventDescriptionWrapper from "@/components/EventDescriptionWrapper";
@@ -137,6 +144,45 @@ export default async function EventPage(props: {
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://all4ruse.com";
   const eventUrl = `${siteUrl}/${locale}/${slug}`;
 
+  const fullAddress = [event.place, event.address, event.town]
+    .filter(Boolean)
+    .join(", ");
+
+  const buildGoogleCalendarUrl = () => {
+    if (!event.startDate) return null;
+
+    const formatDateTime = (date?: string | null, time?: string | null) => {
+      if (!date) return "";
+      const cleanDate = date.replace(/-/g, "");
+      const baseTime = (time && time.trim()) || "00:00";
+      const [hh = "00", mm = "00"] = baseTime.split(":");
+      return `${cleanDate}T${hh}${mm}00`;
+    };
+
+    const start = formatDateTime(event.startDate, event.startTime);
+    const end = formatDateTime(
+      event.endDate || event.startDate,
+      event.endTime || event.startTime,
+    );
+
+    const params = new URLSearchParams();
+    params.set("action", "TEMPLATE");
+    params.set("text", event.title ?? "");
+    if (start && end) {
+      params.set("dates", `${start}/${end}`);
+    }
+    if (fullAddress) {
+      params.set("location", fullAddress);
+    }
+    if (event.description) {
+      params.set("details", event.description);
+    }
+
+    return `https://calendar.google.com/calendar/render?${params.toString()}`;
+  };
+
+  const googleCalendarUrl = buildGoogleCalendarUrl();
+
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Event",
@@ -202,23 +248,10 @@ export default async function EventPage(props: {
               </span>
             </div>
           )}
-          <div className="flex items-center flex-col md:flex-row md:justify-between gap-4">
-            <Typography.H1 className="text-center flex-1">
+          <div className="flex justify-center">
+            <Typography.H1 className="text-center">
               {translatedTitle}
             </Typography.H1>
-            <div className="flex items-center gap-2">
-              {typeof event.id === "number" && (
-                <FavoriteButton
-                  id={event.id}
-                  name={event.title ?? ""}
-                  url={`/${locale}/${slug}`}
-                />
-              )}
-              <EventShareButton
-                url={eventUrl}
-                title={translatedTitle ?? event.title ?? ""}
-              />
-            </div>
           </div>
 
           {(tags.length > 0 || isFree) && (
@@ -245,6 +278,37 @@ export default async function EventPage(props: {
               )}
             </div>
           )}
+
+          <div className="flex justify-center mt-2">
+            <div className="flex flex-col items-center gap-2">
+              <div className="flex items-center gap-2">
+                {typeof event.id === "number" && (
+                  <FavoriteButton
+                    id={event.id}
+                    name={event.title ?? ""}
+                    url={`/${locale}/${slug}`}
+                  />
+                )}
+                <EventShareButton
+                  url={eventUrl}
+                  title={translatedTitle ?? event.title ?? ""}
+                />
+                {googleCalendarUrl && (
+                  <Button asChild variant="outline">
+                    <a
+                      href={googleCalendarUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="flex items-center gap-2"
+                    >
+                      <CalendarDaysIcon className="size-4" />
+                      <span>Google Calendar</span>
+                    </a>
+                  </Button>
+                )}
+              </div>
+            </div>
+          </div>
 
           <hr />
 
