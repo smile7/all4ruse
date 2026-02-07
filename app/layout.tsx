@@ -55,7 +55,10 @@ const organizationJsonLd = {
   name: "All4Ruse",
   url: siteUrl,
   logo: `${siteUrl}/all4ruse_white.png`,
-  sameAs: ["https://www.facebook.com/profile.php?id=61586926929594"],
+  sameAs: [
+    "https://www.facebook.com/profile.php?id=61586926929594",
+    "https://www.instagram.com/all4ruse/",
+  ],
 };
 
 export const metadata: Metadata = {

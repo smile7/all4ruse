@@ -41,6 +41,11 @@ export function SidebarCustomMenu() {
     url: "https://www.facebook.com/profile.php?id=61586926929594",
     emoji: "ⓕ",
   };
+  const instagramPageItem = {
+    name: "Instagram",
+    url: "https://www.instagram.com/all4ruse/",
+    emoji: "📸",
+  };
 
   return (
     <>
@@ -89,6 +94,21 @@ export function SidebarCustomMenu() {
                   {facebookPageItem.emoji}
                 </span>
                 <span>{facebookPageItem.name}</span>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+          <SidebarMenuItem key={instagramPageItem.name}>
+            <SidebarMenuButton asChild>
+              <Link
+                href={instagramPageItem.url}
+                title={instagramPageItem.name}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <span className="inline-flex w-6 justify-center">
+                  {instagramPageItem.emoji}
+                </span>
+                <span>{instagramPageItem.name}</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
