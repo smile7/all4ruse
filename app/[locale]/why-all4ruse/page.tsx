@@ -19,6 +19,7 @@ import {
   AlertCircle,
   PlusCircle,
   Facebook,
+  Instagram,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 
@@ -186,7 +187,7 @@ export default function WhyAll4RusePage() {
           <Typography.P className="text-justify">
             {t("contactInfo")}
           </Typography.P>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="flex flex-col items-center bg-gradient-to-br from-primary/10 to-background rounded-xl p-6 shadow-sm">
               <Mail className="h-8 w-8 text-primary mb-2" />
               <span className="font-semibold text-lg mb-1">{t("email")}</span>
@@ -209,6 +210,18 @@ export default function WhyAll4RusePage() {
                 className="text-primary underline text-base font-medium"
               >
                 all4ruse
+              </a>
+            </div>
+            <div className="flex flex-col items-center bg-gradient-to-br from-primary/10 to-background rounded-xl p-6 shadow-sm">
+              <Instagram className="h-8 w-8 text-primary mb-2" />
+              <span className="font-semibold text-lg mb-1">Instagram</span>
+              <a
+                href="https://www.instagram.com/all4ruse/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary underline text-base font-medium"
+              >
+                @all4ruse
               </a>
             </div>
           </div>
