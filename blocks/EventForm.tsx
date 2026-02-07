@@ -70,6 +70,7 @@ export function EventForm({ mode, event }: EventFormProps) {
   const [imageSizeExceeded, setImageSizeExceeded] = useState(false);
   const [showLeaveDialog, setShowLeaveDialog] = useState(false);
   const [nextUrl, setNextUrl] = useState<string | null>(null);
+  const [uploadError, setUploadError] = useState<string | null>(null);
 
   const [images, setImages] = useState<EventImageItem[]>(() => {
     if (mode !== "edit" || !event) return [];
@@ -341,110 +342,121 @@ export function EventForm({ mode, event }: EventFormProps) {
 
   const onSubmit = async (values: CreateEventSchemaType) => {
     if (!userId) return;
+    setUploadError(null);
 
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("is_confirmed")
-      .eq("id", userId)
-      .maybeSingle();
-    const isConfirmed = profile?.is_confirmed === true;
+    try {
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("is_confirmed")
+        .eq("id", userId)
+        .maybeSingle();
+      const isConfirmed = profile?.is_confirmed === true;
 
-    const newItems = images.filter((i) => i.isNew && i.file);
-    const uploadMap = new Map<string, string>();
+      const newItems = images.filter((i) => i.isNew && i.file);
+      const uploadMap = new Map<string, string>();
 
-    for (const item of newItems) {
-      const file = item.file as File;
-      const url = await validateAndUploadEventImageClient(
-        supabase,
-        file,
-        "events",
-        EVENTS_BUCKET,
-      );
-      if (url) {
-        uploadMap.set(item.id, url);
-      }
-    }
-
-    const orderedUrls: string[] = [];
-    for (const item of images.slice(0, MAX_IMAGES)) {
-      if (item.isNew) {
-        const url = uploadMap.get(item.id);
-        if (url) orderedUrls.push(url);
-      } else {
-        orderedUrls.push(item.url);
-      }
-    }
-
-    const limitedUrls = orderedUrls.slice(0, MAX_IMAGES);
-    const coverUrl = limitedUrls[0] ?? null;
-    const galleryUrls = limitedUrls.slice(1);
-
-    const basePayload = {
-      title: values.title,
-      description: values.description,
-      address: values.address,
-      place: values.place,
-      town: values.town,
-      startDate: values.startDate,
-      startTime: values.startTime,
-      endDate: values.endDate,
-      endTime: values.endTime,
-      organizers: values.organizers,
-      ticketsLink: values.ticketsLink || null,
-      fbLink: values.fbLink || null,
-      email: values.email || null,
-      price: values.price || null,
-      phoneNumber: values.phoneNumber || null,
-      image: coverUrl,
-      images: galleryUrls.length > 0 ? galleryUrls : null,
-    };
-
-    const selectedTagIds = values.tags ?? [];
-
-    if (mode === "create") {
-      const result = await createEventMutate({
-        ...basePayload,
-        isEventActive: isConfirmed,
-        slug: `${slugify(values.title)}-${Math.random().toString(36).slice(2, 8)}`,
-        createdBy: userId,
-      });
-
-      const createdEvent = (result as { data?: Event | null })?.data;
-
-      if (createdEvent?.id && selectedTagIds.length > 0) {
-        await supabase.from("event_tags").insert(
-          selectedTagIds.map((tagId) => ({
-            event_id: createdEvent.id,
-            tag_id: tagId,
-          })),
+      for (const item of newItems) {
+        const file = item.file as File;
+        const url = await validateAndUploadEventImageClient(
+          supabase,
+          file,
+          "events",
+          EVENTS_BUCKET,
         );
+        if (url) {
+          uploadMap.set(item.id, url);
+        }
       }
-    } else if (mode === "edit" && event) {
-      const patch: EventUpdate = {
-        ...basePayload,
-        slug: event.slug,
+
+      const orderedUrls: string[] = [];
+      for (const item of images.slice(0, MAX_IMAGES)) {
+        if (item.isNew) {
+          const url = uploadMap.get(item.id);
+          if (url) orderedUrls.push(url);
+        } else {
+          orderedUrls.push(item.url);
+        }
+      }
+
+      const limitedUrls = orderedUrls.slice(0, MAX_IMAGES);
+      const coverUrl = limitedUrls[0] ?? null;
+      const galleryUrls = limitedUrls.slice(1);
+
+      const basePayload = {
+        title: values.title,
+        description: values.description,
+        address: values.address,
+        place: values.place,
+        town: values.town,
+        startDate: values.startDate,
+        startTime: values.startTime,
+        endDate: values.endDate,
+        endTime: values.endTime,
+        organizers: values.organizers,
+        ticketsLink: values.ticketsLink || null,
+        fbLink: values.fbLink || null,
+        email: values.email || null,
+        price: values.price || null,
+        phoneNumber: values.phoneNumber || null,
+        image: coverUrl,
+        images: galleryUrls.length > 0 ? galleryUrls : null,
       };
 
-      await updateEventMutate({
-        id: event.id,
-        slug: event.slug || "",
-        patch,
-      });
+      const selectedTagIds = values.tags ?? [];
 
-      // replace existing tags with the newly selected ones
-      await supabase.from("event_tags").delete().eq("event_id", event.id);
+      if (mode === "create") {
+        const result = await createEventMutate({
+          ...basePayload,
+          isEventActive: isConfirmed,
+          slug: `${slugify(values.title)}-${Math.random().toString(36).slice(2, 8)}`,
+          createdBy: userId,
+        });
 
-      if (selectedTagIds.length > 0) {
-        await supabase.from("event_tags").insert(
-          selectedTagIds.map((tagId) => ({
-            event_id: event.id,
-            tag_id: tagId,
-          })),
-        );
+        const createdEvent = (result as { data?: Event | null })?.data;
+
+        if (createdEvent?.id && selectedTagIds.length > 0) {
+          await supabase.from("event_tags").insert(
+            selectedTagIds.map((tagId) => ({
+              event_id: createdEvent.id,
+              tag_id: tagId,
+            })),
+          );
+        }
+      } else if (mode === "edit" && event) {
+        const patch: EventUpdate = {
+          ...basePayload,
+          slug: event.slug,
+        };
+
+        await updateEventMutate({
+          id: event.id,
+          slug: event.slug || "",
+          patch,
+        });
+
+        // replace existing tags with the newly selected ones
+        await supabase.from("event_tags").delete().eq("event_id", event.id);
+
+        if (selectedTagIds.length > 0) {
+          await supabase.from("event_tags").insert(
+            selectedTagIds.map((tagId) => ({
+              event_id: event.id,
+              tag_id: tagId,
+            })),
+          );
+        }
       }
-    }
 
-    router.push("/");
+      router.push("/");
+    } catch (err) {
+      // Surface any upload or mutation error to the user instead of letting the promise reject silently
+      console.error(err);
+      const message =
+        err instanceof Error && err.message
+          ? err.message
+          : "Възникна грешка при записването на събитието. Моля, опитайте отново.";
+      setUploadError(message);
+    }
   };
 
   const handleDelete = async () => {
@@ -500,6 +512,7 @@ export function EventForm({ mode, event }: EventFormProps) {
           {mode === "create" ? t("createEventTitle") : t("editEventTitle")}
         </Typography.H1>
 
+        {uploadError && <ErrorAlert error={uploadError} />}
         {error && <ErrorAlert error={error.message} />}
 
         <Form {...form}>

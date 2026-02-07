@@ -45,7 +45,7 @@ export function ImagesGallery({
               height={300}
               alt={`${title ?? "image"} ${idx + 1}`}
               className="h-full w-full object-cover"
-              unoptimized
+              // unoptimized
               loading={idx < 4 ? "eager" : "lazy"}
             />
           </a>
