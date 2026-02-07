@@ -31,7 +31,7 @@ export type EventRow = Omit<Tables<"events">, "organizers"> & {
 
 export async function getEvents(
   client: SupabaseClient,
-  options?: { all?: boolean },
+  options?: { all?: boolean; limit?: number; offset?: number },
 ): Promise<ServiceResult<Event[]>> {
   let query = client
     .from("events")
@@ -40,6 +40,16 @@ export async function getEvents(
 
   if (!options?.all) {
     query = query.eq("isEventActive", true);
+  }
+
+  if (typeof options?.limit === "number") {
+    if (typeof options.offset === "number") {
+      const from = options.offset;
+      const to = from + options.limit - 1;
+      query = query.range(from, to);
+    } else {
+      query = query.limit(options.limit);
+    }
   }
 
   const { data, error } = await query;
