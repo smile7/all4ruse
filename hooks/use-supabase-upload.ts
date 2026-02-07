@@ -6,6 +6,7 @@ import {
 } from "react-dropzone";
 
 import { createClient } from "@/lib/supabase/client";
+import { compressImageToWebp } from "@/lib/imageCompression";
 
 const supabase = createClient();
 
@@ -64,7 +65,8 @@ const useSupabaseUpload = (options: UseSupabaseUploadOptions) => {
     allowedMimeTypes = [],
     maxFileSize = Number.POSITIVE_INFINITY,
     maxFiles = 1,
-    cacheControl = 3600,
+    // Default to 1 year caching for uploaded assets; callers can override
+    cacheControl = 31536000,
     upsert = false,
   } = options;
 
@@ -103,7 +105,7 @@ const useSupabaseUpload = (options: UseSupabaseUploadOptions) => {
 
       setFiles(newFiles);
     },
-    [files, setFiles]
+    [files, setFiles],
   );
 
   const dropzoneProps = useDropzone({
@@ -111,7 +113,7 @@ const useSupabaseUpload = (options: UseSupabaseUploadOptions) => {
     noClick: true,
     accept: allowedMimeTypes.reduce(
       (acc, type) => ({ ...acc, [type]: [] }),
-      {}
+      {},
     ),
     maxSize: maxFileSize,
     maxFiles: maxFiles,
@@ -134,9 +136,21 @@ const useSupabaseUpload = (options: UseSupabaseUploadOptions) => {
 
     const responses = await Promise.all(
       filesToUpload.map(async (file) => {
+        let uploadFile: File = file;
+
+        try {
+          uploadFile = await compressImageToWebp(file);
+        } catch {
+          uploadFile = file;
+        }
+
+        const objectPath = path
+          ? `${path}/${uploadFile.name}`
+          : uploadFile.name;
+
         const { error } = await supabase.storage
           .from(bucketName)
-          .upload(path ? `${path}/${file.name}` : file.name, file, {
+          .upload(objectPath, uploadFile, {
             cacheControl: cacheControl.toString(),
             upsert,
           });
@@ -145,7 +159,7 @@ const useSupabaseUpload = (options: UseSupabaseUploadOptions) => {
         } else {
           return { name: file.name, message: undefined };
         }
-      })
+      }),
     );
 
     const responseErrors = responses.filter((x) => x.message !== undefined);
@@ -154,7 +168,7 @@ const useSupabaseUpload = (options: UseSupabaseUploadOptions) => {
 
     const responseSuccesses = responses.filter((x) => x.message === undefined);
     const newSuccesses = Array.from(
-      new Set([...successes, ...responseSuccesses.map((x) => x.name)])
+      new Set([...successes, ...responseSuccesses.map((x) => x.name)]),
     );
     setSuccesses(newSuccesses);
 

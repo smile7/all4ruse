@@ -42,7 +42,7 @@ export default function EventHeroImage({
             src={src}
             alt={alt}
             fill
-            unoptimized
+            // unoptimized
             priority
             sizes="100vw"
             className="object-cover transition-transform duration-300 ease-out group-hover:scale-105"
@@ -79,7 +79,7 @@ export default function EventHeroImage({
               alt={alt}
               width={1920}
               height={1080}
-              unoptimized
+              // unoptimized
               className="object-contain rounded-md"
               style={{
                 maxHeight: "90vh",
