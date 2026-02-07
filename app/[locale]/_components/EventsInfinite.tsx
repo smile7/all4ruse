@@ -5,7 +5,6 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import type { Event } from "@/lib/api";
 import { getEvents } from "@/lib/api";
 import { createClient } from "@/lib/supabase/client";
-import { Skeleton } from "@/components/ui";
 
 import type { EventTimeFilter } from "./FilterByTime";
 import { Events } from ".";
@@ -121,14 +120,7 @@ export function EventsInfinite({
       />
 
       <div ref={loaderRef} className="flex justify-center py-6">
-        {isLoadingMore && (
-          <div className="grid w-full max-w-3xl grid-cols-1 gap-4 md:grid-cols-2">
-            <Skeleton className="h-32 rounded-lg" />
-            <Skeleton className="h-32 rounded-lg" />
-            <Skeleton className="hidden h-32 rounded-lg md:block" />
-            <Skeleton className="hidden h-32 rounded-lg md:block" />
-          </div>
-        )}
+        {isLoadingMore && <span>Loading more events…</span>}
       </div>
     </div>
   );
