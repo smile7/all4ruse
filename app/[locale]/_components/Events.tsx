@@ -34,7 +34,8 @@ export function Events({
   const eventIds = timeFiltered
     .map((e) => e.id)
     .filter((id): id is number => typeof id === "number");
-  const { data: eventTags = {} } = useEventTagsMap(eventIds);
+  const { data: eventTags = {}, isFetching: isEventTagsFetching } =
+    useEventTagsMap(eventIds);
 
   const { filteredEvents } = useFilteredEvents(
     timeFiltered,

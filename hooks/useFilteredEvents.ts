@@ -78,6 +78,9 @@ export function useFilteredEvents(
     const fromTs = from ? toTimestamp(from) : null;
     const toTs = to ? toTimestamp(to + "T23:59:59") : null;
 
+    const hasTagFilter = tagIds.length > 0;
+    const hasEventTagsData = !!eventTags && Object.keys(eventTags).length > 0;
+
     return events
       .filter((e) => {
         if (query) {
@@ -112,7 +115,10 @@ export function useFilteredEvents(
         // - if only free is selected -> event must be free
         // - if only tags are selected -> event must match at least one tag
         // - if both are selected -> event can be either free OR have a selected tag
-        if (freeOnly || (tagIds.length && eventTags)) {
+        // IMPORTANT: do not apply tag filter until we actually have
+        // an eventTags map, to avoid a brief "0 events" flash while
+        // the tag mapping is still loading on mobile.
+        if (freeOnly || (hasTagFilter && hasEventTagsData)) {
           const isFreeMatch = freeOnly ? price === "0" : false;
           const hasTagMatch =
             tagIds.length && eventTags
