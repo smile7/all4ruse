@@ -9,32 +9,38 @@
 }
 
 .minimal-tiptap-editor .ProseMirror h1,
-.minimal-tiptap-editor h1 {
+.minimal-tiptap-editor h1,
+.minimal-tiptap-viewer h1 {
   @apply mt-[46px] mb-4 text-[2rem] leading-7 tracking-[-0.004375rem];
 }
 
 .minimal-tiptap-editor .ProseMirror h2,
-.minimal-tiptap-editor h2 {
+.minimal-tiptap-editor h2,
+.minimal-tiptap-viewer h2 {
   @apply mt-8 mb-3.5 text-[1.75rem] leading-7 tracking-[0.003125rem];
 }
 
 .minimal-tiptap-editor .ProseMirror h3,
-.minimal-tiptap-editor h3 {
+.minimal-tiptap-editor h3,
+.minimal-tiptap-viewer h3 {
   @apply mt-6 mb-3 text-[1.5rem] leading-6 tracking-[0.00625rem];
 }
 
 .minimal-tiptap-editor .ProseMirror h4,
-.minimal-tiptap-editor h4 {
+.minimal-tiptap-editor h4,
+.minimal-tiptap-viewer h4 {
   @apply mt-4 mb-2 text-[0.9rem] leading-6;
 }
 
 .minimal-tiptap-editor .ProseMirror h5,
-.minimal-tiptap-editor h5 {
+.minimal-tiptap-editor h5,
+.minimal-tiptap-viewer h5 {
   @apply mt-4 mb-2 text-[0.8rem] leading-6;
 }
 
 .minimal-tiptap-editor .ProseMirror h6,
-.minimal-tiptap-editor h6 {
+.minimal-tiptap-editor h6,
+.minimal-tiptap-viewer h6 {
   @apply mt-4 mb-2 text-[0.7rem] leading-6;
 }
 

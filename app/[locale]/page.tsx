@@ -6,7 +6,7 @@ import { Button } from "@/components/ui";
 import { getEvents } from "@/lib/api";
 import { createClient } from "@/lib/supabase/server";
 
-import { Events } from "./_components";
+import { EventsInfinite } from "./_components/EventsInfinite";
 
 export default async function EventsPage({
   params,
@@ -18,7 +18,19 @@ export default async function EventsPage({
   const t = await getTranslations("HomePage");
 
   const supabase = await createClient();
-  const { data: events, error } = await getEvents(supabase);
+  const { data: events, error } = await getEvents(supabase, {
+    all: false,
+    limit: 16,
+  });
+
+  // Count all upcoming active events for the summary counter
+  const today = new Date();
+  const todayStr = today.toISOString().slice(0, 10);
+  const { count: totalUpcoming } = await supabase
+    .from("events")
+    .select("id", { count: "exact", head: true })
+    .eq("isEventActive", true)
+    .gte("startDate", todayStr);
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -41,10 +53,11 @@ export default async function EventsPage({
           <Typography.Small>{t("createProfileMsg")}</Typography.Small>
         </div>
       </div>
-      <Events
-        events={events ?? []}
-        errorMessage={error?.message}
+      <EventsInfinite
+        initialEvents={events ?? []}
+        initialError={error?.message}
         timeFilter="upcoming"
+        totalCount={totalUpcoming ?? events?.length ?? 0}
       />
     </div>
   );

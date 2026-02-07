@@ -14,15 +14,19 @@ import { EventTimeFilter, filterEventsByTime } from "./FilterByTime";
 import { EventsFilters } from "./Filters";
 import { EventsGrid } from ".";
 
+interface EventsProps {
+  events: Event[];
+  errorMessage?: string | null;
+  timeFilter: EventTimeFilter;
+  totalCount?: number;
+}
+
 export function Events({
   events,
   errorMessage,
   timeFilter,
-}: {
-  events: Event[];
-  errorMessage?: string | null;
-  timeFilter: EventTimeFilter;
-}) {
+  totalCount,
+}: EventsProps) {
   const [isFiltersPopupOpen, setIsFiltersPopupOpen] = useState(false);
   const timeFiltered = filterEventsByTime(events, timeFilter);
   const filters = useEventFilters();
@@ -38,7 +42,8 @@ export function Events({
     eventTags,
   );
 
-  const totalCount = timeFiltered.length;
+  const effectiveTotalCount =
+    typeof totalCount === "number" ? totalCount : timeFiltered.length;
   const filteredCount = filteredEvents.length;
   const hasActiveFilters = filters.appliedFiltersCount > 0;
 
@@ -50,9 +55,9 @@ export function Events({
         {hasActiveFilters
           ? t("filteredEventsSummary", {
               filtered: filteredCount,
-              total: totalCount,
+              total: effectiveTotalCount,
             })
-          : t("allEventsSummary", { count: totalCount })}
+          : t("allEventsSummary", { count: effectiveTotalCount })}
       </Typography.Small>
 
       {Boolean(errorMessage) && <ErrorAlert error="">{t("error")}</ErrorAlert>}
