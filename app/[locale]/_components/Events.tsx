@@ -19,6 +19,7 @@ interface EventsProps {
   errorMessage?: string | null;
   timeFilter: EventTimeFilter;
   totalCount?: number;
+  filters: ReturnType<typeof useEventFilters>;
 }
 
 export function Events({
@@ -26,10 +27,10 @@ export function Events({
   errorMessage,
   timeFilter,
   totalCount,
+  filters,
 }: EventsProps) {
   const [isFiltersPopupOpen, setIsFiltersPopupOpen] = useState(false);
   const timeFiltered = filterEventsByTime(events, timeFilter);
-  const filters = useEventFilters();
   const t = useTranslations("HomePage");
   const eventIds = timeFiltered
     .map((e) => e.id)
