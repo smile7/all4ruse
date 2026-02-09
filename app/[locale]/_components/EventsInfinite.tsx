@@ -5,6 +5,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import type { Event } from "@/lib/api";
 import { getEvents } from "@/lib/api";
 import { createClient } from "@/lib/supabase/client";
+import { useEventFilters } from "@/hooks";
+import { Skeleton } from "@/components/ui";
 
 import type { EventTimeFilter } from "./FilterByTime";
 import { Events } from ".";
@@ -24,13 +26,16 @@ export function EventsInfinite({
   timeFilter,
   totalCount,
 }: EventsInfiniteProps) {
+  const filters = useEventFilters();
   const [events, setEvents] = useState<Event[]>(initialEvents);
   const [errorMessage, setErrorMessage] = useState<string | null>(
     initialError ?? null,
   );
-  const [page, setPage] = useState(1); // first page is already loaded
+  const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(initialEvents.length === PAGE_SIZE);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [isLoadingAllForFilters, setIsLoadingAllForFilters] = useState(false);
+  const [hasLoadedAllForFilters, setHasLoadedAllForFilters] = useState(false);
 
   const loaderRef = useRef<HTMLDivElement | null>(null);
 
@@ -61,7 +66,6 @@ export function EventsInfinite({
         return;
       }
 
-      // Merge and de-duplicate by id to avoid duplicate keys in the grid
       setEvents((prev) => {
         const merged = [...prev, ...next];
         const seen = new Set<number | string>();
@@ -86,6 +90,58 @@ export function EventsInfinite({
       setIsLoadingMore(false);
     }
   }, [hasMore, isLoadingMore, page]);
+
+  // When filters are active, load the full events list once so that
+  // filtered counts reflect all matching events, not just the first page.
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadAllEventsForFilters() {
+      setIsLoadingAllForFilters(true);
+      try {
+        const supabase = createClient();
+        const { data, error } = await getEvents(supabase, {
+          all: false,
+        });
+
+        if (cancelled) return;
+
+        if (error) {
+          console.error(error);
+          setErrorMessage(error.message ?? "Failed to load events");
+          setHasMore(false);
+          return;
+        }
+
+        const next = data ?? [];
+        setEvents(next);
+        setPage(1);
+        setHasMore(false);
+        setHasLoadedAllForFilters(true);
+      } catch (err: any) {
+        if (cancelled) return;
+        console.error(err);
+        setErrorMessage(err?.message ?? "Failed to load events");
+        setHasMore(false);
+      } finally {
+        if (!cancelled) {
+          setIsLoadingAllForFilters(false);
+        }
+      }
+    }
+
+    if (filters.hasFilters && !hasLoadedAllForFilters) {
+      void loadAllEventsForFilters();
+    }
+
+    // If filters are cleared after we've loaded all events once,
+    // we simply keep the full list in memory and keep hasMore=false,
+    // so no further lazy loading or extra requests happen.
+
+    return () => {
+      cancelled = true;
+    };
+  }, [filters.hasFilters, hasLoadedAllForFilters]);
 
   useEffect(() => {
     if (!hasMore) return;
@@ -117,10 +173,17 @@ export function EventsInfinite({
         errorMessage={errorMessage}
         timeFilter={timeFilter}
         totalCount={totalCount}
+        filters={filters}
       />
 
       <div ref={loaderRef} className="flex justify-center py-6">
-        {isLoadingMore && <span>Loading more events…</span>}
+        {(isLoadingMore || isLoadingAllForFilters) && (
+          <div className="grid w-full max-w-5xl gap-6 [grid-template-columns:repeat(auto-fill,minmax(min(100%,18rem),1fr))]">
+            {Array.from({ length: 3 }).map((_, index) => (
+              <Skeleton key={index} className="h-72 w-full" />
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
