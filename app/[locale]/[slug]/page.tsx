@@ -153,7 +153,7 @@ export default async function EventPage(props: {
 
     const formatDateTime = (date?: string | null, time?: string | null) => {
       if (!date) return "";
-      const datePart = date.slice(0, 10); // ensure YYYY-MM-DD
+      const datePart = date.slice(0, 10);
       const cleanDate = datePart.replace(/-/g, "");
       const baseTime = (time && time.trim()) || "00:00";
       const [hh = "00", mm = "00"] = baseTime.split(":");
