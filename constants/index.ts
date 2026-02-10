@@ -44,7 +44,7 @@ export const TAG_LABELS_BG: Record<string, string> = {
   EXHIBITION: "ИЗЛОЖБА",
   FOOD: "ХРАНА",
   TECHNOLOGY: "ТЕХНОЛОГИИ",
-  VOLUNTEERING: "ДОБРОВОЛЧЕСТВО",
+  VOLUNTEERING: "БЛАГОТВОРИТЕЛНОСТ",
   FAIR: "БАЗАР",
   OUTDOOR: "НА ОТКРИТО",
   NETWORKING: "СОЦИАЛИЗАЦИЯ",
