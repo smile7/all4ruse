@@ -169,8 +169,6 @@ export default async function EventPage(props: {
     const start = formatForGoogle(startUTC);
     const end = formatForGoogle(endUTC);
     const params = new URLSearchParams();
-    params.set("action", "TEMPLATE");
-    params.set("dates", `${start}/${end}`);
     if (event.title) {
       params.set("text", event.title);
     }
@@ -190,7 +188,9 @@ export default async function EventPage(props: {
     }
 
     const baseUrl = "https://calendar.google.com/calendar/render";
-    return `${baseUrl}?${params.toString()}`;
+    const extraParams = params.toString();
+    const calendarUrl = `${baseUrl}?action=TEMPLATE&dates=${start}/${end}`;
+    return extraParams ? `${calendarUrl}&${extraParams}` : calendarUrl;
   };
 
   const googleCalendarUrl = buildGoogleCalendarUrl();
