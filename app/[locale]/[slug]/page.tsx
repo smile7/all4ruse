@@ -19,7 +19,10 @@ import { TAG_LABELS_BG } from "@/constants";
 import { routing } from "@/i18n/routing";
 import { getEventBySlug, type Tag } from "@/lib/api";
 import { createClient } from "@/lib/supabase/server";
-import { getEventTemporalStatus } from "../_components/FilterByTime";
+import {
+  getEventTemporalStatus,
+  getEventUtcRange,
+} from "../_components/FilterByTime";
 import { CalendarDaysIcon } from "lucide-react";
 
 import "@/components/ui/minimal-tiptap/styles/index.css";
@@ -151,20 +154,18 @@ export default async function EventPage(props: {
   const buildGoogleCalendarUrl = () => {
     if (!event.startDate) return null;
 
-    const formatDateTime = (date?: string | null, time?: string | null) => {
-      if (!date) return "";
-      const datePart = date.slice(0, 10);
-      const cleanDate = datePart.replace(/-/g, "");
-      const baseTime = (time && time.trim()) || "00:00";
-      const [hh = "00", mm = "00"] = baseTime.split(":");
-      return `${cleanDate}T${hh}${mm}00`;
+    const { startUTC, endUTC } = getEventUtcRange(event);
+
+    const formatForGoogle = (date: Date) => {
+      // Google Calendar expects YYYYMMDDTHHMMSSZ
+      return date
+        .toISOString()
+        .replace(/[-:]/g, "")
+        .replace(/\.\d{3}Z$/, "Z");
     };
 
-    const start = formatDateTime(event.startDate, event.startTime);
-    const end = formatDateTime(
-      event.endDate || event.startDate,
-      event.endTime || event.startTime,
-    );
+    const start = formatForGoogle(startUTC);
+    const end = formatForGoogle(endUTC);
 
     const params = new URLSearchParams();
     params.set("action", "TEMPLATE");
@@ -176,7 +177,9 @@ export default async function EventPage(props: {
       params.set("location", fullAddress);
     }
     if (event.description) {
-      params.set("details", event.description);
+      // Strip HTML tags for a cleaner, safer description in Calendar
+      const plainDescription = event.description.replace(/<[^>]+>/g, " ");
+      params.set("details", plainDescription);
     }
 
     return `https://calendar.google.com/calendar/render?${params.toString()}`;
@@ -295,7 +298,7 @@ export default async function EventPage(props: {
                   title={translatedTitle ?? event.title ?? ""}
                 />
               </div>
-              {/* {googleCalendarUrl && (
+              {googleCalendarUrl && (
                 <Button
                   asChild
                   variant="outline"
@@ -311,7 +314,7 @@ export default async function EventPage(props: {
                     <span>Google Calendar</span>
                   </a>
                 </Button>
-              )} */}
+              )}
             </div>
           </div>
 
