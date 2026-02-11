@@ -191,7 +191,7 @@ export default async function EventPage(props: {
 
     const otherParams = params.toString();
     const baseUrl = "https://calendar.google.com/calendar/render";
-    return `${baseUrl}?action=TEMPLATE&dates=${datesParam}$${
+    return `${baseUrl}?action=TEMPLATE&dates=${datesParam}${
       otherParams ? `&${otherParams}` : ""
     }`;
   };
