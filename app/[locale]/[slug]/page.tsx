@@ -156,33 +156,44 @@ export default async function EventPage(props: {
 
     const { startUTC, endUTC } = getEventUtcRange(event);
 
+    if (Number.isNaN(startUTC.getTime()) || Number.isNaN(endUTC.getTime())) {
+      return null;
+    }
+
     const formatForGoogle = (date: Date) => {
       // Google Calendar expects YYYYMMDDTHHMMSSZ
-      return date
-        .toISOString()
-        .replace(/[-:]/g, "")
-        .replace(/\.\d{3}Z$/, "Z");
+      const iso = date.toISOString(); // e.g. 2026-02-11T10:00:00.000Z
+      return iso.replace(/[-:]/g, "").replace(/\.\d{3}Z$/, "Z");
     };
 
     const start = formatForGoogle(startUTC);
     const end = formatForGoogle(endUTC);
+    const datesParam = `${start}/${end}`;
 
     const params = new URLSearchParams();
-    params.set("action", "TEMPLATE");
-    params.set("text", event.title ?? "");
-    if (start && end) {
-      params.set("dates", `${start}/${end}`);
+    if (event.title) {
+      params.set("text", event.title);
     }
     if (fullAddress) {
       params.set("location", fullAddress);
     }
     if (event.description) {
-      // Strip HTML tags for a cleaner, safer description in Calendar
-      const plainDescription = event.description.replace(/<[^>]+>/g, " ");
-      params.set("details", plainDescription);
+      // Strip HTML tags and collapse whitespace for a cleaner, safer description
+      const plainDescription = event.description
+        .replace(/<[^>]+>/g, " ")
+        .replace(/\s+/g, " ")
+        .trim()
+        .slice(0, 1000);
+      if (plainDescription) {
+        params.set("details", plainDescription);
+      }
     }
 
-    return `https://calendar.google.com/calendar/render?${params.toString()}`;
+    const otherParams = params.toString();
+    const baseUrl = "https://calendar.google.com/calendar/render";
+    return `${baseUrl}?action=TEMPLATE&dates=${datesParam}$${
+      otherParams ? `&${otherParams}` : ""
+    }`;
   };
 
   const googleCalendarUrl = buildGoogleCalendarUrl();
