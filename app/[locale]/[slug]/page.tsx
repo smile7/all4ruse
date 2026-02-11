@@ -19,16 +19,15 @@ import { TAG_LABELS_BG } from "@/constants";
 import { routing } from "@/i18n/routing";
 import { getEventBySlug, type Tag } from "@/lib/api";
 import { createClient } from "@/lib/supabase/server";
-import {
-  getEventTemporalStatus,
-  getEventUtcRange,
-} from "../_components/FilterByTime";
+import { getEventTemporalStatus } from "../_components/FilterByTime";
 import { CalendarDaysIcon } from "lucide-react";
 
 import "@/components/ui/minimal-tiptap/styles/index.css";
 import EventDescriptionWrapper from "@/components/EventDescriptionWrapper";
 import { translateText } from "@/lib/translateText";
 import { ScrollToTopOnMount } from "@/components/ScrollToTopOnMount";
+
+const DEFAULT_CALENDAR_TIMEZONE = "Europe/Sofia";
 
 type EventPageParams = { slug: string };
 
@@ -154,21 +153,55 @@ export default async function EventPage(props: {
   const buildGoogleCalendarUrl = () => {
     if (!event.startDate) return null;
 
-    const { startUTC, endUTC } = getEventUtcRange(event);
+    const hasTimeComponent = Boolean(
+      (event.startTime && event.startTime.trim()) ||
+        (event.endTime && event.endTime.trim()),
+    );
 
-    if (Number.isNaN(startUTC.getTime()) || Number.isNaN(endUTC.getTime())) {
+    const normalizeDatePart = (value?: string | null) => {
+      if (!value) return null;
+      return value.slice(0, 10).replace(/-/g, "");
+    };
+
+    const pad2 = (num: number) => num.toString().padStart(2, "0");
+    const normalizeTimePart = (value?: string | null) => {
+      if (!value) return "000000";
+      const [h = "0", m = "0", s = "0"] = value.trim().split(":");
+      const safePart = (part: string) => {
+        const parsed = Number.parseInt(part, 10);
+        if (Number.isFinite(parsed) && parsed >= 0) {
+          return pad2(parsed);
+        }
+        return "00";
+      };
+      return `${safePart(h)}${safePart(m)}${safePart(s)}`;
+    };
+
+    const buildToken = (
+      dateStr?: string | null,
+      timeStr?: string | null,
+    ): string | null => {
+      const datePart = normalizeDatePart(dateStr);
+      if (!datePart) return null;
+      if (!hasTimeComponent) {
+        return datePart;
+      }
+      return `${datePart}T${normalizeTimePart(timeStr)}`;
+    };
+
+    const startToken = buildToken(event.startDate, event.startTime);
+    const endToken = buildToken(
+      event.endDate ?? event.startDate,
+      event.endTime ?? event.startTime,
+    );
+
+    if (!startToken || !endToken) {
       return null;
     }
 
-    const formatForGoogle = (date: Date) => {
-      // Google Calendar expects YYYYMMDDTHHMMSSZ
-      const iso = date.toISOString(); // e.g. 2026-02-11T10:00:00.000Z
-      return iso.replace(/[-:]/g, "").replace(/\.\d{3}Z$/, "Z");
-    };
-
-    const start = formatForGoogle(startUTC);
-    const end = formatForGoogle(endUTC);
     const params = new URLSearchParams();
+    params.set("ctz", DEFAULT_CALENDAR_TIMEZONE);
+
     if (event.title) {
       params.set("text", event.title);
     }
@@ -189,7 +222,7 @@ export default async function EventPage(props: {
 
     const baseUrl = "https://calendar.google.com/calendar/render";
     const extraParams = params.toString();
-    const calendarUrl = `${baseUrl}?action=TEMPLATE&dates=${start}/${end}`;
+    const calendarUrl = `${baseUrl}?action=TEMPLATE&dates=${startToken}/${endToken}`;
     return extraParams ? `${calendarUrl}&${extraParams}` : calendarUrl;
   };
 
