@@ -1,4 +1,5 @@
 import { Typography } from "@/components/Typography";
+import { EmailObfuscated } from "@/components/EmailObfuscated";
 
 export default function LegalPage() {
   return (
@@ -33,10 +34,12 @@ export default function LegalPage() {
         <br />
         Управител: Силвена Здравкова Митева
         <br />
-        Имейл за контакт:{" "}
-        <a href="mailto:silvena.miteva.007@gmail.com">
-          silvena.miteva.007@gmail.com
-        </a>
+        Имейл за контакт: {" "}
+        <EmailObfuscated
+          user="silvena.miteva.007"
+          domain="gmail.com"
+          aria-label="Имейл за контакт: silvena.miteva.007 at gmail dot com"
+        />
       </Typography.P>
       <br />
       <Typography.H3>2. Приемане на условията</Typography.H3>
@@ -250,9 +253,11 @@ export default function LegalPage() {
       </Typography.P>
       <Typography.P>
         8.2. За да подадете сигнал, моля изпратете имейл на{" "}
-        <a href="mailto:silvena.miteva.007@gmail.com">
-          silvena.miteva.007@gmail.com
-        </a>{" "}
+        <EmailObfuscated
+          user="silvena.miteva.007"
+          domain="gmail.com"
+          aria-label="Имейл за контакт: silvena.miteva.007 at gmail dot com"
+        />{" "}
         с:
       </Typography.P>
       <ul className="list-disc list-inside ml-4">
@@ -342,13 +347,15 @@ export default function LegalPage() {
       </Typography.P>
 
       <br />
-      <Typography.H3>
-        11. Технически ограничения и забрана на злоупотреба
-      </Typography.H3>
-      <Typography.P>11.1. На Сайта се забранява:</Typography.P>
-      <ul className="list-disc list-inside ml-4">
-        <li>
-          използване на роботи, скрейпери или други автоматизирани инструменти
+      <Typography.P>
+        За въпроси относно тези Условия, моля свържете се с нас на: {" "}
+        <EmailObfuscated
+          user="silvena.miteva.007"
+          domain="gmail.com"
+          aria-label="Имейл за контакт: silvena.miteva.007 at gmail dot com"
+        />
+        .
+      </Typography.P>
           за събиране на данни без изрично разрешение;
         </li>
         <li>

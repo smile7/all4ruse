@@ -107,6 +107,26 @@ export default async function EventPage(props: {
     notFound();
   }
 
+  const publicEvent = (() => {
+    const originalEmail = event.email as string | null | undefined;
+    if (!originalEmail || !originalEmail.includes("@")) {
+      return { ...event, email: null } as typeof event & {
+        emailUser?: string | null;
+        emailDomain?: string | null;
+      };
+    }
+
+    const [user, ...rest] = originalEmail.split("@");
+    const domain = rest.join("@");
+
+    return {
+      ...event,
+      email: null,
+      emailUser: user,
+      emailDomain: domain,
+    } as typeof event & { emailUser: string; emailDomain: string };
+  })();
+
   // Load tags for this event with the join table
   const { data: eventTags } = await supabase
     .from("event_tags")
@@ -369,7 +389,7 @@ export default async function EventPage(props: {
               />
             </div>
             <div className="lg:col-span-4">
-              <EventDetailsCard event={event} />
+              <EventDetailsCard event={publicEvent} />
             </div>
           </div>
         </CardContent>

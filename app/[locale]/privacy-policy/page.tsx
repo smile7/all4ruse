@@ -1,4 +1,5 @@
 import { Typography } from "@/components/Typography";
+import { EmailObfuscated } from "@/components/EmailObfuscated";
 
 export default function PrivacyPage() {
   return (
@@ -39,9 +40,11 @@ export default function PrivacyPage() {
         Управител: Силвена Здравкова Митева
         <br />
         Имейл за контакт по GDPR въпроси:{" "}
-        <a href="mailto:silvena.miteva.007@gmail.com">
-          silvena.miteva.007@gmail.com
-        </a>
+        <EmailObfuscated
+          user="silvena.miteva.007"
+          domain="gmail.com"
+          aria-label="Имейл за контакт по GDPR: silvena.miteva.007 at gmail dot com"
+        />
       </Typography.P>
       <br />
       <Typography.H3>3. Категории на субектите на данни</Typography.H3>
@@ -295,9 +298,11 @@ export default function PrivacyPage() {
         <br />
         За да упражните което и да е от горните права, моля свържете се с
         администратора на имейл:{" "}
-        <a href="mailto:silvena.miteva.007@gmail.com">
-          silvena.miteva.007@gmail.com
-        </a>
+        <EmailObfuscated
+          user="silvena.miteva.007"
+          domain="gmail.com"
+          aria-label="Имейл за контакт: silvena.miteva.007 at gmail dot com"
+        />
         .
         <br />
         При получаване на искане администраторът ще отговори в разумен срок
@@ -322,7 +327,12 @@ export default function PrivacyPage() {
         <br />
         Телефон: +359 2 915 3420
         <br />
-        Електронна поща: <a href="mailto:kzld@cpdp.bg">kzld@cpdp.bg</a>
+        Електронна поща:{" "}
+        <EmailObfuscated
+          user="kzld"
+          domain="cpdp.bg"
+          aria-label="Имейл на КЗЛД: kzld at cpdp dot bg"
+        />
       </Typography.P>
       <Typography.P>
         Имате право да подадете жалба до КЗЛД, ако смятате, че обработката на
@@ -414,9 +424,11 @@ export default function PrivacyPage() {
       <Typography.P>
         За въпроси относно обработката на вашите лични данни или за упражняване
         на правата си, моля свържете се с нас на:{" "}
-        <a href="mailto:silvena.miteva.007@gmail.com">
-          silvena.miteva.007@gmail.com
-        </a>
+        <EmailObfuscated
+          user="silvena.miteva.007"
+          domain="gmail.com"
+          aria-label="Имейл за контакт: silvena.miteva.007 at gmail dot com"
+        />
         .
       </Typography.P>
       <br />
