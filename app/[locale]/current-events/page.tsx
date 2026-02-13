@@ -18,7 +18,24 @@ export default async function CurrentEventsPage({
   const t = await getTranslations("CurrentEvents");
 
   const supabase = await createClient();
-  const { data: events, error } = await getEvents(supabase);
+  const { data: eventsRaw, error } = await getEvents(supabase);
+
+  const events = (eventsRaw ?? []).map((event) => {
+    const originalEmail = event.email as string | null | undefined;
+    if (!originalEmail || !originalEmail.includes("@")) {
+      return { ...event, email: null };
+    }
+
+    const [user, ...rest] = originalEmail.split("@");
+    const domain = rest.join("@");
+
+    return {
+      ...event,
+      email: null,
+      emailUser: user,
+      emailDomain: domain,
+    } as typeof event & { emailUser: string; emailDomain: string };
+  });
 
   const {
     data: { user },
@@ -41,7 +58,7 @@ export default async function CurrentEventsPage({
         </div>
       </div>
       <Events
-        events={events ?? []}
+        events={events}
         errorMessage={error?.message}
         timeFilter="current"
       />

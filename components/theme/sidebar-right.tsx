@@ -16,7 +16,7 @@ import { Calendars, DatePicker, NavUser } from ".";
 const data = {
   user: {
     name: "shadcn",
-    email: "person@all4ruse.com",
+    email: "person[at]all4ruse.com",
     avatar: "/avatars/shadcn.jpg",
   },
   calendars: [

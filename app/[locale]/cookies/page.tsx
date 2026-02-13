@@ -220,6 +220,7 @@ export default function CookiesPage() {
       </ul>
       <Typography.P>
         Потребителят трябва да направи избор, преди да може да използва сайта
+        import {EmailObfuscated} from "@/components/EmailObfuscated";
         по-нататък.
       </Typography.P>
 
@@ -316,9 +317,11 @@ export default function CookiesPage() {
       <Typography.P>
         За въпроси относно бисквитките и тяхното използване, свържете се с нас
         на имейл:{" "}
-        <a href="mailto:silvena.miteva.007@gmail.com">
-          silvena.miteva.007@gmail.com
-        </a>
+        <EmailObfuscated
+          user="silvena.miteva.007"
+          domain="gmail.com"
+          aria-label="Имейл за контакт: silvena.miteva.007 at gmail dot com"
+        />
         .
       </Typography.P>
       <br />

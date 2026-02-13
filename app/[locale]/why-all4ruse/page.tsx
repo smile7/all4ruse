@@ -2,6 +2,7 @@
 import Image from "next/image";
 import { AspectRatio } from "@/components/AspectRatio";
 import { Typography } from "@/components/Typography";
+import { EmailObfuscated } from "@/components/EmailObfuscated";
 import {
   Mail,
   Sparkles,
@@ -191,12 +192,12 @@ export default function WhyAll4RusePage() {
             <div className="flex flex-col items-center bg-gradient-to-br from-primary/10 to-background rounded-xl p-6 shadow-sm">
               <Mail className="h-8 w-8 text-primary mb-2" />
               <span className="font-semibold text-lg mb-1">{t("email")}</span>
-              <a
-                href="mailto:silvena@all4ruse.com"
+              <EmailObfuscated
+                user="silvena"
+                domain="all4ruse.com"
                 className="text-primary underline text-base font-medium"
-              >
-                silvena@all4ruse.com
-              </a>
+                aria-label="Имейл за контакт: silvena at all4ruse dot com"
+              />
             </div>
             <div className="flex flex-col items-center bg-gradient-to-br from-primary/10 to-background rounded-xl p-6 shadow-sm">
               <Facebook className="h-8 w-8 text-primary mb-2" />
