@@ -1,4 +1,5 @@
 import { Typography } from "@/components/Typography";
+import { EmailObfuscated } from "@/components/EmailObfuscated";
 
 export default function CookiesPage() {
   return (
@@ -220,7 +221,6 @@ export default function CookiesPage() {
       </ul>
       <Typography.P>
         Потребителят трябва да направи избор, преди да може да използва сайта
-        import {EmailObfuscated} from "@/components/EmailObfuscated";
         по-нататък.
       </Typography.P>
 
