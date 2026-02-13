@@ -18,9 +18,26 @@ export default async function EventsPage({
   const t = await getTranslations("HomePage");
 
   const supabase = await createClient();
-  const { data: events, error } = await getEvents(supabase, {
+  const { data: eventsRaw, error } = await getEvents(supabase, {
     all: false,
     limit: 16,
+  });
+
+  const events = (eventsRaw ?? []).map((event) => {
+    const originalEmail = event.email as string | null | undefined;
+    if (!originalEmail || !originalEmail.includes("@")) {
+      return { ...event, email: null };
+    }
+
+    const [user, ...rest] = originalEmail.split("@");
+    const domain = rest.join("@");
+
+    return {
+      ...event,
+      email: null,
+      emailUser: user,
+      emailDomain: domain,
+    } as typeof event & { emailUser: string; emailDomain: string };
   });
 
   // Count all upcoming active events for the summary counter
@@ -54,7 +71,7 @@ export default async function EventsPage({
         </div>
       </div>
       <EventsInfinite
-        initialEvents={events ?? []}
+        initialEvents={events}
         initialError={error?.message}
         timeFilter="upcoming"
         totalCount={totalUpcoming ?? events?.length ?? 0}

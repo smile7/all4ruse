@@ -47,6 +47,20 @@ function OrganizersList({ organizers }: { organizers: Host[] }) {
 
 export function EventDetailsCard({ event }: { event: Event }) {
   const organizers = event.organizers as Host[];
+  const rawEmail = (event as any).email as string | undefined | null;
+  const emailUser = (event as any).emailUser as string | undefined | null;
+  const emailDomain = (event as any).emailDomain as string | undefined | null;
+
+  const hasEmail = Boolean(
+    (rawEmail && rawEmail.trim()) || (emailUser && emailDomain),
+  );
+
+  const obfuscatedEmailText =
+    emailUser && emailDomain
+      ? `${emailUser} [at] ${emailDomain}`
+      : rawEmail
+        ? rawEmail.replace("@", " [at] ")
+        : "";
   const t = useTranslations("SingleEvent");
   const locale = useLocale();
   const localeCode = locale === "bg" ? "bg" : "en";
@@ -98,16 +112,27 @@ export function EventDetailsCard({ event }: { event: Event }) {
               </Typography.P>
             </div>
           )}
-          {event.email?.trim() && (
+          {hasEmail && (
             <div className="flex items-center gap-2 border-b pb-2 border-foreground/20 min-w-0">
               <MailIcon className="size-4 shrink-0 text-primary" />
               <Typography.P className="flex-1 min-w-0 break-all">
-                <a
-                  href={`mailto:${event.email}`}
-                  className="text-primary hover:underline break-all"
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (typeof window !== "undefined") {
+                      const emailAddress =
+                        emailUser && emailDomain
+                          ? `${emailUser}@${emailDomain}`
+                          : (rawEmail ?? "");
+                      if (emailAddress) {
+                        window.location.href = `mailto:${emailAddress}`;
+                      }
+                    }
+                  }}
+                  className="text-primary hover:underline break-all text-left"
                 >
-                  {event.email}
-                </a>
+                  {obfuscatedEmailText}
+                </button>
               </Typography.P>
             </div>
           )}

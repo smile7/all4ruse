@@ -27,6 +27,8 @@ import EventDescriptionWrapper from "@/components/EventDescriptionWrapper";
 import { translateText } from "@/lib/translateText";
 import { ScrollToTopOnMount } from "@/components/ScrollToTopOnMount";
 
+const DEFAULT_CALENDAR_TIMEZONE = "Europe/Sofia";
+
 type EventPageParams = { slug: string };
 
 export async function generateMetadata({
@@ -105,6 +107,26 @@ export default async function EventPage(props: {
     notFound();
   }
 
+  const publicEvent = (() => {
+    const originalEmail = event.email as string | null | undefined;
+    if (!originalEmail || !originalEmail.includes("@")) {
+      return { ...event, email: null } as typeof event & {
+        emailUser?: string | null;
+        emailDomain?: string | null;
+      };
+    }
+
+    const [user, ...rest] = originalEmail.split("@");
+    const domain = rest.join("@");
+
+    return {
+      ...event,
+      email: null,
+      emailUser: user,
+      emailDomain: domain,
+    } as typeof event & { emailUser: string; emailDomain: string };
+  })();
+
   // Load tags for this event with the join table
   const { data: eventTags } = await supabase
     .from("event_tags")
@@ -151,35 +173,77 @@ export default async function EventPage(props: {
   const buildGoogleCalendarUrl = () => {
     if (!event.startDate) return null;
 
-    const formatDateTime = (date?: string | null, time?: string | null) => {
-      if (!date) return "";
-      const datePart = date.slice(0, 10);
-      const cleanDate = datePart.replace(/-/g, "");
-      const baseTime = (time && time.trim()) || "00:00";
-      const [hh = "00", mm = "00"] = baseTime.split(":");
-      return `${cleanDate}T${hh}${mm}00`;
-    };
-
-    const start = formatDateTime(event.startDate, event.startTime);
-    const end = formatDateTime(
-      event.endDate || event.startDate,
-      event.endTime || event.startTime,
+    const hasTimeComponent = Boolean(
+      (event.startTime && event.startTime.trim()) ||
+        (event.endTime && event.endTime.trim()),
     );
 
+    const normalizeDatePart = (value?: string | null) => {
+      if (!value) return null;
+      return value.slice(0, 10).replace(/-/g, "");
+    };
+
+    const pad2 = (num: number) => num.toString().padStart(2, "0");
+    const normalizeTimePart = (value?: string | null) => {
+      if (!value) return "000000";
+      const [h = "0", m = "0", s = "0"] = value.trim().split(":");
+      const safePart = (part: string) => {
+        const parsed = Number.parseInt(part, 10);
+        if (Number.isFinite(parsed) && parsed >= 0) {
+          return pad2(parsed);
+        }
+        return "00";
+      };
+      return `${safePart(h)}${safePart(m)}${safePart(s)}`;
+    };
+
+    const buildToken = (
+      dateStr?: string | null,
+      timeStr?: string | null,
+    ): string | null => {
+      const datePart = normalizeDatePart(dateStr);
+      if (!datePart) return null;
+      if (!hasTimeComponent) {
+        return datePart;
+      }
+      return `${datePart}T${normalizeTimePart(timeStr)}`;
+    };
+
+    const startToken = buildToken(event.startDate, event.startTime);
+    const endToken = buildToken(
+      event.endDate ?? event.startDate,
+      event.endTime ?? event.startTime,
+    );
+
+    if (!startToken || !endToken) {
+      return null;
+    }
+
     const params = new URLSearchParams();
-    params.set("action", "TEMPLATE");
-    params.set("text", event.title ?? "");
-    if (start && end) {
-      params.set("dates", `${start}/${end}`);
+    params.set("ctz", DEFAULT_CALENDAR_TIMEZONE);
+
+    if (event.title) {
+      params.set("text", event.title);
     }
     if (fullAddress) {
       params.set("location", fullAddress);
     }
     if (event.description) {
-      params.set("details", event.description);
+      // Strip HTML tags and collapse whitespace for a cleaner, safer description
+      const plainDescription = event.description
+        .replace(/<[^>]+>/g, " ")
+        .replace(/\s+/g, " ")
+        .trim()
+        .slice(0, 1000);
+      if (plainDescription) {
+        params.set("details", plainDescription);
+      }
     }
 
-    return `https://calendar.google.com/calendar/render?${params.toString()}`;
+    const baseUrl = "https://calendar.google.com/calendar/render";
+    const extraParams = params.toString();
+    const calendarUrl = `${baseUrl}?action=TEMPLATE&dates=${startToken}/${endToken}`;
+    return extraParams ? `${calendarUrl}&${extraParams}` : calendarUrl;
   };
 
   const googleCalendarUrl = buildGoogleCalendarUrl();
@@ -295,7 +359,7 @@ export default async function EventPage(props: {
                   title={translatedTitle ?? event.title ?? ""}
                 />
               </div>
-              {/* {googleCalendarUrl && (
+              {googleCalendarUrl && (
                 <Button
                   asChild
                   variant="outline"
@@ -311,7 +375,7 @@ export default async function EventPage(props: {
                     <span>Google Calendar</span>
                   </a>
                 </Button>
-              )} */}
+              )}
             </div>
           </div>
 
@@ -325,7 +389,7 @@ export default async function EventPage(props: {
               />
             </div>
             <div className="lg:col-span-4">
-              <EventDetailsCard event={event} />
+              <EventDetailsCard event={publicEvent} />
             </div>
           </div>
         </CardContent>

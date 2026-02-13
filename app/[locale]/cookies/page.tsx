@@ -1,4 +1,5 @@
 import { Typography } from "@/components/Typography";
+import { EmailObfuscated } from "@/components/EmailObfuscated";
 
 export default function CookiesPage() {
   return (
@@ -316,9 +317,11 @@ export default function CookiesPage() {
       <Typography.P>
         За въпроси относно бисквитките и тяхното използване, свържете се с нас
         на имейл:{" "}
-        <a href="mailto:silvena.miteva.007@gmail.com">
-          silvena.miteva.007@gmail.com
-        </a>
+        <EmailObfuscated
+          user="silvena.miteva.007"
+          domain="gmail.com"
+          aria-label="Имейл за контакт: silvena.miteva.007 at gmail dot com"
+        />
         .
       </Typography.P>
       <br />
