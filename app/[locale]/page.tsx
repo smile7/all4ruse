@@ -6,7 +6,7 @@ import { Button } from "@/components/ui";
 import { getEvents } from "@/lib/api";
 import { createClient } from "@/lib/supabase/server";
 
-import { EventsInfinite } from "./_components/EventsInfinite";
+import { Events } from "./_components";
 
 export default async function EventsPage({
   params,
@@ -20,7 +20,6 @@ export default async function EventsPage({
   const supabase = await createClient();
   const { data: eventsRaw, error } = await getEvents(supabase, {
     all: false,
-    limit: 16,
   });
 
   const events = (eventsRaw ?? []).map((event) => {
@@ -70,11 +69,11 @@ export default async function EventsPage({
           <Typography.Small>{t("createProfileMsg")}</Typography.Small>
         </div>
       </div>
-      <EventsInfinite
-        initialEvents={events}
-        initialError={error?.message}
+      <Events
+        events={events}
+        errorMessage={error?.message}
         timeFilter="upcoming"
-        totalCount={totalUpcoming ?? events?.length ?? 0}
+        totalCount={totalUpcoming ?? events.length}
       />
     </div>
   );
