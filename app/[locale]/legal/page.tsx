@@ -34,7 +34,7 @@ export default function LegalPage() {
         <br />
         Управител: Силвена Здравкова Митева
         <br />
-        Имейл за контакт: {" "}
+        Имейл за контакт:{" "}
         <EmailObfuscated
           user="silvena.miteva.007"
           domain="gmail.com"
@@ -347,15 +347,13 @@ export default function LegalPage() {
       </Typography.P>
 
       <br />
-      <Typography.P>
-        За въпроси относно тези Условия, моля свържете се с нас на: {" "}
-        <EmailObfuscated
-          user="silvena.miteva.007"
-          domain="gmail.com"
-          aria-label="Имейл за контакт: silvena.miteva.007 at gmail dot com"
-        />
-        .
-      </Typography.P>
+      <Typography.H3>
+        11. Технически ограничения и забрана на злоупотреба
+      </Typography.H3>
+      <Typography.P>11.1. На Сайта се забранява:</Typography.P>
+      <ul className="list-disc list-inside ml-4">
+        <li>
+          използване на роботи, скрейпери или други автоматизирани инструменти
           за събиране на данни без изрично разрешение;
         </li>
         <li>
@@ -468,9 +466,11 @@ export default function LegalPage() {
       <Typography.H3>18. Контакт</Typography.H3>
       <Typography.P>
         За въпроси относно тези Условия, моля свържете се с нас на:{" "}
-        <a href="mailto:silvena.miteva.007@gmail.com">
-          silvena.miteva.007@gmail.com
-        </a>
+        <EmailObfuscated
+          user="silvena.miteva.007"
+          domain="gmail.com"
+          aria-label="Имейл за контакт: silvena.miteva.007 at gmail dot com"
+        />
         .
       </Typography.P>
       <br />
