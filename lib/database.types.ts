@@ -52,7 +52,7 @@ export type Database = {
           description: string
           email: string | null
           endDate: string
-          endTime: string
+          endTime: string | null
           fbLink: string | null
           id: number
           image: string | null
@@ -76,7 +76,7 @@ export type Database = {
           description: string
           email?: string | null
           endDate: string
-          endTime: string
+          endTime?: string | null
           fbLink?: string | null
           id?: number
           image?: string | null
@@ -100,7 +100,7 @@ export type Database = {
           description?: string
           email?: string | null
           endDate?: string
-          endTime?: string
+          endTime?: string | null
           fbLink?: string | null
           id?: number
           image?: string | null

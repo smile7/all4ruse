@@ -6,7 +6,7 @@ import { Input } from "@/components/ui";
 import { cn } from "@/lib/utils";
 
 type TimePickerProps = {
-  value: string;
+  value?: string;
   onChange: (value: string) => void;
   id?: string;
   stepSeconds?: number;

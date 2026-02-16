@@ -39,6 +39,7 @@
     "menuCurrentEvents": "Текущи Събития",
     "menuWhyAll4Ruse": "Защо all4ruse?",
     "menuWhyAll4RuseTitle": "За нас",
+    "host": "Организатор",
     "facebookPage": "Facebook страница",
     "shareOnFacebook": "Сподели",
     "more": "Още",
@@ -205,6 +206,8 @@
     "onlyNecessary": "Само необходими",
     "acceptCookies": "Приеми бисквитки",
     "cookiePreferences": "Управление на бисквитки",
+    "addToFavorites": "Добави в любими",
+    "removeFromFavorites": "Премахни от любими",
     "favoritesAvailability": "За да запазите събитие като любимо, моля позволете съхранение на бисквитки в браузъра си."
   },
   "NotFound": {

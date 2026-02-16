@@ -24,6 +24,7 @@ export interface MinimalTiptapProps
   onChange?: (value: Content) => void;
   className?: string;
   editorContentClassName?: string;
+  showLinkBubbleMenu?: boolean;
 }
 
 const Toolbar = ({ editor }: { editor: Editor }) => (
@@ -74,6 +75,7 @@ export const MinimalTiptapEditor = ({
   // extensions = [],
   className,
   editorContentClassName,
+  showLinkBubbleMenu = true,
   ...props
 }: MinimalTiptapProps) => {
   const editor = useMinimalTiptapEditor({
@@ -102,7 +104,7 @@ export const MinimalTiptapEditor = ({
         editor={editor}
         className={cn("minimal-tiptap-editor", editorContentClassName)}
       />
-      <LinkBubbleMenu editor={editor} />
+      {showLinkBubbleMenu && <LinkBubbleMenu editor={editor} />}
     </MeasuredContainer>
   );
 };

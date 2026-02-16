@@ -50,7 +50,8 @@ export function FavoriteButton({ id, name, url }: FavoriteButtonProps) {
         variant={isFav ? "default" : "outline"}
         size="icon"
         aria-pressed={isFav}
-        aria-label={isFav ? "Remove from favorites" : "Add to favorites"}
+        aria-label={isFav ? t("removeFromFavorites") : t("addToFavorites")}
+        title={isFav ? t("removeFromFavorites") : t("addToFavorites")}
         onClick={handleClick}
       >
         <Heart className={isFav ? "fill-current" : ""} />

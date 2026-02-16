@@ -4,14 +4,33 @@ import type { TablesInsert } from "./database.types";
 
 export type EventInsert = TablesInsert<"events">;
 
+const normalizeUrlLike = (value: unknown): string => {
+  if (typeof value !== "string") return "";
+  const trimmed = value.trim();
+  if (!trimmed) return "";
+
+  if (/^https?:\/\//i.test(trimmed)) {
+    return trimmed;
+  }
+
+  if (/^www\./i.test(trimmed)) {
+    return `https://${trimmed}`;
+  }
+
+  return `https://${trimmed}`;
+};
+
 export const organizerSchema = (t: (key: string) => string) =>
   z.object({
     name: z.string().min(1, t("requiredField")),
-    link: z
-      .string()
-      .url({ message: t("invalidUrl") })
-      .optional()
-      .or(z.literal("")),
+    link: z.preprocess(
+      normalizeUrlLike,
+      z
+        .string()
+        .url({ message: t("invalidUrl") })
+        .optional()
+        .or(z.literal("")),
+    ),
   });
 
 export const createEventSchema = (t: (key: string) => string) =>
@@ -25,7 +44,7 @@ export const createEventSchema = (t: (key: string) => string) =>
       startDate: z.string().min(1, t("requiredField")),
       startTime: z.string().min(1, t("requiredField")),
       endDate: z.string().min(1, t("requiredField")),
-      endTime: z.string().min(1, t("requiredField")),
+      endTime: z.string().optional().or(z.literal("")),
       organizers: z.array(organizerSchema(t)).min(1, t("atLeastOneOrganizer")),
       ticketsLink: z.string().optional().or(z.literal("")),
       fbLink: z.string().optional().or(z.literal("")),
@@ -49,7 +68,12 @@ export const createEventSchema = (t: (key: string) => string) =>
         });
         return;
       }
-      if (data.endDate === data.startDate && data.endTime <= data.startTime) {
+      const hasEndTime = Boolean(data.endTime && data.endTime.trim());
+      if (
+        hasEndTime &&
+        data.endDate === data.startDate &&
+        data.endTime! <= data.startTime
+      ) {
         ctx.addIssue({
           code: "custom",
           path: ["endTime"],
