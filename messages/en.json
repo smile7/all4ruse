@@ -39,6 +39,7 @@
     "menuCurrentEvents": "Current Events",
     "menuWhyAll4Ruse": "Why All4Ruse?",
     "menuWhyAll4RuseTitle": "About Us",
+    "host": "Host",
     "facebookPage": "Facebook page",
     "shareOnFacebook": "Share",
     "more": "More",
@@ -205,6 +206,8 @@
     "onlyNecessary": "Only necessary",
     "acceptCookies": "Accept cookies",
     "cookiePreferences": "Manage cookies",
+    "addToFavorites": "Add to Favorites",
+    "removeFromFavorites": "Remove from Favorites",
     "favoritesAvailability": "To save an event as a favorite, please allow cookie storage in your browser."
   },
   "NotFound": {
