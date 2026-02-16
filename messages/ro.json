@@ -39,6 +39,7 @@
     "menuCurrentEvents": "Evenimente în desfășurare",
     "menuWhyAll4Ruse": "De ce All4Ruse?",
     "menuWhyAll4RuseTitle": "Despre noi",
+    "host": "Gazdă",
     "facebookPage": "Pagină Facebook",
     "shareOnFacebook": "Distribuie",
     "more": "Mai multe",
@@ -205,6 +206,8 @@
     "onlyNecessary": "Doar necesare",
     "acceptCookies": "Acceptă cookie-urile",
     "cookiePreferences": "Gestionează cookie-urile",
+    "addToFavorites": "Adaugă la favorite",
+    "removeFromFavorites": "Elimină din favorite",
     "favoritesAvailability": "Pentru a salva un eveniment la favorite, te rugăm să permiți stocarea cookie-urilor în browser."
   },
   "NotFound": {

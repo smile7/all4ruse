@@ -41,6 +41,7 @@
     "menuWhyAll4RuseTitle": "Про нас",
     "facebookPage": "Сторінка Facebook",
     "shareOnFacebook": "Поділитися",
+    "host": "Організатор",
     "more": "Ще",
     "clear": "Очистити фільтри",
     "events": "події",
@@ -205,6 +206,8 @@
     "onlyNecessary": "Лише необхідні",
     "acceptCookies": "Прийняти cookie",
     "cookiePreferences": "Керування cookie",
+    "addToFavorites": "Додати в обране",
+    "removeFromFavorites": "Прибрати з обраного",
     "favoritesAvailability": "Щоб зберегти подію в обране, дозвольте зберігання cookie у своєму браузері."
   },
   "NotFound": {

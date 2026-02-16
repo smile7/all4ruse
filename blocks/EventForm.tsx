@@ -382,6 +382,9 @@ export function EventForm({ mode, event }: EventFormProps) {
       const coverUrl = limitedUrls[0] ?? null;
       const galleryUrls = limitedUrls.slice(1);
 
+      const cleanedEndTime =
+        values.endTime && values.endTime.trim() !== "" ? values.endTime : null;
+
       const basePayload = {
         title: values.title,
         description: values.description,
@@ -391,7 +394,7 @@ export function EventForm({ mode, event }: EventFormProps) {
         startDate: values.startDate,
         startTime: values.startTime,
         endDate: values.endDate,
-        endTime: values.endTime,
+        endTime: cleanedEndTime,
         organizers: values.organizers,
         ticketsLink: values.ticketsLink || null,
         fbLink: values.fbLink || null,
@@ -546,6 +549,7 @@ export function EventForm({ mode, event }: EventFormProps) {
                       onChange={field.onChange}
                       className="w-full"
                       editorContentClassName="p-5"
+                      showLinkBubbleMenu={false}
                       output="html"
                       placeholder={t("enterDescription")}
                       editable
@@ -752,7 +756,7 @@ export function EventForm({ mode, event }: EventFormProps) {
                 name="endTime"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel isRequired>{t("toTime")}</FormLabel>
+                    <FormLabel>{t("toTime")}</FormLabel>
                     <FormControl>
                       <TimePopover
                         id="endTime"

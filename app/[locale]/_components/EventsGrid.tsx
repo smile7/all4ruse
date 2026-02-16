@@ -8,9 +8,8 @@ import { AspectRatio } from "@/components/AspectRatio";
 import { FavoriteButton } from "@/components/FavoriteButton";
 import { Typography } from "@/components/Typography";
 import { Card, CardContent } from "@/components/ui";
-import { FALLBACK_IMAGE, TAG_LABELS_BG } from "@/constants";
-import type { Event, Tag } from "@/lib/api";
-import { useTags } from "@/hooks/query";
+import { FALLBACK_IMAGE } from "@/constants";
+import type { Event } from "@/lib/api";
 import {
   formatShortDate,
   formatTimeTZ,
@@ -20,6 +19,7 @@ import {
 import { EventTimeFilter } from "./FilterByTime";
 import type { EventTagsMap } from "@/hooks/useEventTagsMap";
 import { useTranslatedTitles } from "./useTranslatedTitles";
+import { UserIcon } from "lucide-react";
 
 export function EventsGrid({
   events,
@@ -34,21 +34,10 @@ export function EventsGrid({
 }) {
   const t = useTranslations("HomePage");
   const locale = useLocale();
-  const { data: allTags = [] } = useTags();
   const translatedTitles: { [key: number]: string } = useTranslatedTitles(
     events,
     locale,
   );
-
-  const tagsById = new Map<number, Tag>();
-  for (const tag of allTags) {
-    tagsById.set(tag.id, tag);
-  }
-
-  const formatTagLabel = (tag: Tag) => {
-    const base = (tag.title ?? "").toUpperCase();
-    return locale === "bg" ? (TAG_LABELS_BG[base] ?? base) : base;
-  };
 
   const shouldGroupByMonth = timeFilter === "upcoming";
 
@@ -100,10 +89,6 @@ export function EventsGrid({
   }
 
   const renderEventCard = (e: Event) => {
-    const tagIds =
-      (eventTags && typeof e.id === "number" ? (eventTags[e.id] ?? []) : []) ??
-      [];
-
     const shortDate = e.startDate
       ? formatShortDate(e.startDate, locale === "bg" ? "bg" : "en")
       : "";
@@ -115,6 +100,15 @@ export function EventsGrid({
       month = monthPart;
     }
     const imageSrc = normalizeSupabaseImageUrl(e.image || FALLBACK_IMAGE);
+
+    const rawOrganizers = (e as any).organizers;
+    const organizersArray: any[] = Array.isArray(rawOrganizers)
+      ? rawOrganizers
+      : [];
+    const hostName: string | undefined =
+      organizersArray.length > 0 && typeof organizersArray[0]?.name === "string"
+        ? organizersArray[0].name
+        : undefined;
 
     return (
       <Link
@@ -211,14 +205,14 @@ export function EventsGrid({
               {translatedTitles[e.id] || e.title}
             </Typography.Lead>
 
-            {tagIds.length > 0 && (
-              <div className="flex flex-wrap gap-1 text-xs text-muted-foreground">
-                {tagIds.map((tagId) => {
-                  const tag = tagsById.get(tagId);
-                  if (!tag) return null;
-                  return <span key={tagId}>#{formatTagLabel(tag)}</span>;
-                })}
-              </div>
+            {hostName && (
+              <span
+                className="inline-flex mt-2 gap-2 text-xs"
+                title={t("host")}
+              >
+                <UserIcon className="size-4 text-muted-foreground" />
+                <span className="text-white">{hostName}</span>
+              </span>
             )}
 
             {/* <div className="flex items-center gap-2 text-xs opacity-80">
