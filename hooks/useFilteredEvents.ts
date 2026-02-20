@@ -81,63 +81,54 @@ export function useFilteredEvents(
     const hasTagFilter = tagIds.length > 0;
     const hasEventTagsData = !!eventTags && Object.keys(eventTags).length > 0;
 
-    return events
-      .filter((e) => {
-        if (query) {
-          const t = (e.title ?? "").toLowerCase();
-          let matches = t.includes(query);
+    return events.filter((e) => {
+      if (query) {
+        const t = (e.title ?? "").toLowerCase();
+        let matches = t.includes(query);
 
-          // Also allow matching by tag labels (both EN/BG variants)
-          if (!matches && eventTags && tagsById.size) {
-            const tagsForEvent = eventTags[e.id as number] ?? [];
-            for (const tagId of tagsForEvent) {
-              const tag = tagsById.get(tagId);
-              if (!tag) continue;
-              const tokens = normalizeTagSearchTokens(tag);
-              if (tokens.some((token) => token.includes(query))) {
-                matches = true;
-                break;
-              }
+        // Also allow matching by tag labels (both EN/BG variants)
+        if (!matches && eventTags && tagsById.size) {
+          const tagsForEvent = eventTags[e.id as number] ?? [];
+          for (const tagId of tagsForEvent) {
+            const tag = tagsById.get(tagId);
+            if (!tag) continue;
+            const tokens = normalizeTagSearchTokens(tag);
+            if (tokens.some((token) => token.includes(query))) {
+              matches = true;
+              break;
             }
           }
-
-          if (!matches) return false;
-        }
-        if (fromTs || toTs) {
-          const start = toTimestamp(e.startDate);
-          if (fromTs && start && start < fromTs) return false;
-          if (toTs && start && start > toTs) return false;
-        }
-        const price = (e.price ?? "").trim();
-        const tagsForEvent = eventTags ? (eventTags[e.id as number] ?? []) : [];
-
-        // Combine "free only" and "tags" with OR:
-        // - if only free is selected -> event must be free
-        // - if only tags are selected -> event must match at least one tag
-        // - if both are selected -> event can be either free OR have a selected tag
-        // IMPORTANT: do not apply tag filter until we actually have
-        // an eventTags map, to avoid a brief "0 events" flash while
-        // the tag mapping is still loading on mobile.
-        if (freeOnly || (hasTagFilter && hasEventTagsData)) {
-          const isFreeMatch = freeOnly ? price === "0" : false;
-          const hasTagMatch =
-            tagIds.length && eventTags
-              ? tagsForEvent.some((id) => tagIds.includes(id))
-              : false;
-
-          if (!isFreeMatch && !hasTagMatch) return false;
         }
 
-        return true;
-      })
-      .sort((a, b) => {
-        const aT = toTimestamp(a.startDate);
-        const bT = toTimestamp(b.startDate);
-        if (aT === bT) return 0;
-        if (aT === null) return 1;
-        if (bT === null) return -1;
-        return aT - bT;
-      });
+        if (!matches) return false;
+      }
+      if (fromTs || toTs) {
+        const start = toTimestamp(e.startDate);
+        if (fromTs && start && start < fromTs) return false;
+        if (toTs && start && start > toTs) return false;
+      }
+      const price = (e.price ?? "").trim();
+      const tagsForEvent = eventTags ? (eventTags[e.id as number] ?? []) : [];
+
+      // Combine "free only" and "tags" with OR:
+      // - if only free is selected -> event must be free
+      // - if only tags are selected -> event must match at least one tag
+      // - if both are selected -> event can be either free OR have a selected tag
+      // IMPORTANT: do not apply tag filter until we actually have
+      // an eventTags map, to avoid a brief "0 events" flash while
+      // the tag mapping is still loading on mobile.
+      if (freeOnly || (hasTagFilter && hasEventTagsData)) {
+        const isFreeMatch = freeOnly ? price === "0" : false;
+        const hasTagMatch =
+          tagIds.length && eventTags
+            ? tagsForEvent.some((id) => tagIds.includes(id))
+            : false;
+
+        if (!isFreeMatch && !hasTagMatch) return false;
+      }
+
+      return true;
+    });
   }, [
     events,
     title,
