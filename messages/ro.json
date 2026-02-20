@@ -51,7 +51,8 @@
     "waitingForApproval": "În așteptarea aprobării",
     "noEventsFound": "Niciun eveniment găsit.",
     "error": "A apărut o eroare. Te rugăm să încerci din nou mai târziu.",
-    "edit": "Editează"
+    "edit": "Editează",
+    "duplicate": "Dublică"
   },
   "CreateEvent": {
     "createEventTitle": "Creează un eveniment nou",
