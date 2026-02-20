@@ -51,7 +51,8 @@
     "waitingForApproval": "Очікують на підтвердження",
     "noEventsFound": "Подій не знайдено.",
     "error": "Сталася помилка. Спробуйте пізніше.",
-    "edit": "Редагувати"
+    "edit": "Редагувати",
+    "duplicate": "Дублювати"
   },
   "CreateEvent": {
     "createEventTitle": "Створити нову подію",

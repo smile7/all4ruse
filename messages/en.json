@@ -51,7 +51,8 @@
     "waitingForApproval": "Waiting for approval",
     "noEventsFound": "No events found.",
     "error": "An error occurred. Please try again later.",
-    "edit": "Edit"
+    "edit": "Edit",
+    "duplicate": "Duplicate"
   },
   "CreateEvent": {
     "createEventTitle": "Create New Event",
