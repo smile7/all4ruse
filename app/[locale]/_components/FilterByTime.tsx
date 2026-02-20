@@ -14,7 +14,7 @@ type EventMeta = {
 export function filterEventsByTime(
   events: Event[],
   filter: EventTimeFilter,
-  reference: Date = new Date()
+  reference: Date = new Date(),
 ): Event[] {
   const metas = events
     .map((event) => buildEventMeta(event, reference))
@@ -23,18 +23,20 @@ export function filterEventsByTime(
   const filtered = metas.filter((meta) => meta.status === filter);
 
   const sort =
-    filter === "past"
-      ? (a: EventMeta, b: EventMeta) =>
-          b.startUTC.getTime() - a.startUTC.getTime()
-      : (a: EventMeta, b: EventMeta) =>
-          a.startUTC.getTime() - b.startUTC.getTime();
+    filter === "upcoming"
+      ? // Upcoming: soonest first (ascending start date/time)
+        (a: EventMeta, b: EventMeta) =>
+          a.startUTC.getTime() - b.startUTC.getTime()
+      : // Current & past: most recent first (descending start date/time)
+        (a: EventMeta, b: EventMeta) =>
+          b.startUTC.getTime() - a.startUTC.getTime();
 
   return filtered.sort(sort).map((meta) => meta.event);
 }
 
 export function getEventTemporalStatus(
   event: Event,
-  reference: Date = new Date()
+  reference: Date = new Date(),
 ): EventTimeFilter {
   const { startUTC, endUTC } = getEventUtcRange(event);
   return resolveStatus(startUTC, endUTC, reference);
@@ -48,14 +50,14 @@ export function getEventUtcRange(event: Event): {
     toUTCDate(event.startDate, event.startTime) ??
     toUTCDate(
       event.endDate ?? event.startDate,
-      event.endTime ?? event.startTime
+      event.endTime ?? event.startTime,
     ) ??
     new Date(0);
 
   let endUTC =
     toUTCDate(
       event.endDate ?? event.startDate,
-      event.endTime ?? event.startTime
+      event.endTime ?? event.startTime,
     ) ?? startUTC;
 
   if (endUTC.getTime() < startUTC.getTime()) {
@@ -78,7 +80,7 @@ function buildEventMeta(event: Event, reference: Date): EventMeta | null {
 function resolveStatus(
   startUTC: Date,
   endUTC: Date,
-  reference: Date
+  reference: Date,
 ): EventTimeFilter {
   const now = reference.getTime();
   if (startUTC.getTime() > now) return "upcoming";
@@ -88,7 +90,7 @@ function resolveStatus(
 
 function toUTCDate(
   dateStr?: string | null,
-  timeStr?: string | null
+  timeStr?: string | null,
 ): Date | null {
   if (!dateStr) return null;
   const trimmedDate = dateStr.trim();
