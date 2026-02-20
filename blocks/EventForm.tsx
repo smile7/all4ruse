@@ -73,7 +73,7 @@ export function EventForm({ mode, event }: EventFormProps) {
   const [uploadError, setUploadError] = useState<string | null>(null);
 
   const [images, setImages] = useState<EventImageItem[]>(() => {
-    if (mode !== "edit" || !event) return [];
+    if (!event) return [];
 
     const initial: EventImageItem[] = [];
     if (event.image) {
@@ -304,9 +304,8 @@ export function EventForm({ mode, event }: EventFormProps) {
     multiple: true,
   });
 
-  // When editing, load existing tags for this event so they appear pre-selected
   useEffect(() => {
-    if (mode !== "edit" || !event?.id) return;
+    if (!event?.id) return;
 
     supabase
       .from("event_tags")
@@ -317,7 +316,7 @@ export function EventForm({ mode, event }: EventFormProps) {
         const tagIds = data.map((row: { tag_id: number }) => row.tag_id);
         form.setValue("tags", tagIds);
       });
-  }, [mode, event, supabase, form]);
+  }, [event, supabase, form]);
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {

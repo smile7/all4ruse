@@ -51,7 +51,8 @@
     "waitingForApproval": "Чакащи одобрение",
     "noEventsFound": "Няма намерени събития.",
     "error": "Възникна грешка. Моля опитайте отново по-късно.",
-    "edit": "Редактирай"
+    "edit": "Редактирай",
+    "duplicate": "Дублирай"
   },
   "CreateEvent": {
     "createEventTitle": "Създай Ново Събитие",
