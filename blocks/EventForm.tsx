@@ -424,6 +424,11 @@ export function EventForm({ mode, event }: EventFormProps) {
             })),
           );
         }
+
+        if (createdEvent?.slug) {
+          router.push(`/${locale}/${createdEvent.slug}`);
+          return;
+        }
       } else if (mode === "edit" && event) {
         const patch: EventUpdate = {
           ...basePayload,
