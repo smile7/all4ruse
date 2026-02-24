@@ -112,6 +112,9 @@ export default function RootLayout({
       suppressHydrationWarning
       className={comfortaa.variable}
     >
+      <head>
+        <meta property="fb:app_id" content={process.env.NEXT_PUBLIC_META_PIXEL_ID} />
+      </head>
       <body
         className={`${comfortaa.className} ${geistMono.variable} antialiased`}
       >
