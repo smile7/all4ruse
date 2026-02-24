@@ -209,7 +209,7 @@ export function EventsGrid({
           {hostName && (
             <span className="inline-flex mt-2 gap-2 text-xs" title={t("host")}>
               <UserIcon className="size-4 text-muted-foreground" />
-              <span className="text-white">{hostName}</span>
+              <span className="text-foreground">{hostName}</span>
             </span>
           )}
 
