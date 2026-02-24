@@ -186,11 +186,18 @@ export function EventsGrid({
             )}
 
             {day !== null && (
-              <div className="absolute left-3 top-3 z-20 flex flex-col items-center rounded-xl bg-white/95 px-4 py-3 font-semibold uppercase tracking-wide text-slate-800 shadow-md">
-                <span className="text-2xl leading-none">{day}</span>
-                <span className="text-[11px] leading-tight mt-0.5">
-                  {month}
-                </span>
+              <div className="absolute left-3 top-3 z-20 flex flex-col items-center">
+                <div className="flex flex-col items-center rounded-xl bg-white/95 p-3 font-semibold uppercase tracking-wide text-slate-800 shadow-md min-w-[3.5rem]">
+                  <span className="text-2xl leading-none">{day}</span>
+                  <span className="text-[11px] leading-tight ">{month}</span>
+                  {e.startTime && (
+                    <div className="flex flex-col items-center rounded-xl bg-gray-400 z-10 px-2 py-1 mt-0.5 font-semibold text-primary-foreground shadow-md min-w-[2.5rem] border-2 border-white">
+                      <span className="text-xs tracking-wide">
+                        {formatTimeTZ(e.startTime)}
+                      </span>
+                    </div>
+                  )}
+                </div>
               </div>
             )}
 
