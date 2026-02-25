@@ -11,6 +11,8 @@ type BasicFilters = {
   to: string | null;
   tagIds: number[];
   freeOnly: boolean;
+  place?: string | null;
+  host?: string | null;
 };
 
 export function useFilteredEvents(
@@ -18,7 +20,7 @@ export function useFilteredEvents(
   filters: BasicFilters,
   eventTags?: Record<number, number[]>,
 ) {
-  const { title, from, to, tagIds, freeOnly } = filters;
+  const { title, from, to, tagIds, freeOnly, place, host } = filters;
   const { data: allTags = [] } = useTags();
 
   const tagsById = useMemo(() => {
@@ -75,6 +77,8 @@ export function useFilteredEvents(
 
   const filteredEvents = useMemo(() => {
     const query = title.trim().toLowerCase();
+    const placeQuery = place ? place.trim().toLowerCase() : null;
+    const hostQuery = host ? host.trim().toLowerCase() : null;
     const fromTs = from ? toTimestamp(from) : null;
     const toTs = to ? toTimestamp(to + "T23:59:59") : null;
 
@@ -127,6 +131,34 @@ export function useFilteredEvents(
         if (!isFreeMatch && !hasTagMatch) return false;
       }
 
+      if (placeQuery) {
+        const p = [e.place ?? "", e.town ?? "", (e as any).address ?? ""]
+          .filter(Boolean)
+          .join(" ")
+          .toLowerCase();
+        if (!p.includes(placeQuery)) return false;
+      }
+
+      if (hostQuery) {
+        let organizers: any[] = [];
+        if (Array.isArray(e.organizers)) organizers = e.organizers as any[];
+        else if (typeof e.organizers === "string") {
+          try {
+            const parsed = JSON.parse(e.organizers as string);
+            if (Array.isArray(parsed)) organizers = parsed;
+          } catch (err) {
+            organizers = [];
+          }
+        }
+
+        const names = organizers
+          .map((o) => (o && (o.name ?? "")) || "")
+          .join(" ")
+          .toLowerCase();
+
+        if (!names.includes(hostQuery)) return false;
+      }
+
       return true;
     });
   }, [
@@ -138,6 +170,8 @@ export function useFilteredEvents(
     eventTags,
     tagsById,
     normalizeTagSearchTokens,
+    place,
+    host,
   ]);
 
   return {
