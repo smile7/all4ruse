@@ -47,6 +47,10 @@ export function EventsFilters({
     hasFilters,
     appliedFiltersCount,
     clear,
+    place,
+    setPlace,
+    host,
+    setHost,
   } = filters;
 
   const t = useTranslations("HomePage");
@@ -88,14 +92,15 @@ export function EventsFilters({
           </AccordionTrigger>
         )}
         <AccordionContent className="grid border-t p-4 gap-4">
+          {/* First row: title + dates */}
           <div
             className={
               inDialog
-                ? "grid gap-4 md:grid-cols-3"
-                : "grid gap-4 md:grid-cols-[minmax(0,1fr)_10rem_10rem_auto]"
+                ? "grid gap-4 md:grid-cols-1"
+                : "grid gap-4 md:grid-cols-[minmax(0,1fr)_10rem_10rem]"
             }
           >
-            <div className={`relative ${inDialog ? "md:col-span-3" : ""}`}>
+            <div className="relative">
               <Label
                 htmlFor="events-title"
                 className="text-xs text-muted-foreground"
@@ -151,6 +156,67 @@ export function EventsFilters({
                 onChange={(v) => setTo(v)}
                 onClear={() => setTo(null)}
               />
+            </div>
+          </div>
+
+          {/* Second row: host, place (equal width), clear button */}
+          <div
+            className={
+              inDialog
+                ? "grid gap-4 md:grid-cols-1"
+                : "grid gap-4 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_10rem]"
+            }
+          >
+            <div className="relative">
+              <Label
+                htmlFor="events-host"
+                className="text-xs text-muted-foreground"
+              >
+                {t("host")}
+              </Label>
+              <Input
+                id="events-host"
+                placeholder={t("hostFilter")}
+                value={host ?? ""}
+                onChange={(e) => setHost(e.target.value)}
+                className="pr-10"
+              />
+              <Button
+                type="button"
+                size="icon"
+                variant="ghost"
+                aria-label="Clear host"
+                onClick={() => setHost("")}
+                className={`absolute bottom-0 right-0 size-9 rounded-l-none transition-opacity ${host ? "opacity-100" : "opacity-0 pointer-events-none"}`}
+              >
+                <XIcon className="size-4" />
+              </Button>
+            </div>
+
+            <div className="relative">
+              <Label
+                htmlFor="events-place"
+                className="text-xs text-muted-foreground"
+              >
+                {t("place")}
+              </Label>
+              <Input
+                id="events-place"
+                placeholder={t("placeFilter")}
+                value={place ?? ""}
+                onChange={(e) => setPlace(e.target.value)}
+                className="pr-10"
+              />
+              <Button
+                type="button"
+                size="icon"
+                variant="ghost"
+                aria-label="Clear place"
+                onClick={() => setPlace("")}
+                className={`absolute bottom-0 right-0 size-9 rounded-l-none transition-opacity ${place ? "opacity-100" : "opacity-0 pointer-events-none"}`}
+              >
+                <XIcon className="size-4" />
+              </Button>
             </div>
 
             <div className="flex items-end">
