@@ -16,6 +16,8 @@ type Filters = {
   to: string | null;
   tagIds: number[];
   freeOnly: boolean;
+  place?: string;
+  host?: string;
 };
 
 export function useEventFilters() {
@@ -31,6 +33,12 @@ export function useEventFilters() {
   const [to, setTo] = useState<string | null>(initial.to);
   const [tagIds, setTagIds] = useState<number[]>(initial.tagIds);
   const [freeOnly, setFreeOnly] = useState(initial.freeOnly);
+  const [place, setPlace] = useState<string | undefined>(
+    initial.place ?? undefined,
+  );
+  const [host, setHost] = useState<string | undefined>(
+    initial.host ?? undefined,
+  );
 
   const debouncedTitle = useDebounce(title, DEBOUNCE_MS);
   const lastAppliedQSRef = useRef<string | null>(null);
@@ -47,6 +55,8 @@ export function useEventFilters() {
     setTo(parsed.to);
     setTagIds(parsed.tagIds);
     setFreeOnly(parsed.freeOnly);
+    setPlace(parsed.place ?? undefined);
+    setHost(parsed.host ?? undefined);
     initializedFromUrlRef.current = true;
   }, [searchParams, allTags]);
 
@@ -64,6 +74,8 @@ export function useEventFilters() {
         to,
         tagIds,
         freeOnly,
+        place,
+        host,
       },
       allTags,
     );
@@ -91,19 +103,29 @@ export function useEventFilters() {
     setTo(null);
     setTagIds([]);
     setFreeOnly(false);
+    setPlace(undefined);
+    setHost(undefined);
     lastAppliedQSRef.current = "";
     router.replace(pathname, { scroll: false });
   }, [pathname, router]);
 
   const hasFilters = Boolean(
-    title.trim() || from || to || tagIds.length || freeOnly,
+    title.trim() ||
+      from ||
+      to ||
+      tagIds.length ||
+      freeOnly ||
+      (place && place.trim()) ||
+      (host && host.trim()),
   );
   const appliedFiltersCount =
     (title.trim() ? 1 : 0) +
     (from ? 1 : 0) +
     (to ? 1 : 0) +
     tagIds.length +
-    (freeOnly ? 1 : 0);
+    (freeOnly ? 1 : 0) +
+    (place && place.trim() ? 1 : 0) +
+    (host && host.trim() ? 1 : 0);
 
   return {
     title,
@@ -116,6 +138,10 @@ export function useEventFilters() {
     setTagIds,
     freeOnly,
     setFreeOnly,
+    place,
+    setPlace,
+    host,
+    setHost,
     hasFilters,
     appliedFiltersCount,
     clear,
@@ -151,6 +177,8 @@ function parseFromSearch(searchParams: URLSearchParams, allTags: Tag[]) {
   }
 
   const freeOnly = searchParams.get("free") === "1";
+  const place = searchParams.get("place") || null;
+  const host = searchParams.get("host") || null;
 
   return {
     title: searchParams.get("title") || "",
@@ -158,11 +186,13 @@ function parseFromSearch(searchParams: URLSearchParams, allTags: Tag[]) {
     to: searchParams.get("to"),
     tagIds,
     freeOnly,
+    place,
+    host,
   };
 }
 
 function buildStringQuery(
-  { title, from, to, tagIds, freeOnly }: Filters,
+  { title, from, to, tagIds, freeOnly, place, host }: Filters,
   allTags: Tag[],
 ) {
   const params = new URLSearchParams();
@@ -191,6 +221,8 @@ function buildStringQuery(
     }
   }
   if (freeOnly) params.set("free", "1");
+  if (place && place.trim()) params.set("place", place.trim());
+  if (host && host.trim()) params.set("host", host.trim());
   const s = params.toString();
   return s;
 }
