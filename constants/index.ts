@@ -49,9 +49,11 @@ export const TAG_LABELS_BG: Record<string, string> = {
   OUTDOOR: "НА ОТКРИТО",
   NETWORKING: "СОЦИАЛИЗАЦИЯ",
   INFANTS: "БЕБЕТА",
-  GAMES: "БОРДОВИИГРИ",
+  GAMES: "НАСТОЛНИИГРИ",
   MARCHMUSICALDAYS: "МАРТЕНСКИМУЗИКАЛНИДНИ",
   OPERA: "ОПЕРА",
   BOOKS: "КНИГИ",
   PUPPETTHEATRE: "КУКЛЕНТЕАТЪР",
+  ROLEPLAYINGGAMES: "РОЛЕВИИГРИ",
+  ANIME: "АНИМЕ",
 };

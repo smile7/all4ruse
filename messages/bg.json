@@ -55,7 +55,9 @@
     "noEventsFound": "Няма намерени събития.",
     "error": "Възникна грешка. Моля опитайте отново по-късно.",
     "edit": "Редактирай",
-    "duplicate": "Дублирай"
+    "duplicate": "Дублирай",
+    "createNewEvent": "Създай ново събитие",
+    "duplicateExistingEvent": "Дублирай съществуващо събитие"
   },
   "CreateEvent": {
     "createEventTitle": "Създай Ново Събитие",

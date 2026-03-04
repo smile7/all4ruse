@@ -55,7 +55,9 @@
     "noEventsFound": "Подій не знайдено.",
     "error": "Сталася помилка. Спробуйте пізніше.",
     "edit": "Редагувати",
-    "duplicate": "Дублювати"
+    "duplicate": "Дублювати",
+    "createNewEvent": "Створити нову подію",
+    "duplicateExistingEvent": "Дублювати існующее событие"
   },
   "CreateEvent": {
     "createEventTitle": "Створити нову подію",
