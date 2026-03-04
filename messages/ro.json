@@ -55,7 +55,9 @@
     "noEventsFound": "Niciun eveniment găsit.",
     "error": "A apărut o eroare. Te rugăm să încerci din nou mai târziu.",
     "edit": "Editează",
-    "duplicate": "Dublică"
+    "duplicate": "Dublică",
+    "createNewEvent": "Creează un eveniment nou",
+    "duplicateExistingEvent": "Dublică un eveniment existent"
   },
   "CreateEvent": {
     "createEventTitle": "Creează un eveniment nou",

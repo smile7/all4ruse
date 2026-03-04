@@ -2,19 +2,13 @@
 
 import { useMemo } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import Link from "next/link";
 
 import { Typography } from "@/components/Typography";
-import {
-  Button,
-  Card,
-  CardContent,
-  CardTitle,
-  ErrorAlert,
-} from "@/components/ui";
+import { Card, CardContent, CardTitle, ErrorAlert } from "@/components/ui";
 import { useEvents, useProfile } from "@/hooks/query";
 
 import { EventsGrid, filterEventsByTime } from "../_components";
+import { AddEventDropdown } from "../_components/AddEventDropdown";
 
 export default function PublishedEventsPage() {
   const t = useTranslations("HomePage");
@@ -55,29 +49,32 @@ export default function PublishedEventsPage() {
     return <Typography.P>{t("noEventsFound")}</Typography.P>;
   }
 
+  const isAccountConfirmed = profile?.is_confirmed === true;
+
   return (
     <div className="mx-auto w-full flex flex-col gap-6">
       {Boolean(error) && <ErrorAlert error="">{t("error")}</ErrorAlert>}
 
       <div className="flex flex-col md:flex-row w-full gap-4 md:items-center md:justify-between items-center text-center md:text-left">
         {profile && (
-          <Button
-            asChild
+          <AddEventDropdown
+            locale={locale}
+            label={t("createEvent")}
             className="order-1 md:order-2 self-end md:self-center md:ml-auto w-full md:w-auto"
-          >
-            <Link href={`/${locale}/create`}>{t("createEvent")}</Link>
-          </Button>
+          />
         )}
       </div>
 
-      <Card className="space-y-4 p-6 border-orange-400">
-        <CardTitle>
-          <Typography.H2>{t("waitingForApproval")}</Typography.H2>
-        </CardTitle>
-        <CardContent className="p-0">
-          <EventsGrid events={waitingApprovalEvents} isEditMode />
-        </CardContent>
-      </Card>
+      {!isAccountConfirmed && (
+        <Card className="space-y-4 p-6 border-orange-400">
+          <CardTitle>
+            <Typography.H2>{t("waitingForApproval")}</Typography.H2>
+          </CardTitle>
+          <CardContent className="p-0">
+            <EventsGrid events={waitingApprovalEvents} isEditMode />
+          </CardContent>
+        </Card>
+      )}
 
       <Card className="space-y-4 p-6">
         <CardTitle>
