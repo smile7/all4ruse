@@ -41,6 +41,8 @@ export function useEventFilters() {
   );
 
   const debouncedTitle = useDebounce(title, DEBOUNCE_MS);
+  const debouncedPlace = useDebounce(place ?? "", DEBOUNCE_MS);
+  const debouncedHost = useDebounce(host ?? "", DEBOUNCE_MS);
   const lastAppliedQSRef = useRef<string | null>(null);
   const initializedFromUrlRef = useRef(false);
 
@@ -74,8 +76,8 @@ export function useEventFilters() {
         to,
         tagIds,
         freeOnly,
-        place,
-        host,
+        place: debouncedPlace,
+        host: debouncedHost,
       },
       allTags,
     );
@@ -87,6 +89,8 @@ export function useEventFilters() {
     router.replace(url, { scroll: false });
   }, [
     debouncedTitle,
+    debouncedPlace,
+    debouncedHost,
     from,
     to,
     tagIds,
