@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
@@ -9,8 +9,9 @@ import { AspectRatio } from "@/components/AspectRatio";
 import { FavoriteButton } from "@/components/FavoriteButton";
 import { Typography } from "@/components/Typography";
 import { Button, Card, CardContent } from "@/components/ui";
-import { FALLBACK_IMAGE } from "@/constants";
-import type { Event } from "@/lib/api";
+import { FALLBACK_IMAGE, TAG_LABELS_BG } from "@/constants";
+import { useTags } from "@/hooks/query";
+import type { Event, Tag } from "@/lib/api";
 import {
   formatShortDate,
   formatTimeTZ,
@@ -37,10 +38,30 @@ export function EventsGrid({
 }) {
   const t = useTranslations("HomePage");
   const locale = useLocale();
+  const { data: allTags = [] } = useTags();
   const translatedTitles: { [key: number]: string } = useTranslatedTitles(
     events,
     locale,
   );
+
+  const tagsById = useMemo(() => {
+    const map = new Map<number, Tag>();
+    for (const tag of allTags) {
+      if (tag && typeof tag.id === "number") {
+        map.set(tag.id, tag);
+      }
+    }
+    return map;
+  }, [allTags]);
+
+  const TAG_COLOR_CLASSES = [
+    "bg-emerald-100 text-emerald-900 border-emerald-300",
+    "bg-sky-100 text-sky-900 border-sky-300",
+    "bg-amber-100 text-amber-900 border-amber-300",
+    "bg-rose-100 text-rose-900 border-rose-300",
+    "bg-violet-100 text-violet-900 border-violet-300",
+    "bg-slate-100 text-slate-900 border-slate-300",
+  ] as const;
 
   const shouldGroupByMonth = timeFilter === "upcoming" && variant === "grid";
 
@@ -95,12 +116,32 @@ export function EventsGrid({
     const shortDate = e.startDate
       ? formatShortDate(e.startDate, locale === "bg" ? "bg" : "en")
       : "";
+
     let day: string | null = null;
     let month = "";
+    let isToday = false;
+    let isTomorrow = false;
+
     if (shortDate && shortDate.includes(" ")) {
       const [dayPart, monthPart] = shortDate.split(" ");
       day = dayPart;
       month = monthPart;
+    }
+
+    if (e.startDate) {
+      const eventDate = new Date(e.startDate);
+      const today = new Date();
+      const normalize = (d: Date) =>
+        new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+      const eventTs = normalize(eventDate);
+      const todayTs = normalize(today);
+      const tomorrowTs = todayTs + 24 * 60 * 60 * 1000;
+
+      if (eventTs === todayTs) {
+        isToday = true;
+      } else if (eventTs === tomorrowTs) {
+        isTomorrow = true;
+      }
     }
     const imageSrc = normalizeSupabaseImageUrl(e.image || FALLBACK_IMAGE);
 
@@ -112,6 +153,23 @@ export function EventsGrid({
       organizersArray.length > 0 && typeof organizersArray[0]?.name === "string"
         ? organizersArray[0].name
         : undefined;
+
+    const tagEntries =
+      eventTags && typeof e.id === "number"
+        ? (eventTags[e.id] ?? [])
+            .map((id) => {
+              const tag = tagsById.get(id);
+              if (!tag) return null;
+              const base = (tag.title ?? "").toUpperCase();
+              const label =
+                locale === "bg" ? (TAG_LABELS_BG[base] ?? base) : base;
+              if (!label) return null;
+              return { id, label };
+            })
+            .filter((x): x is { id: number; label: string } =>
+              Boolean(x && x.label),
+            )
+        : [];
 
     const cardInner = (
       <Card
@@ -140,7 +198,7 @@ export function EventsGrid({
             </span>
           </div>
         )}
-        <AspectRatio ratio={6 / 9}>
+        <AspectRatio ratio={16 / 11}>
           <div className="absolute inset-0 overflow-hidden">
             <div className="absolute inset-0 transform-gpu will-change-transform transition-transform duration-500 ease-out group-hover:scale-[1.05]">
               <Image
@@ -188,13 +246,30 @@ export function EventsGrid({
               </div>
             )}
 
-            {day !== null && (
+            {(isToday || isTomorrow || day !== null) && (
               <div className="absolute left-3 top-3 z-20 flex flex-col items-center">
-                <div className="flex flex-col items-center rounded-xl bg-white/95 p-3 font-semibold uppercase tracking-wide text-slate-800 shadow-md min-w-[3.5rem]">
-                  <span className="text-2xl leading-none">{day}</span>
-                  <span className="text-[11px] leading-tight ">{month}</span>
+                <div className="flex flex-col items-center rounded-xl bg-white/90 px-3 pb-3 pt-2 font-semibold uppercase tracking-wide text-black shadow-md min-w-[3.5rem]">
+                  <div className="flex items-baseline gap-1 leading-none h-[0.5rem]">
+                    <span
+                      className={`text-lg ${
+                        isToday || isTomorrow ? "opacity-0 select-none" : ""
+                      }`}
+                    >
+                      {day ?? "00"}
+                    </span>
+                    {!isToday && !isTomorrow && (
+                      <span className="text-[11px]">{month}</span>
+                    )}
+                  </div>
+                  <span className="text-[11px] leading-tight flex items-center justify-center">
+                    {isToday
+                      ? t("today")
+                      : isTomorrow
+                        ? t("tomorrow")
+                        : "\u00A0"}
+                  </span>
                   {e.startTime && (
-                    <div className="flex flex-col items-center rounded-xl bg-gray-400 z-10 px-2 py-1 mt-0.5 font-semibold text-primary-foreground shadow-md min-w-[2.5rem] border-2 border-white">
+                    <div className="flex flex-col items-center rounded-xl bg-gray-400 z-10 px-2 py-1 mt-1.5 font-semibold text-primary-foreground shadow-md min-w-[2.5rem] border-2 border-white">
                       <span className="text-xs tracking-wide">
                         {formatTimeTZ(e.startTime)}
                       </span>
@@ -212,16 +287,46 @@ export function EventsGrid({
           </div>
         </AspectRatio>
         <CardContent className="flex flex-col gap-2 p-4 pt-0">
-          <Typography.Lead className="leading-tight mb-1">
-            {translatedTitles[e.id] || e.title}
-          </Typography.Lead>
+          <div className="flex flex-col gap-4">
+            <div className="flex items-start md:min-h-[2.75rem]">
+              <Typography.Lead className="leading-tight line-clamp-2">
+                {translatedTitles[e.id] || e.title}
+              </Typography.Lead>
+            </div>
 
-          {hostName && (
-            <span className="inline-flex mt-2 gap-2 text-xs" title={t("host")}>
-              <UserIcon className="size-4 text-muted-foreground" />
-              <span className="text-foreground">{hostName}</span>
-            </span>
-          )}
+            <div className="flex items-start md:h-[1.25rem]">
+              {hostName && (
+                <span
+                  className="inline-flex gap-2 text-xs max-w-full"
+                  title={t("host")}
+                >
+                  <UserIcon className="size-4 text-muted-foreground" />
+                  <span className="text-foreground line-clamp-1">
+                    {hostName}
+                  </span>
+                </span>
+              )}
+            </div>
+
+            <div className="flex items-start md:min-h-[1.5rem]">
+              {tagEntries.length > 0 && (
+                <div className="flex flex-wrap gap-1">
+                  {tagEntries.slice(0, 3).map(({ id, label }) => {
+                    const colorClass =
+                      TAG_COLOR_CLASSES[id % TAG_COLOR_CLASSES.length];
+                    return (
+                      <span
+                        key={id}
+                        className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${colorClass}`}
+                      >
+                        {label}
+                      </span>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          </div>
 
           {/* <div className="flex items-center gap-2 text-xs opacity-80">
                   <Calendar1Icon className="size-4 opacity-70 shrink-0" />

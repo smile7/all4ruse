@@ -1,6 +1,6 @@
 "use client";
 
-import { Heart } from "lucide-react";
+import { BookmarkIcon, Heart, SaveIcon } from "lucide-react";
 
 import { useState } from "react";
 
@@ -54,7 +54,7 @@ export function FavoriteButton({ id, name, url }: FavoriteButtonProps) {
         title={isFav ? t("removeFromFavorites") : t("addToFavorites")}
         onClick={handleClick}
       >
-        <Heart className={isFav ? "fill-current" : ""} />
+        <BookmarkIcon className={isFav ? "fill-current" : ""} />
       </Button>
       <DrawerDialog
         open={open}

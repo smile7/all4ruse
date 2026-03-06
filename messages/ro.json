@@ -57,7 +57,9 @@
     "edit": "Editează",
     "duplicate": "Dublică",
     "createNewEvent": "Creează un eveniment nou",
-    "duplicateExistingEvent": "Dublică un eveniment existent"
+    "duplicateExistingEvent": "Dublică un eveniment existent",
+    "today": "Astăzi",
+    "tomorrow": "Mâine"
   },
   "CreateEvent": {
     "createEventTitle": "Creează un eveniment nou",

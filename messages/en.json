@@ -56,6 +56,8 @@
     "error": "An error occurred. Please try again later.",
     "edit": "Edit",
     "duplicate": "Duplicate",
+    "today": "Today",
+    "tomorrow": "Tomorrow",
     "createNewEvent": "Create New Event",
     "duplicateExistingEvent": "Duplicate Existing Event"
   },
