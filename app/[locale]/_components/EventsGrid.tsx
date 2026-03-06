@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
@@ -19,18 +20,20 @@ import {
 import { EventTimeFilter } from "./FilterByTime";
 import type { EventTagsMap } from "@/hooks/useEventTagsMap";
 import { useTranslatedTitles } from "./useTranslatedTitles";
-import { UserIcon } from "lucide-react";
+import { ChevronLeftIcon, ChevronRightIcon, UserIcon } from "lucide-react";
 
 export function EventsGrid({
   events,
   timeFilter,
   isEditMode = false,
   eventTags,
+  variant = "grid",
 }: {
   events: Event[];
   timeFilter?: EventTimeFilter;
   isEditMode?: boolean;
   eventTags?: EventTagsMap;
+  variant?: "grid" | "scroll";
 }) {
   const t = useTranslations("HomePage");
   const locale = useLocale();
@@ -39,7 +42,7 @@ export function EventsGrid({
     locale,
   );
 
-  const shouldGroupByMonth = timeFilter === "upcoming";
+  const shouldGroupByMonth = timeFilter === "upcoming" && variant === "grid";
 
   let monthLocale: string;
   if (locale === "bg") {
@@ -255,28 +258,108 @@ export function EventsGrid({
     );
   };
 
+  if (events.length === 0) {
+    return (
+      <div className="flex flex-col gap-8" aria-label="Събития">
+        <Typography.P>{t("noEvents")}</Typography.P>
+      </div>
+    );
+  }
+
+  if (variant === "scroll") {
+    const scrollRef = useRef<HTMLDivElement | null>(null);
+    const [canScrollLeft, setCanScrollLeft] = useState(false);
+    const [canScrollRight, setCanScrollRight] = useState(false);
+
+    const updateScrollButtons = () => {
+      const el = scrollRef.current;
+      if (!el) return;
+      const { scrollLeft, scrollWidth, clientWidth } = el;
+      setCanScrollLeft(scrollLeft > 0);
+      setCanScrollRight(scrollLeft + clientWidth < scrollWidth - 1);
+    };
+
+    useEffect(() => {
+      const el = scrollRef.current;
+      if (!el) return;
+      updateScrollButtons();
+      el.addEventListener("scroll", updateScrollButtons);
+      window.addEventListener("resize", updateScrollButtons);
+      return () => {
+        el.removeEventListener("scroll", updateScrollButtons);
+        window.removeEventListener("resize", updateScrollButtons);
+      };
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    const scrollByAmount = (direction: "left" | "right") => {
+      const el = scrollRef.current;
+      if (!el) return;
+      const amount = el.clientWidth * 0.8;
+      el.scrollBy({
+        left: direction === "left" ? -amount : amount,
+        behavior: "smooth",
+      });
+    };
+
+    return (
+      <div className="relative" aria-label="Събития">
+        <div
+          ref={scrollRef}
+          className="flex gap-4 overflow-x-auto pb-2 snap-x snap-mandatory"
+        >
+          {events.map((event) => (
+            <div key={event.id} className="snap-start shrink-0 w-72 max-w-full">
+              {renderEventCard(event)}
+            </div>
+          ))}
+        </div>
+
+        <div className="pointer-events-none absolute inset-y-0 left-0 right-0 hidden md:flex items-center justify-between">
+          <button
+            type="button"
+            className="pointer-events-auto ml-2 rounded-full bg-background/90 shadow-md border border-border p-2 disabled:opacity-30"
+            onClick={() => scrollByAmount("left")}
+            disabled={!canScrollLeft}
+            aria-label="Scroll left"
+          >
+            <ChevronLeftIcon className="size-7 cursor-pointer" />
+          </button>
+          <button
+            type="button"
+            className="pointer-events-auto mr-2 rounded-full bg-background/90 shadow-md border border-border p-2 disabled:opacity-30"
+            onClick={() => scrollByAmount("right")}
+            disabled={!canScrollRight}
+            aria-label="Scroll right"
+          >
+            <ChevronRightIcon className="size-7 cursor-pointer" />
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col gap-8" aria-label="Събития">
-      {events.length === 0 && <Typography.P>{t("noEvents")}</Typography.P>}
-      {shouldGroupByMonth
-        ? monthGroups.map((group, groupIndex) => (
-            <div key={group.monthKey} className="flex flex-col gap-4">
-              {groupIndex > 0 && group.monthLabel && (
-                <Typography.H2 className="pt-10">
-                  {group.monthLabel}
-                </Typography.H2>
-              )}
+      {shouldGroupByMonth ? (
+        monthGroups.map((group, groupIndex) => (
+          <div key={group.monthKey} className="flex flex-col gap-4">
+            {groupIndex > 0 && group.monthLabel && (
+              <Typography.H2 className="pt-10">
+                {group.monthLabel}
+              </Typography.H2>
+            )}
 
-              <div className="grid gap-6 [grid-template-columns:repeat(auto-fill,minmax(min(100%,18rem),1fr))]">
-                {group.events.map(renderEventCard)}
-              </div>
-            </div>
-          ))
-        : events.length > 0 && (
             <div className="grid gap-6 [grid-template-columns:repeat(auto-fill,minmax(min(100%,18rem),1fr))]">
-              {events.map(renderEventCard)}
+              {group.events.map(renderEventCard)}
             </div>
-          )}
+          </div>
+        ))
+      ) : (
+        <div className="grid gap-6 [grid-template-columns:repeat(auto-fill,minmax(min(100%,18rem),1fr))]">
+          {events.map(renderEventCard)}
+        </div>
+      )}
     </div>
   );
 }

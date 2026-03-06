@@ -8,18 +8,13 @@ import { EventShareButton } from "@/components/EventShareButton";
 import { FavoriteButton } from "@/components/FavoriteButton";
 import { ImagesGallery } from "@/components/ImagesGallery";
 import { Typography } from "@/components/Typography";
-import {
-  Button,
-  Card,
-  CardContent,
-  CardTitle,
-  ErrorAlert,
-} from "@/components/ui";
+import { Button, Card, CardContent, CardTitle } from "@/components/ui";
 import { TAG_LABELS_BG } from "@/constants";
 import { routing } from "@/i18n/routing";
-import { getEventBySlug, type Tag } from "@/lib/api";
+import { getEventBySlug, type Event, type Tag } from "@/lib/api";
 import { createClient } from "@/lib/supabase/server";
 import { getEventTemporalStatus } from "../_components/FilterByTime";
+import { EventsGrid } from "../_components";
 import { CalendarDaysIcon } from "lucide-react";
 
 import "@/components/ui/minimal-tiptap/styles/index.css";
@@ -134,6 +129,7 @@ export default async function EventPage(props: {
     .eq("event_id", event.id);
 
   let tags: Tag[] = [];
+  let relatedEvents: Event[] = [];
 
   if (eventTags && eventTags.length > 0) {
     const tagIds = eventTags.map((row: { tag_id: number }) => row.tag_id);
@@ -143,6 +139,34 @@ export default async function EventPage(props: {
       .in("id", tagIds);
 
     tags = (tagsData ?? []) as Tag[];
+
+    // Load up to 10 other active events that share at least one tag
+    const todayStr = new Date().toISOString().slice(0, 10);
+    const { data: relatedTagRows } = await supabase
+      .from("event_tags")
+      .select("event_id")
+      .in("tag_id", tagIds);
+
+    const relatedEventIds = Array.from(
+      new Set(
+        (relatedTagRows ?? [])
+          .map((row: { event_id: number }) => row.event_id)
+          .filter((id) => id !== event.id),
+      ),
+    );
+
+    if (relatedEventIds.length > 0) {
+      const { data: relatedEventsData } = await supabase
+        .from("events")
+        .select("*")
+        .in("id", relatedEventIds)
+        .eq("isEventActive", true)
+        .gte("startDate", todayStr)
+        .order("startDate", { ascending: true })
+        .limit(10);
+
+      relatedEvents = (relatedEventsData ?? []) as Event[];
+    }
   }
 
   const images: string[] = Array.isArray(event.images)
@@ -402,6 +426,19 @@ export default async function EventPage(props: {
           </CardTitle>
           <CardContent className="p-0">
             <ImagesGallery images={images} title={event.title} />
+          </CardContent>
+        </Card>
+      )}
+
+      {relatedEvents.length > 0 && (
+        <Card className="space-y-4 p-6">
+          <CardTitle>
+            <Typography.H2>
+              {tHome("more")} {tHome("events")}
+            </Typography.H2>
+          </CardTitle>
+          <CardContent className="p-0">
+            <EventsGrid events={relatedEvents} variant="scroll" />
           </CardContent>
         </Card>
       )}
