@@ -57,7 +57,9 @@
     "edit": "Редагувати",
     "duplicate": "Дублювати",
     "createNewEvent": "Створити нову подію",
-    "duplicateExistingEvent": "Дублювати існующее событие"
+    "duplicateExistingEvent": "Дублювати існующее событие",
+    "today": "Сьогодні",
+    "tomorrow": "Завтра"
   },
   "CreateEvent": {
     "createEventTitle": "Створити нову подію",
