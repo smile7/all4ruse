@@ -56,4 +56,5 @@ export const TAG_LABELS_BG: Record<string, string> = {
   PUPPETTHEATRE: "КУКЛЕНТЕАТЪР",
   ROLEPLAYINGGAMES: "РОЛЕВИИГРИ",
   ANIME: "АНИМЕ",
+  LITERATURE: "ЛИТЕРАТУРА",
 };
