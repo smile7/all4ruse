@@ -892,7 +892,7 @@ export function EventForm({ mode, event }: EventFormProps) {
               {images.length > 0 && (
                 <div className="mt-6 space-y-4">
                   <div className="relative group w-full max-w-[18rem] mx-auto">
-                    <AspectRatio ratio={6 / 9}>
+                    <AspectRatio ratio={16 / 11}>
                       <Image
                         src={images[0].url}
                         alt="Cover image"
@@ -926,7 +926,7 @@ export function EventForm({ mode, event }: EventFormProps) {
                             key={item.id}
                             className="relative group shrink-0 w-64"
                           >
-                            <AspectRatio ratio={4 / 3}>
+                            <AspectRatio ratio={16 / 11}>
                               <Image
                                 src={item.url}
                                 alt="image"

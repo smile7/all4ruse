@@ -37,7 +37,8 @@ export default function EventHeroImage({
         onClick={() => setIsOpen(true)}
       >
         {/* Image */}
-        <div className="relative aspect-[16/9] md:aspect-auto md:h-[36vh] lg:h-[42vh] xl:h-[48vh]">
+        <div className="relative w-full aspect-[191/100] max-h-[60vh] md:max-h-[50vh]">
+          {/* Blurred background cover */}
           <Image
             src={src}
             alt={alt}
@@ -45,11 +46,25 @@ export default function EventHeroImage({
             unoptimized
             priority
             sizes="100vw"
-            className="object-cover transition-transform duration-300 ease-out group-hover:scale-105"
+            className="object-cover blur-md scale-110 opacity-70"
             draggable={false}
+            aria-hidden="true"
           />
-          {/* Dark overlay layer */}
-          <div className="absolute inset-0 bg-black/10 group-hover:bg-black/0 transition-opacity" />
+          <div className="absolute inset-0 bg-background/40" />
+
+          {/* Sharp foreground image, fully visible */}
+          <div className="relative z-10 flex h-full w-full items-center justify-center">
+            <Image
+              src={src}
+              alt={alt}
+              fill
+              unoptimized
+              priority
+              sizes="100vw"
+              className="object-contain transition-transform duration-300 ease-out group-hover:scale-105"
+              draggable={false}
+            />
+          </div>
         </div>
       </div>
 
