@@ -179,7 +179,7 @@ export function EventsGrid({
                 ${timeFilter === "past" ? "opacity-60 grayscale" : ""}
               `}
       >
-        {timeFilter === "past" && (
+        {/* {timeFilter === "past" && (
           <div
             className="absolute left-1/2 top-2/5 z-40"
             style={{
@@ -197,7 +197,7 @@ export function EventsGrid({
               {t("pastEvent")}
             </span>
           </div>
-        )}
+        )} */}
         <AspectRatio ratio={16 / 11}>
           <div className="absolute inset-0 overflow-hidden">
             <div className="absolute inset-0 transform-gpu will-change-transform transition-transform duration-500 ease-out group-hover:scale-[1.05]">
