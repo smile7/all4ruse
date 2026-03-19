@@ -119,7 +119,19 @@
     "unsavedChangesTitle": "Незбережені зміни",
     "unsavedChangesDescription": "У вас є незбережені зміни. Ви впевнені, що хочете залишити сторінку?",
     "unsavedChangesConfirm": "Вийти без збереження",
-    "unsavedChangesCancel": "Залишитися на сторінці"
+    "unsavedChangesCancel": "Залишитися на сторінці",
+    "facebookImportTitle": "Імпорт з події Facebook",
+    "facebookImportDescription": "Підʼєднайте свій профіль у Facebook і вставте посилання на публічну подію, щоб ми автоматично заповнили поля.",
+    "connectFacebook": "Підʼєднати Facebook",
+    "connectingFacebook": "Підʼєднання...",
+    "importFromFacebook": "Імпортувати з посилання",
+    "importingFromFacebook": "Імпорт...",
+    "connectFacebookError": "Сталася помилка під час підʼєднання до Facebook. Спробуйте ще раз.",
+    "coverImageAlt": "Головне зображення події",
+    "eventImageAlt": "Зображення події",
+    "removeImageAria": "Видалити зображення",
+    "makeCoverAria": "Зробити це зображення обкладинкою",
+    "organizerLinkPlaceholder": "https://all4ruse.com"
   },
   "PastEvents": {
     "createEvent": "Створити подію",

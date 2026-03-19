@@ -119,7 +119,19 @@
     "unsavedChangesTitle": "Незапазени промени",
     "unsavedChangesDescription": "Имате незапазени промени. Сигурни ли сте, че искате да напуснете страницата?",
     "unsavedChangesConfirm": "Напусни без да запазваш",
-    "unsavedChangesCancel": "Остани на страницата"
+    "unsavedChangesCancel": "Остани на страницата",
+    "facebookImportTitle": "Импортиране от Facebook събитие",
+    "facebookImportDescription": "Свържете профила си във Facebook и поставете линк към публично събитие, за да попълним автоматично полетата.",
+    "connectFacebook": "Свържи Facebook",
+    "connectingFacebook": "Свързване...",
+    "importFromFacebook": "Импортирай от линка",
+    "importingFromFacebook": "Импортиране...",
+    "connectFacebookError": "Възникна грешка при свързването с Facebook. Моля, опитайте отново.",
+    "coverImageAlt": "Главно изображение за събитието",
+    "eventImageAlt": "Изображение за събитието",
+    "removeImageAria": "Премахни изображението",
+    "makeCoverAria": "Направи това изображение главно",
+    "organizerLinkPlaceholder": "https://all4ruse.com"
   },
   "PastEvents": {
     "createEvent": "Създай Събитие",
