@@ -119,7 +119,19 @@
     "unsavedChangesTitle": "Discard changes?",
     "unsavedChangesDescription": "You have unsaved changes. Are you sure you want to leave this page?",
     "unsavedChangesConfirm": "Leave without saving",
-    "unsavedChangesCancel": "Stay on this page"
+    "unsavedChangesCancel": "Stay on this page",
+    "facebookImportTitle": "Import from Facebook event",
+    "facebookImportDescription": "Connect your Facebook account and paste a link to a public event so we can auto-fill the fields.",
+    "connectFacebook": "Connect Facebook",
+    "connectingFacebook": "Connecting...",
+    "importFromFacebook": "Import from link",
+    "importingFromFacebook": "Importing...",
+    "connectFacebookError": "There was an error connecting to Facebook. Please try again.",
+    "coverImageAlt": "Cover image for the event",
+    "eventImageAlt": "Event image",
+    "removeImageAria": "Remove image",
+    "makeCoverAria": "Set this image as cover",
+    "organizerLinkPlaceholder": "https://all4ruse.com"
   },
   "PastEvents": {
     "createEvent": "Create an Event",

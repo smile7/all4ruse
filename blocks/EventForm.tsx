@@ -72,6 +72,11 @@ export function EventForm({ mode, event }: EventFormProps) {
   const [nextUrl, setNextUrl] = useState<string | null>(null);
   const [uploadError, setUploadError] = useState<string | null>(null);
 
+  const [fbImportUrl, setFbImportUrl] = useState("");
+  const [isConnectingFacebook, setIsConnectingFacebook] = useState(false);
+  const [isImportingFromFacebook, setIsImportingFromFacebook] = useState(false);
+  const [facebookError, setFacebookError] = useState<string | null>(null);
+
   const [images, setImages] = useState<EventImageItem[]>(() => {
     if (!event) return [];
 
@@ -164,6 +169,86 @@ export function EventForm({ mode, event }: EventFormProps) {
     resolver: zodResolver(createEventSchema(t)) as any,
     defaultValues,
   });
+
+  const isFacebookPilotUser =
+    userId === "288aec4c-e378-45cd-b73b-f52d22998b5b" ||
+    userId === "98b3619c-b0f2-4b15-91e9-0045cf0eac51";
+
+  const handleConnectFacebook = useCallback(async () => {
+    setFacebookError(null);
+    setIsConnectingFacebook(true);
+    try {
+      const res = await fetch("/api/facebook-auth");
+      const body = await res.json().catch(() => null);
+
+      if (!res.ok || !body?.url) {
+        throw new Error(body?.error || t("connectFacebookError"));
+      }
+
+      window.location.href = body.url as string;
+    } catch (err) {
+      console.error(err);
+      const message =
+        err instanceof Error && err.message
+          ? err.message
+          : t("connectFacebookError");
+      setFacebookError(message);
+    } finally {
+      setIsConnectingFacebook(false);
+    }
+  }, [t]);
+
+  const handleImportFromFacebook = useCallback(async () => {
+    setFacebookError(null);
+    const trimmed = fbImportUrl.trim();
+    if (!trimmed) return;
+
+    setIsImportingFromFacebook(true);
+    try {
+      const res = await fetch("/api/facebook-import", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url: trimmed, locale }),
+      });
+
+      const body = await res.json().catch(() => null);
+
+      if (!res.ok || !body) {
+        throw new Error(body?.error || t("error"));
+      }
+
+      form.reset({
+        ...form.getValues(),
+        title: body.title || form.getValues("title"),
+        description: body.description || form.getValues("description"),
+        startDate: body.startDate || form.getValues("startDate"),
+        endDate: body.endDate || form.getValues("endDate"),
+        startTime: body.startTime || form.getValues("startTime"),
+        endTime: body.endTime || form.getValues("endTime"),
+        address: body.address || form.getValues("address"),
+        place: body.place || form.getValues("place"),
+        town: body.town || form.getValues("town"),
+        fbLink: trimmed,
+      });
+
+      if (body.coverImageUrl) {
+        setImages([
+          {
+            id: "fb-cover",
+            url: body.coverImageUrl as string,
+            isNew: false,
+          },
+        ]);
+      }
+    } catch (err) {
+      console.error(err);
+      const message =
+        err instanceof Error && err.message ? err.message : t("error");
+      setFacebookError(message);
+    } finally {
+      setIsImportingFromFacebook(false);
+    }
+  }, [fbImportUrl, form, locale, setImages, t]);
 
   const syncFormImagesFromState = useCallback(() => {
     const newFiles = images
@@ -459,9 +544,7 @@ export function EventForm({ mode, event }: EventFormProps) {
       // Surface any upload or mutation error to the user instead of letting the promise reject silently
       console.error(err);
       const message =
-        err instanceof Error && err.message
-          ? err.message
-          : "Възникна грешка при записването на събитието. Моля, опитайте отново.";
+        err instanceof Error && err.message ? err.message : t("error");
       setUploadError(message);
     }
   };
@@ -521,6 +604,51 @@ export function EventForm({ mode, event }: EventFormProps) {
 
         {uploadError && <ErrorAlert error={uploadError} />}
         {error && <ErrorAlert error={error.message} />}
+
+        {isFacebookPilotUser && (
+          <div className="space-y-2 rounded-md border p-4">
+            <Typography.P className="font-medium">
+              {t("facebookImportTitle")}
+            </Typography.P>
+            <Typography.Small className="text-muted-foreground">
+              {t("facebookImportDescription")}
+            </Typography.Small>
+            <div className="flex flex-col gap-2 md:flex-row md:items-center">
+              <Input
+                placeholder={t("enterFbLink")}
+                value={fbImportUrl}
+                onChange={(e) => setFbImportUrl(e.target.value)}
+              />
+              <div className="flex gap-2 md:ml-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleConnectFacebook}
+                  disabled={isConnectingFacebook}
+                >
+                  {isConnectingFacebook
+                    ? t("connectingFacebook")
+                    : t("connectFacebook")}
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleImportFromFacebook}
+                  disabled={isImportingFromFacebook}
+                >
+                  {isImportingFromFacebook
+                    ? t("importingFromFacebook")
+                    : t("importFromFacebook")}
+                </Button>
+              </div>
+            </div>
+            {facebookError && (
+              <Typography.Small className="text-destructive">
+                {facebookError}
+              </Typography.Small>
+            )}
+          </div>
+        )}
 
         <Form {...form}>
           <form
@@ -895,7 +1023,7 @@ export function EventForm({ mode, event }: EventFormProps) {
                     <AspectRatio ratio={16 / 11}>
                       <Image
                         src={images[0].url}
-                        alt="Cover image"
+                        alt={t("coverImageAlt")}
                         fill
                         sizes="600px"
                         className="rounded-md object-cover"
@@ -904,7 +1032,7 @@ export function EventForm({ mode, event }: EventFormProps) {
 
                     <button
                       type="button"
-                      aria-label="Remove image"
+                      aria-label={t("removeImageAria")}
                       onClick={() => removeImage(0)}
                       className="absolute top-2 right-2 flex size-8 cursor-pointer items-center justify-center rounded-full bg-black/60 text-white hover:opacity-80"
                     >
@@ -929,7 +1057,7 @@ export function EventForm({ mode, event }: EventFormProps) {
                             <AspectRatio ratio={16 / 11}>
                               <Image
                                 src={item.url}
-                                alt="image"
+                                alt={t("eventImageAlt")}
                                 fill
                                 sizes="256px"
                                 className="rounded-md object-cover"
@@ -938,7 +1066,7 @@ export function EventForm({ mode, event }: EventFormProps) {
 
                             <button
                               type="button"
-                              aria-label="Remove image"
+                              aria-label={t("removeImageAria")}
                               onClick={() => removeImage(originalIndex)}
                               className="absolute top-2 right-2 flex size-8 cursor-pointer items-center justify-center rounded-full bg-black/60 text-white hover:opacity-80"
                             >
@@ -947,7 +1075,7 @@ export function EventForm({ mode, event }: EventFormProps) {
 
                             <button
                               type="button"
-                              aria-label="Make cover"
+                              aria-label={t("makeCoverAria")}
                               onClick={() => makeCover(originalIndex)}
                               className="absolute bottom-2 right-2 inline-flex h-6 items-center justify-center rounded-md bg-blue-600/80 px-2 text-[10px] text-white hover:bg-blue-600"
                             >
@@ -1083,7 +1211,7 @@ function OrganizersFieldArray({ disabled }: { disabled?: boolean }) {
               <FormLabel>{t("organizerLink")}</FormLabel>
               <FormControl>
                 <Input
-                  placeholder="https://all4ruse.com"
+                  placeholder={t("organizerLinkPlaceholder")}
                   disabled={disabled}
                   {...register(`organizers.${index}.link`)}
                 />
