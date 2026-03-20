@@ -535,7 +535,11 @@ export function EventForm({ mode, event }: EventFormProps) {
         }
 
         if (createdEvent?.slug) {
-          router.push(`/${locale}/${createdEvent.slug}`);
+          if (isConfirmed) {
+            router.push(`/${locale}/${createdEvent.slug}`);
+          } else {
+            router.push(`/${locale}/published-events`);
+          }
           return;
         }
       } else if (mode === "edit" && event) {
