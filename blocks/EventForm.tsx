@@ -203,12 +203,36 @@ export function EventForm({ mode, event }: EventFormProps) {
     const trimmed = fbImportUrl.trim();
     if (!trimmed) return;
 
-    setIsImportingFromFacebook(true);
+    // Normalize URL (add https:// if missing) so we can safely inspect hostname
+    let normalizedUrl = trimmed;
+    if (!/^https?:\/\//i.test(normalizedUrl)) {
+      normalizedUrl = `https://${normalizedUrl}`;
+    }
+
+    let endpoint = "/api/facebook-import";
     try {
-      const res = await fetch("/api/facebook-import", {
+      let parsed: URL;
+      try {
+        parsed = new URL(normalizedUrl);
+      } catch {
+        throw new Error(t("invalidUrl"));
+      }
+
+      const hostname = parsed.hostname.toLowerCase();
+      if (hostname.includes("facebook.com")) {
+        endpoint = "/api/facebook-import";
+      } else if (hostname.includes("grabo.bg")) {
+        endpoint = "/api/grabo-import";
+      } else {
+        throw new Error(t("eventNotFound"));
+      }
+
+      setIsImportingFromFacebook(true);
+
+      const res = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url: trimmed, locale }),
+        body: JSON.stringify({ url: normalizedUrl, locale }),
       });
 
       const body = await res.json().catch(() => null);
@@ -234,7 +258,7 @@ export function EventForm({ mode, event }: EventFormProps) {
       if (body.coverImageUrl) {
         setImages([
           {
-            id: "fb-cover",
+            id: "import-cover",
             url: body.coverImageUrl as string,
             isNew: false,
           },

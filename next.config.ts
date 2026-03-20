@@ -10,6 +10,12 @@ const nextConfig: NextConfig = {
         port: "",
         pathname: "/storage/v1/object/public/event-images/**",
       },
+      {
+        protocol: "https",
+        hostname: "imgrabo.com",
+        port: "",
+        pathname: "**",
+      },
     ],
     // Cache optimized images in Next.js image cache for 30 days
     minimumCacheTTL: 60 * 60 * 24 * 30,
