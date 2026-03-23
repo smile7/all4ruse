@@ -24,7 +24,7 @@ import type { EventTagsMap } from "@/hooks/useEventTagsMap";
 import { useTranslatedTitles } from "./useTranslatedTitles";
 import { ChevronLeftIcon, ChevronRightIcon, UserIcon } from "lucide-react";
 
-const AD_PREVIEW_TOKEN = "true";
+const AD_PREVIEW_TOKEN = "decathlon";
 const AD_DECATHLON_URL = "https://www.decathlon.bg";
 const AD_INSERT_AFTER = 5;
 
@@ -45,7 +45,7 @@ export function EventsGrid({
   const locale = useLocale();
   const { data: allTags = [] } = useTags();
   const searchParams = useSearchParams();
-  const showAd = searchParams.get("ad_preview") === AD_PREVIEW_TOKEN;
+  const showAd = searchParams.get("ad") === AD_PREVIEW_TOKEN;
   const translatedTitles: { [key: number]: string } = useTranslatedTitles(
     events,
     locale,
