@@ -63,7 +63,7 @@ export function useEventFilters() {
   }, [searchParams, allTags]);
 
   // Params that should always be passed through unchanged (e.g. ad preview token)
-  const PASSTHROUGH_PARAMS = ["ad_preview"] as const;
+  const PASSTHROUGH_PARAMS = ["ad"] as const;
 
   // Build query string from local state and push it into the URL
   useEffect(() => {
@@ -115,7 +115,7 @@ export function useEventFilters() {
     setPlace(undefined);
     setHost(undefined);
     lastAppliedQSRef.current = "";
-    // Preserve passthrough params (e.g. ad_preview) when clearing filters
+    // Preserve passthrough params (e.g. ad) when clearing filters
     const passthroughQS = buildStringQuery(
       {
         title: "",
