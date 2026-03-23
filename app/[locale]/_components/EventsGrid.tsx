@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 
 import { AspectRatio } from "@/components/AspectRatio";
@@ -23,6 +24,10 @@ import type { EventTagsMap } from "@/hooks/useEventTagsMap";
 import { useTranslatedTitles } from "./useTranslatedTitles";
 import { ChevronLeftIcon, ChevronRightIcon, UserIcon } from "lucide-react";
 
+const AD_PREVIEW_TOKEN = "true";
+const AD_DECATHLON_URL = "https://www.decathlon.bg";
+const AD_INSERT_AFTER = 5;
+
 export function EventsGrid({
   events,
   timeFilter,
@@ -39,6 +44,8 @@ export function EventsGrid({
   const t = useTranslations("HomePage");
   const locale = useLocale();
   const { data: allTags = [] } = useTags();
+  const searchParams = useSearchParams();
+  const showAd = searchParams.get("ad_preview") === AD_PREVIEW_TOKEN;
   const translatedTitles: { [key: number]: string } = useTranslatedTitles(
     events,
     locale,
@@ -64,6 +71,36 @@ export function EventsGrid({
   ] as const;
 
   const shouldGroupByMonth = timeFilter === "upcoming" && variant === "grid";
+
+  const renderAdCard = () => (
+    <a
+      key="sponsor-ad"
+      href={AD_DECATHLON_URL}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="group block"
+      aria-label="Спонсор: Decathlon"
+    >
+      <AspectRatio ratio={16 / 11}>
+        <div className="absolute inset-0 overflow-hidden rounded-xl">
+          <div className="absolute inset-0 transform-gpu will-change-transform transition-transform duration-500 ease-out group-hover:scale-[1.05]">
+            <Image
+              src="/sponsors/decathlon.png"
+              alt="Decathlon"
+              fill
+              sizes="28rem"
+              className="w-full object-cover"
+              draggable={false}
+            />
+          </div>
+          <div className="pointer-events-none absolute inset-0 z-10 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+          {/* <span className="absolute top-4 right-4 z-20 rounded-full bg-black/40 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white backdrop-blur-sm">
+            Спонсор
+          </span> */}
+        </div>
+      </AspectRatio>
+    </a>
+  );
 
   let monthLocale: string;
   if (locale === "bg") {
@@ -363,6 +400,22 @@ export function EventsGrid({
     );
   };
 
+  // Compute which group+position the ad falls in (for grouped-by-month view)
+  let adGroupIndex = -1;
+  let adIndexInGroup = -1;
+  if (showAd && shouldGroupByMonth) {
+    let count = 0;
+    for (let gi = 0; gi < monthGroups.length; gi++) {
+      const size = monthGroups[gi].events.length;
+      if (count + size >= AD_INSERT_AFTER) {
+        adGroupIndex = gi;
+        adIndexInGroup = AD_INSERT_AFTER - count;
+        break;
+      }
+      count += size;
+    }
+  }
+
   if (events.length === 0) {
     return (
       <div className="flex flex-col gap-8" aria-label="Събития">
@@ -456,13 +509,27 @@ export function EventsGrid({
             )}
 
             <div className="grid gap-6 [grid-template-columns:repeat(auto-fill,minmax(min(100%,18rem),1fr))]">
-              {group.events.map(renderEventCard)}
+              {groupIndex === adGroupIndex
+                ? [
+                    ...group.events
+                      .slice(0, adIndexInGroup)
+                      .map(renderEventCard),
+                    renderAdCard(),
+                    ...group.events.slice(adIndexInGroup).map(renderEventCard),
+                  ]
+                : group.events.map(renderEventCard)}
             </div>
           </div>
         ))
       ) : (
         <div className="grid gap-6 [grid-template-columns:repeat(auto-fill,minmax(min(100%,18rem),1fr))]">
-          {events.map(renderEventCard)}
+          {showAd && events.length >= AD_INSERT_AFTER
+            ? [
+                ...events.slice(0, AD_INSERT_AFTER).map(renderEventCard),
+                renderAdCard(),
+                ...events.slice(AD_INSERT_AFTER).map(renderEventCard),
+              ]
+            : events.map(renderEventCard)}
         </div>
       )}
     </div>

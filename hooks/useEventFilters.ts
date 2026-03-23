@@ -62,6 +62,9 @@ export function useEventFilters() {
     initializedFromUrlRef.current = true;
   }, [searchParams, allTags]);
 
+  // Params that should always be passed through unchanged (e.g. ad preview token)
+  const PASSTHROUGH_PARAMS = ["ad_preview"] as const;
+
   // Build query string from local state and push it into the URL
   useEffect(() => {
     // Avoid clobbering existing tag slugs before tags metadata is loaded
@@ -80,6 +83,8 @@ export function useEventFilters() {
         host: debouncedHost,
       },
       allTags,
+      searchParams as URLSearchParams,
+      PASSTHROUGH_PARAMS,
     );
 
     if (lastAppliedQSRef.current === nextQS) return;
@@ -110,8 +115,24 @@ export function useEventFilters() {
     setPlace(undefined);
     setHost(undefined);
     lastAppliedQSRef.current = "";
-    router.replace(pathname, { scroll: false });
-  }, [pathname, router]);
+    // Preserve passthrough params (e.g. ad_preview) when clearing filters
+    const passthroughQS = buildStringQuery(
+      {
+        title: "",
+        from: null,
+        to: null,
+        tagIds: [],
+        freeOnly: false,
+        place: "",
+        host: "",
+      },
+      [],
+      searchParams as URLSearchParams,
+      PASSTHROUGH_PARAMS,
+    );
+    const url = passthroughQS ? `${pathname}?${passthroughQS}` : pathname;
+    router.replace(url, { scroll: false });
+  }, [pathname, router, searchParams]);
 
   const hasFilters = Boolean(
     title.trim() ||
@@ -198,8 +219,17 @@ function parseFromSearch(searchParams: URLSearchParams, allTags: Tag[]) {
 function buildStringQuery(
   { title, from, to, tagIds, freeOnly, place, host }: Filters,
   allTags: Tag[],
+  currentParams?: URLSearchParams,
+  passthroughKeys: readonly string[] = [],
 ) {
   const params = new URLSearchParams();
+  // Carry over any passthrough params that exist in the current URL
+  if (currentParams) {
+    for (const key of passthroughKeys) {
+      const val = currentParams.get(key);
+      if (val !== null) params.set(key, val);
+    }
+  }
   if (title.trim()) params.set("title", title.trim());
   if (from) params.set("from", from);
   if (to) params.set("to", to);
