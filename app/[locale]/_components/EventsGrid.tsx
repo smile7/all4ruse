@@ -14,6 +14,7 @@ import { FALLBACK_IMAGE, TAG_LABELS_BG } from "@/constants";
 import { useTags } from "@/hooks/query";
 import type { Event, Tag } from "@/lib/api";
 import {
+  cn,
   formatShortDate,
   formatTimeTZ,
   normalizeSupabaseImageUrl,
@@ -70,7 +71,26 @@ export function EventsGrid({
     "bg-slate-100 text-slate-900 border-slate-300",
   ] as const;
 
-  const shouldGroupByMonth = timeFilter === "upcoming" && variant === "grid";
+  const sortedEvents = useMemo(() => {
+    return events
+      .map((event, index) => ({ event, index }))
+      .sort((left, right) => {
+        const premiumDelta =
+          Number(Boolean(right.event.isEventPremium)) -
+          Number(Boolean(left.event.isEventPremium));
+
+        if (premiumDelta !== 0) {
+          return premiumDelta;
+        }
+
+        return left.index - right.index;
+      })
+      .map(({ event }) => event);
+  }, [events]);
+
+  const hasPremiumEvents = sortedEvents.some((event) => event.isEventPremium);
+  const shouldGroupByMonth =
+    timeFilter === "upcoming" && variant === "grid" && !hasPremiumEvents;
 
   const renderAdCard = () => (
     <a
@@ -124,7 +144,7 @@ export function EventsGrid({
   }[] = [];
 
   if (shouldGroupByMonth) {
-    for (const event of events) {
+    for (const event of sortedEvents) {
       let monthKey = "unknown";
       let monthLabel = "";
 
@@ -150,6 +170,7 @@ export function EventsGrid({
   }
 
   const renderEventCard = (e: Event) => {
+    const isPremium = Boolean(e.isEventPremium);
     const shortDate = e.startDate
       ? formatShortDate(e.startDate, locale === "bg" ? "bg" : "en")
       : "";
@@ -210,11 +231,10 @@ export function EventsGrid({
 
     const cardInner = (
       <Card
-        className={`
-                flex flex-col h-full p-0 overflow-hidden border-border/60 transition-all duration-300 hover:shadow-lg
-                relative border-4 hover:border-secondary
-                ${timeFilter === "past" ? "opacity-60 grayscale" : ""}
-              `}
+        className={cn(
+          "relative flex h-full flex-col overflow-hidden border-4 p-0 transition-all duration-300 hover:shadow-lg border-border/60 hover:border-secondary",
+          timeFilter === "past" && "opacity-60 grayscale",
+        )}
       >
         {/* {timeFilter === "past" && (
           <div
@@ -316,8 +336,19 @@ export function EventsGrid({
               </div>
             )}
 
+            {isPremium && (
+              <div className="absolute right-3 top-3 z-20 rounded-md border-2 border-white bg-primary px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-white shadow-md backdrop-blur-sm">
+                {t("premiumEvent")}
+              </div>
+            )}
+
             {e.price === "0" && (
-              <div className="absolute right-3 top-3 z-20 border-white border-2 rounded-md bg-primary px-3 py-1.5 text-[11px] uppercase text-primary-foreground backdrop-blur-sm shadow-md">
+              <div
+                className={cn(
+                  "absolute right-3 z-20 rounded-md border-2 border-white bg-primary px-3 py-1.5 text-[11px] uppercase text-primary-foreground backdrop-blur-sm shadow-md",
+                  isPremium ? "top-14" : "top-3",
+                )}
+              >
                 {t("freeEvent")}
               </div>
             )}
@@ -416,7 +447,7 @@ export function EventsGrid({
     }
   }
 
-  if (events.length === 0) {
+  if (sortedEvents.length === 0) {
     return (
       <div className="flex flex-col gap-8" aria-label="Събития">
         <Typography.P>{t("noEvents")}</Typography.P>
@@ -466,7 +497,7 @@ export function EventsGrid({
           ref={scrollRef}
           className="flex gap-4 overflow-x-auto pb-2 snap-x snap-mandatory"
         >
-          {events.map((event) => (
+          {sortedEvents.map((event) => (
             <div key={event.id} className="snap-start shrink-0 w-72 max-w-full">
               {renderEventCard(event)}
             </div>
@@ -523,13 +554,13 @@ export function EventsGrid({
         ))
       ) : (
         <div className="grid gap-6 [grid-template-columns:repeat(auto-fill,minmax(min(100%,18rem),1fr))]">
-          {showAd && events.length >= AD_INSERT_AFTER
+          {showAd && sortedEvents.length >= AD_INSERT_AFTER
             ? [
-                ...events.slice(0, AD_INSERT_AFTER).map(renderEventCard),
+                ...sortedEvents.slice(0, AD_INSERT_AFTER).map(renderEventCard),
                 renderAdCard(),
-                ...events.slice(AD_INSERT_AFTER).map(renderEventCard),
+                ...sortedEvents.slice(AD_INSERT_AFTER).map(renderEventCard),
               ]
-            : events.map(renderEventCard)}
+            : sortedEvents.map(renderEventCard)}
         </div>
       )}
     </div>
