@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
@@ -88,9 +88,12 @@ export function EventsGrid({
       .map(({ event }) => event);
   }, [events]);
 
-  const hasPremiumEvents = sortedEvents.some((event) => event.isEventPremium);
-  const shouldGroupByMonth =
-    timeFilter === "upcoming" && variant === "grid" && !hasPremiumEvents;
+  const shouldGroupByMonth = timeFilter === "upcoming" && variant === "grid";
+  const currentMonthKey = `${new Date().getFullYear()}-${new Date().getMonth()}`;
+  const premiumEvents = sortedEvents.filter((event) => event.isEventPremium);
+  const nonPremiumEvents = sortedEvents.filter(
+    (event) => !event.isEventPremium,
+  );
 
   const renderAdCard = () => (
     <a
@@ -137,37 +140,26 @@ export function EventsGrid({
     month: "long",
   });
 
-  const monthGroups: {
-    monthKey: string;
-    monthLabel: string;
-    events: Event[];
-  }[] = [];
-
-  if (shouldGroupByMonth) {
-    for (const event of sortedEvents) {
-      let monthKey = "unknown";
-      let monthLabel = "";
-
-      if (event.startDate) {
-        const date = new Date(event.startDate);
-        if (!Number.isNaN(date.getTime())) {
-          monthKey = `${date.getFullYear()}-${date.getMonth()}`;
-          monthLabel = monthFormatter.format(date);
-          if (monthLabel) {
-            monthLabel =
-              monthLabel.charAt(0).toUpperCase() + monthLabel.slice(1);
-          }
-        }
-      }
-
-      let group = monthGroups.find((g) => g.monthKey === monthKey);
-      if (!group) {
-        group = { monthKey, monthLabel, events: [] };
-        monthGroups.push(group);
-      }
-      group.events.push(event);
+  const getMonthMeta = (event: Event) => {
+    if (!event.startDate) {
+      return { monthKey: "unknown", monthLabel: "" };
     }
-  }
+
+    const date = new Date(event.startDate);
+    if (Number.isNaN(date.getTime())) {
+      return { monthKey: "unknown", monthLabel: "" };
+    }
+
+    let monthLabel = monthFormatter.format(date);
+    if (monthLabel) {
+      monthLabel = monthLabel.charAt(0).toUpperCase() + monthLabel.slice(1);
+    }
+
+    return {
+      monthKey: `${date.getFullYear()}-${date.getMonth()}`,
+      monthLabel,
+    };
+  };
 
   const renderEventCard = (e: Event) => {
     const isPremium = Boolean(e.isEventPremium);
@@ -431,21 +423,60 @@ export function EventsGrid({
     );
   };
 
-  // Compute which group+position the ad falls in (for grouped-by-month view)
-  let adGroupIndex = -1;
-  let adIndexInGroup = -1;
-  if (showAd && shouldGroupByMonth) {
-    let count = 0;
-    for (let gi = 0; gi < monthGroups.length; gi++) {
-      const size = monthGroups[gi].events.length;
-      if (count + size >= AD_INSERT_AFTER) {
-        adGroupIndex = gi;
-        adIndexInGroup = AD_INSERT_AFTER - count;
-        break;
+  const groupedGridItems = useMemo(() => {
+    const items: ReactNode[] = [];
+    let renderedEvents = 0;
+    let lastFutureMonthKey: string | null = null;
+
+    const pushAdIfNeeded = () => {
+      if (showAd && renderedEvents === AD_INSERT_AFTER) {
+        items.push(renderAdCard());
       }
-      count += size;
+    };
+
+    const pushEvent = (event: Event) => {
+      items.push(renderEventCard(event));
+      renderedEvents += 1;
+      pushAdIfNeeded();
+    };
+
+    for (const event of premiumEvents) {
+      pushEvent(event);
     }
-  }
+
+    for (const event of nonPremiumEvents) {
+      const { monthKey, monthLabel } = getMonthMeta(event);
+      const shouldShowMonthSeparator =
+        monthKey !== "unknown" &&
+        monthKey !== currentMonthKey &&
+        monthKey !== lastFutureMonthKey;
+
+      if (shouldShowMonthSeparator) {
+        items.push(
+          <div key={`month-${monthKey}`} className="col-span-full pt-10">
+            <Typography.H2>{monthLabel}</Typography.H2>
+          </div>,
+        );
+        lastFutureMonthKey = monthKey;
+      }
+
+      pushEvent(event);
+    }
+
+    return items;
+  }, [
+    currentMonthKey,
+    nonPremiumEvents,
+    premiumEvents,
+    showAd,
+    translatedTitles,
+    locale,
+    isEditMode,
+    eventTags,
+    allTags,
+    timeFilter,
+    t,
+  ]);
 
   if (sortedEvents.length === 0) {
     return (
@@ -531,27 +562,9 @@ export function EventsGrid({
   return (
     <div className="flex flex-col gap-8" aria-label="Събития">
       {shouldGroupByMonth ? (
-        monthGroups.map((group, groupIndex) => (
-          <div key={group.monthKey} className="flex flex-col gap-4">
-            {groupIndex > 0 && group.monthLabel && (
-              <Typography.H2 className="pt-10">
-                {group.monthLabel}
-              </Typography.H2>
-            )}
-
-            <div className="grid gap-6 [grid-template-columns:repeat(auto-fill,minmax(min(100%,18rem),1fr))]">
-              {groupIndex === adGroupIndex
-                ? [
-                    ...group.events
-                      .slice(0, adIndexInGroup)
-                      .map(renderEventCard),
-                    renderAdCard(),
-                    ...group.events.slice(adIndexInGroup).map(renderEventCard),
-                  ]
-                : group.events.map(renderEventCard)}
-            </div>
-          </div>
-        ))
+        <div className="grid gap-6 [grid-template-columns:repeat(auto-fill,minmax(min(100%,18rem),1fr))]">
+          {groupedGridItems}
+        </div>
       ) : (
         <div className="grid gap-6 [grid-template-columns:repeat(auto-fill,minmax(min(100%,18rem),1fr))]">
           {showAd && sortedEvents.length >= AD_INSERT_AFTER
