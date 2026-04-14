@@ -1,20 +1,37 @@
 "use client";
 
-import { ArrowLeftIcon } from "lucide-react";
+import { ChevronLeftIcon } from "lucide-react";
+import { useLocale } from "next-intl";
 import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui";
 
 export default function BackButton() {
+  const locale = useLocale();
   const router = useRouter();
+
+  function handleClick() {
+    const referrer = document.referrer;
+    const isInternalReferrer =
+      referrer && new URL(referrer).origin === window.location.origin;
+
+    if (isInternalReferrer) {
+      router.back();
+      return;
+    }
+
+    router.push(`/${locale}`);
+  }
+
   return (
     <Button
-      onClick={() => router.back()}
-      className="my-2 flex items-center gap-2 hover:underline focus-visible:underline focus-visible:outline-hidden"
+      onClick={handleClick}
+      className="my-2 rounded-full"
       aria-label="Go back"
-      variant="ghost"
+      variant="outline"
+      size="icon"
     >
-      <ArrowLeftIcon className="size-4" />
+      <ChevronLeftIcon className="size-4" />
     </Button>
   );
 }
