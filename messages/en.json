@@ -59,6 +59,7 @@
     "duplicate": "Duplicate",
     "today": "Today",
     "tomorrow": "Tomorrow",
+    "goHomePage": "Back to home page",
     "createNewEvent": "Create New Event",
     "duplicateExistingEvent": "Duplicate Existing Event"
   },
