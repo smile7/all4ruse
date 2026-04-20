@@ -241,7 +241,9 @@ type BandItem = {
 };
 
 type PremiumPageContent = {
+  topBarCaption: string;
   heroTitle: string;
+  heroTicketButtonLabel: string;
   storyEyebrow: string;
   storyTitle: string;
   story: string[];
@@ -263,7 +265,9 @@ type PremiumPageContent = {
 };
 
 const PREMIUM_PAGE_CONTENT: PremiumPageContent = {
+  topBarCaption: "Всички културни събития в Русе на едно място!",
   heroTitle: VINOFRENIA_TITLE,
+  heroTicketButtonLabel: "Купи билети",
   storyEyebrow: "За фестивала",
   storyTitle: "Едно нестандартно преживяване",
   story: [...VINOFRENIA_STORY],
@@ -372,30 +376,36 @@ export function PremiumEventPage({
         <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top,_rgba(180,83,9,0.18),_transparent_34%),radial-gradient(circle_at_20%_15%,_rgba(127,29,29,0.14),_transparent_28%),radial-gradient(circle_at_bottom_right,_rgba(21,128,61,0.12),_transparent_26%)]" />
         <div className="mx-auto flex min-h-svh w-full max-w-7xl flex-col px-4 pb-24 sm:px-6 lg:px-8">
           <div className="fixed inset-x-0 top-4 z-40 px-4 sm:top-6 sm:px-6 lg:top-8 lg:px-8">
-            <div className="mx-auto grid w-full max-w-[21.5rem] grid-cols-[auto_1fr_auto] items-center gap-2 rounded-[1.35rem] border border-white/14 bg-black/30 px-2.5 py-2.5 shadow-[0_24px_70px_-44px_rgba(0,0,0,0.85)] backdrop-blur-md sm:max-w-[25rem] sm:gap-3 sm:px-3 sm:py-3">
-              <div className="justify-self-start [&_button]:my-0 [&_button]:border-white/18 [&_button]:bg-black/24 [&_button]:text-white [&_button]:shadow-none [&_button]:backdrop-blur-md [&_button]:hover:bg-white/12 [&_button]:hover:text-white">
-                <BackButton />
-              </div>
-
-              <Link
-                href={`/${locale}`}
-                aria-label={labels.goHome}
-                className="group justify-self-center"
-              >
-                <div className="relative h-8 w-28 transition-transform duration-300 group-hover:scale-[1.02] sm:h-10 sm:w-36">
-                  <Image
-                    src="/all4ruse_white.png"
-                    alt="All4Ruse logo"
-                    fill
-                    priority
-                    className="object-contain"
-                  />
+            <div className="mx-auto w-full max-w-[26rem] rounded-[1.35rem] border border-white/14 bg-black/30 px-2.5 py-2.5 shadow-[0_24px_70px_-44px_rgba(0,0,0,0.85)] backdrop-blur-md sm:max-w-[32rem] sm:px-3 sm:py-3">
+              <div className="grid grid-cols-[auto_1fr_auto] items-center gap-2 sm:gap-3">
+                <div className="justify-self-start [&_button]:my-0 [&_button]:border-white/18 [&_button]:bg-black/24 [&_button]:text-white [&_button]:shadow-none [&_button]:backdrop-blur-md [&_button]:hover:bg-white/12 [&_button]:hover:text-white">
+                  <BackButton />
                 </div>
-              </Link>
 
-              <div className="justify-self-end [&_button]:my-0 [&_button]:size-9 [&_button]:rounded-full [&_button]:border [&_button]:border-white/18 [&_button]:bg-black/24 [&_button]:text-white [&_button]:shadow-none [&_button]:backdrop-blur-md [&_button]:hover:bg-white/12 [&_button]:hover:text-white">
-                <ThemeToggle />
+                <Link
+                  href={`/${locale}`}
+                  aria-label={labels.goHome}
+                  className="group justify-self-center"
+                >
+                  <div className="relative h-8 w-28 transition-transform duration-300 group-hover:scale-[1.02] sm:h-10 sm:w-36">
+                    <Image
+                      src="/all4ruse_white.png"
+                      alt="All4Ruse logo"
+                      fill
+                      priority
+                      className="object-contain"
+                    />
+                  </div>
+                </Link>
+
+                <div className="justify-self-end [&_button]:my-0 [&_button]:size-9 [&_button]:rounded-full [&_button]:border [&_button]:border-white/18 [&_button]:bg-black/24 [&_button]:text-white [&_button]:shadow-none [&_button]:backdrop-blur-md [&_button]:hover:bg-white/12 [&_button]:hover:text-white">
+                  <ThemeToggle />
+                </div>
               </div>
+
+              <p className="mt-2 px-2 text-center text-[11px] leading-4 text-white/76 sm:text-xs sm:leading-5">
+                {content.topBarCaption}
+              </p>
             </div>
           </div>
 
@@ -425,9 +435,15 @@ export function PremiumEventPage({
                     <Typography.H1 className="w-fit max-w-full text-balance text-center text-5xl leading-[0.92] text-white sm:text-6xl xl:text-7xl">
                       {content.heroTitle}
                     </Typography.H1>
-                    <Typography.P className="mt-5 w-fit max-w-full text-center text-base leading-7 text-white/82 sm:text-lg sm:leading-8">
-                      {content.closing}
-                    </Typography.P>
+                    <Button
+                      asChild
+                      size="lg"
+                      className="mt-6 rounded-full bg-white px-7 text-base font-semibold text-black shadow-[0_20px_50px_-28px_rgba(255,255,255,0.9)] transition hover:bg-white/90"
+                    >
+                      <a href="#festival-tickets">
+                        {content.heroTicketButtonLabel}
+                      </a>
+                    </Button>
                   </div>
                 </div>
 
@@ -644,7 +660,10 @@ export function PremiumEventPage({
               </div>
             </section>
 
-            <section className="rounded-[2rem] border border-border/60 bg-card/85 p-6 shadow-[0_24px_70px_-42px_rgba(0,0,0,0.65)] backdrop-blur sm:p-8">
+            <section
+              id="festival-tickets"
+              className="scroll-mt-32 rounded-[2rem] border border-border/60 bg-card/85 p-6 shadow-[0_24px_70px_-42px_rgba(0,0,0,0.65)] backdrop-blur sm:p-8"
+            >
               <div className="flex items-center justify-center gap-2 text-[11px] font-semibold uppercase tracking-[0.24em] text-muted-foreground">
                 <span>{content.ticketsEyebrow}</span>
               </div>
