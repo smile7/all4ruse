@@ -199,6 +199,14 @@ export const useMinimalTiptapEditor = ({
   // uploader,
   ...props
 }: UseMinimalTiptapEditorProps) => {
+  const serializeContent = React.useCallback(
+    (content: Content | object | string | undefined) => {
+      if (content == null) return "";
+      return typeof content === "string" ? content : JSON.stringify(content);
+    },
+    [],
+  );
+
   const throttledSetValue = useThrottle(
     (value: Content) => onUpdate?.(value),
     throttleDelay,
@@ -265,6 +273,26 @@ export const useMinimalTiptapEditor = ({
   React.useEffect(() => {
     editorRef.current = editor;
   }, [editor]);
+
+  React.useEffect(() => {
+    if (!editor || value === undefined) return;
+
+    const currentValue = serializeContent(getOutput(editor, output));
+    const nextValue = serializeContent(value);
+
+    if (currentValue === nextValue) {
+      return;
+    }
+
+    if (nextValue === "") {
+      if (!editor.isEmpty) {
+        editor.commands.clearContent(false);
+      }
+      return;
+    }
+
+    editor.commands.setContent(value, { emitUpdate: false });
+  }, [editor, output, serializeContent, value]);
 
   return editor;
 };

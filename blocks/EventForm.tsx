@@ -31,6 +31,7 @@ import {
   Popover,
   PopoverContent,
   PopoverTrigger,
+  Textarea,
   WarningAlert,
 } from "@/components/ui";
 import { MinimalTiptapEditor } from "@/components/ui/minimal-tiptap";
@@ -44,6 +45,7 @@ import {
 import type { Event, EventUpdate, Host, Tag } from "@/lib/api";
 import { createEventSchema, type CreateEventSchemaType } from "@/lib/schema";
 import { createClient } from "@/lib/supabase/client";
+import type { GraboImportResult } from "@/lib/grabo";
 import { slugify } from "@/lib/utils";
 
 type EventFormProps = {
@@ -59,6 +61,223 @@ type EventImageItem = {
 };
 
 const MAX_IMAGES = 10;
+const JSON_IMPORT_TIME_ZONE = "Europe/Sofia";
+const IMPORT_PILOT_USER_IDS = new Set([
+  "288aec4c-e378-45cd-b73b-f52d22998b5b",
+  "98b3619c-b0f2-4b15-91e9-0045cf0eac51",
+]);
+
+type FacebookJsonImportLocation = {
+  name?: string | null;
+  streetAddress?: string | null;
+};
+
+type FacebookJsonImportTicketsInfo = {
+  buyUrl?: string | null;
+  price?: string | number | null;
+};
+
+type FacebookJsonImportOrganizer = {
+  name?: string | null;
+  url?: string | null;
+};
+
+type FacebookJsonImportItem = {
+  inputUrl?: string | null;
+  url?: string | null;
+  name?: string | null;
+  imageUrl?: string | null;
+  utcStartDate?: string | null;
+  utcEndDate?: string | null;
+  description?: string | null;
+  location?: FacebookJsonImportLocation | null;
+  ticketsInfo?: FacebookJsonImportTicketsInfo | null;
+  organizedBy?: string | null;
+  organizators?: FacebookJsonImportOrganizer[] | null;
+};
+
+type FacebookJsonImportResult = GraboImportResult & {
+  fbLink: string;
+};
+
+function normalizeTagToken(value: string): string {
+  return value.trim().toUpperCase().replace(/\s+/g, "");
+}
+
+function toTrimmedString(value: unknown): string {
+  return typeof value === "string" ? value.trim() : "";
+}
+
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/\"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+function convertPlainTextToHtml(value: string): string {
+  const normalized = value.replace(/\r\n?/g, "\n").trim();
+  if (!normalized) return "";
+
+  return normalized
+    .split(/\n{2,}/)
+    .map(
+      (paragraph) => `<p>${escapeHtml(paragraph).replace(/\n/g, "<br />")}</p>`,
+    )
+    .join("");
+}
+
+function unwrapJsonPayload(raw: string): string {
+  const trimmed = raw.trim();
+  const match = trimmed.match(/^```(?:json)?\s*([\s\S]*?)\s*```$/i);
+  return match?.[1]?.trim() ?? trimmed;
+}
+
+function selectFirstFacebookJsonImportItem(
+  value: unknown,
+): FacebookJsonImportItem | null {
+  if (Array.isArray(value)) {
+    const firstObject = value.find(
+      (item): item is Record<string, unknown> =>
+        typeof item === "object" && item !== null,
+    );
+
+    return firstObject ? (firstObject as FacebookJsonImportItem) : null;
+  }
+
+  return typeof value === "object" && value !== null
+    ? (value as FacebookJsonImportItem)
+    : null;
+}
+
+function formatIsoInTimeZone(
+  value: string,
+  timeZone: string,
+): { date: string; time: string } {
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) {
+    return { date: "", time: "" };
+  }
+
+  return {
+    date: new Intl.DateTimeFormat("sv-SE", {
+      timeZone,
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    }).format(parsed),
+    time: new Intl.DateTimeFormat("sv-SE", {
+      timeZone,
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    }).format(parsed),
+  };
+}
+
+function normalizeOrganizedBy(value: string): string {
+  return value
+    .replace(/^Event by\s+/i, "")
+    .replace(/^Hosted by\s+/i, "")
+    .replace(/^Събитие от\s+/i, "")
+    .replace(/^Hosted\s+by\s+/i, "")
+    .trim();
+}
+
+function inferFacebookJsonTagSuggestions(
+  item: FacebookJsonImportItem,
+): string[] {
+  const haystack = [
+    toTrimmedString(item.name),
+    toTrimmedString(item.description),
+    toTrimmedString(item.location?.name),
+  ]
+    .join(" ")
+    .toLowerCase();
+
+  const suggestions = new Set<string>();
+
+  if (haystack.includes("концерт")) {
+    suggestions.add("CONCERT");
+  }
+
+  if (
+    haystack.includes("муз") ||
+    haystack.includes("песен") ||
+    haystack.includes("трио") ||
+    haystack.includes("пиано") ||
+    haystack.includes("джаз") ||
+    haystack.includes("пиаф")
+  ) {
+    suggestions.add("MUSIC");
+  }
+
+  if (haystack.includes("теат") || haystack.includes("спектак")) {
+    suggestions.add("THEATRE");
+  }
+
+  if (haystack.includes("комед")) {
+    suggestions.add("COMEDY");
+  }
+
+  if (haystack.includes("летен театър") || haystack.includes("на открито")) {
+    suggestions.add("OUTDOOR");
+  }
+
+  return Array.from(suggestions);
+}
+
+function parseFacebookJsonImport(raw: string): FacebookJsonImportResult {
+  const parsed = JSON.parse(unwrapJsonPayload(raw)) as unknown;
+  const item = selectFirstFacebookJsonImportItem(parsed);
+
+  if (!item) {
+    throw new Error("Missing event object in JSON payload.");
+  }
+
+  const start = item.utcStartDate
+    ? formatIsoInTimeZone(item.utcStartDate, JSON_IMPORT_TIME_ZONE)
+    : { date: "", time: "" };
+  const end = item.utcEndDate
+    ? formatIsoInTimeZone(item.utcEndDate, JSON_IMPORT_TIME_ZONE)
+    : { date: start.date, time: "" };
+
+  const firstOrganizer = item.organizators?.find((organizer) =>
+    Boolean(toTrimmedString(organizer?.name)),
+  );
+  const organizerName =
+    toTrimmedString(firstOrganizer?.name) ||
+    normalizeOrganizedBy(toTrimmedString(item.organizedBy));
+  const organizerLink = toTrimmedString(firstOrganizer?.url);
+  const coverImageUrl = toTrimmedString(item.imageUrl);
+  const priceValue = item.ticketsInfo?.price;
+  const price =
+    typeof priceValue === "number"
+      ? priceValue.toString()
+      : toTrimmedString(priceValue);
+
+  return {
+    title: toTrimmedString(item.name),
+    description: convertPlainTextToHtml(toTrimmedString(item.description)),
+    startDate: start.date,
+    endDate: end.date || start.date,
+    startTime: start.time,
+    endTime: end.time,
+    address: toTrimmedString(item.location?.streetAddress),
+    place: toTrimmedString(item.location?.name),
+    town: "",
+    organizers: organizerName
+      ? [{ name: organizerName, link: organizerLink }]
+      : [],
+    ticketsLink: toTrimmedString(item.ticketsInfo?.buyUrl),
+    fbLink: toTrimmedString(item.url) || toTrimmedString(item.inputUrl),
+    price,
+    coverImageUrl: coverImageUrl || null,
+    tagSuggestions: inferFacebookJsonTagSuggestions(item),
+  };
+}
 
 export function EventForm({ mode, event }: EventFormProps) {
   const t = useTranslations("CreateEvent");
@@ -73,9 +292,16 @@ export function EventForm({ mode, event }: EventFormProps) {
   const [uploadError, setUploadError] = useState<string | null>(null);
 
   const [fbImportUrl, setFbImportUrl] = useState("");
+  const [graboImportUrl, setGraboImportUrl] = useState("");
+  const [facebookJsonImportPayload, setFacebookJsonImportPayload] =
+    useState("");
   const [isConnectingFacebook, setIsConnectingFacebook] = useState(false);
   const [isImportingFromFacebook, setIsImportingFromFacebook] = useState(false);
+  const [isImportingFromGrabo, setIsImportingFromGrabo] = useState(false);
+  const [isImportingFromJson, setIsImportingFromJson] = useState(false);
   const [facebookError, setFacebookError] = useState<string | null>(null);
+  const [graboError, setGraboError] = useState<string | null>(null);
+  const [jsonImportError, setJsonImportError] = useState<string | null>(null);
 
   const [images, setImages] = useState<EventImageItem[]>(() => {
     if (!event) return [];
@@ -170,9 +396,30 @@ export function EventForm({ mode, event }: EventFormProps) {
     defaultValues,
   });
 
-  const isFacebookPilotUser =
-    userId === "288aec4c-e378-45cd-b73b-f52d22998b5b" ||
-    userId === "98b3619c-b0f2-4b15-91e9-0045cf0eac51";
+  const isImportPilotUser = userId ? IMPORT_PILOT_USER_IDS.has(userId) : false;
+
+  const resolveImportedTagIds = useCallback(
+    (suggestions: string[] | undefined) => {
+      if (!suggestions?.length) return [];
+
+      const normalizedSuggestions = new Set(
+        suggestions.map((suggestion) => normalizeTagToken(suggestion)),
+      );
+
+      return allTags
+        .filter((tag) => {
+          const rawTitle = normalizeTagToken(tag.title ?? "");
+          const bgLabel = normalizeTagToken(TAG_LABELS_BG[rawTitle] ?? "");
+
+          return (
+            normalizedSuggestions.has(rawTitle) ||
+            (bgLabel !== "" && normalizedSuggestions.has(bgLabel))
+          );
+        })
+        .map((tag) => tag.id);
+    },
+    [allTags],
+  );
 
   const handleConnectFacebook = useCallback(async () => {
     setFacebookError(null);
@@ -249,6 +496,130 @@ export function EventForm({ mode, event }: EventFormProps) {
       setIsImportingFromFacebook(false);
     }
   }, [fbImportUrl, form, locale, setImages, t]);
+
+  const handleImportFromGrabo = useCallback(async () => {
+    setGraboError(null);
+    const trimmed = graboImportUrl.trim();
+    if (!trimmed) return;
+
+    setIsImportingFromGrabo(true);
+    try {
+      const res = await fetch("/api/grabo-import", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url: trimmed }),
+      });
+
+      const body = (await res.json().catch(() => null)) as
+        | (GraboImportResult & { error?: never })
+        | { error?: string }
+        | null;
+
+      if (!res.ok || !body || ("error" in body && body.error)) {
+        throw new Error(body?.error || t("error"));
+      }
+
+      const importedEvent = body as GraboImportResult;
+      const currentValues = form.getValues();
+      const importedTagIds = resolveImportedTagIds(
+        importedEvent.tagSuggestions,
+      );
+
+      form.reset({
+        ...currentValues,
+        title: importedEvent.title || currentValues.title,
+        description: importedEvent.description || currentValues.description,
+        startDate: importedEvent.startDate || currentValues.startDate,
+        endDate: importedEvent.endDate || currentValues.endDate,
+        startTime: importedEvent.startTime || currentValues.startTime,
+        endTime: importedEvent.endTime || currentValues.endTime,
+        address: importedEvent.address || currentValues.address,
+        place: importedEvent.place || currentValues.place,
+        town: importedEvent.town || currentValues.town,
+        organizers:
+          importedEvent.organizers.length > 0
+            ? importedEvent.organizers
+            : currentValues.organizers,
+        ticketsLink: importedEvent.ticketsLink || currentValues.ticketsLink,
+        price: importedEvent.price || currentValues.price,
+        tags: importedTagIds.length > 0 ? importedTagIds : currentValues.tags,
+      });
+
+      if (importedEvent.coverImageUrl) {
+        setImages([
+          {
+            id: "grabo-cover",
+            url: importedEvent.coverImageUrl,
+            isNew: false,
+          },
+        ]);
+      }
+    } catch (err) {
+      console.error(err);
+      const message =
+        err instanceof Error && err.message ? err.message : t("error");
+      setGraboError(message);
+    } finally {
+      setIsImportingFromGrabo(false);
+    }
+  }, [form, graboImportUrl, resolveImportedTagIds, t]);
+
+  const handleImportFromFacebookJson = useCallback(async () => {
+    setJsonImportError(null);
+    const trimmed = facebookJsonImportPayload.trim();
+    if (!trimmed) return;
+
+    setIsImportingFromJson(true);
+    try {
+      const importedEvent = parseFacebookJsonImport(trimmed);
+      const currentValues = form.getValues();
+      const importedTagIds = resolveImportedTagIds(
+        importedEvent.tagSuggestions,
+      );
+
+      form.reset({
+        ...currentValues,
+        title: importedEvent.title || currentValues.title,
+        description: importedEvent.description || currentValues.description,
+        startDate: importedEvent.startDate || currentValues.startDate,
+        endDate:
+          importedEvent.endDate ||
+          importedEvent.startDate ||
+          currentValues.endDate,
+        startTime: importedEvent.startTime || currentValues.startTime,
+        endTime: importedEvent.endTime || currentValues.endTime,
+        address: importedEvent.address || currentValues.address,
+        place: importedEvent.place || currentValues.place,
+        organizers:
+          importedEvent.organizers.length > 0
+            ? importedEvent.organizers
+            : currentValues.organizers,
+        ticketsLink: importedEvent.ticketsLink || currentValues.ticketsLink,
+        fbLink: importedEvent.fbLink || currentValues.fbLink,
+        price: importedEvent.price || currentValues.price,
+        tags: importedTagIds.length > 0 ? importedTagIds : currentValues.tags,
+      });
+
+      if (importedEvent.coverImageUrl) {
+        setImages([
+          {
+            id: "facebook-json-cover",
+            url: importedEvent.coverImageUrl,
+            isNew: false,
+          },
+        ]);
+      }
+    } catch (err) {
+      console.error(err);
+      const message =
+        err instanceof Error && err.message
+          ? err.message
+          : t("invalidJsonImport");
+      setJsonImportError(message);
+    } finally {
+      setIsImportingFromJson(false);
+    }
+  }, [facebookJsonImportPayload, form, resolveImportedTagIds, t]);
 
   const syncFormImagesFromState = useCallback(() => {
     const newFiles = images
@@ -609,7 +980,7 @@ export function EventForm({ mode, event }: EventFormProps) {
         {uploadError && <ErrorAlert error={uploadError} />}
         {error && <ErrorAlert error={error.message} />}
 
-        {isFacebookPilotUser && (
+        {isImportPilotUser && (
           <div className="space-y-2 rounded-md border p-4">
             <Typography.P className="font-medium">
               {t("facebookImportTitle")}
@@ -651,6 +1022,71 @@ export function EventForm({ mode, event }: EventFormProps) {
                 {facebookError}
               </Typography.Small>
             )}
+
+            <div className="border-t pt-4">
+              <Typography.P className="font-medium">
+                {t("graboImportTitle")}
+              </Typography.P>
+              <Typography.Small className="text-muted-foreground">
+                {t("graboImportDescription")}
+              </Typography.Small>
+              <div className="mt-2 flex flex-col gap-2 md:flex-row md:items-center">
+                <Input
+                  placeholder={t("enterGraboLink")}
+                  value={graboImportUrl}
+                  onChange={(e) => setGraboImportUrl(e.target.value)}
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleImportFromGrabo}
+                  disabled={isImportingFromGrabo || !graboImportUrl.trim()}
+                >
+                  {isImportingFromGrabo
+                    ? t("importingFromGrabo")
+                    : t("importFromGrabo")}
+                </Button>
+              </div>
+              {graboError && (
+                <Typography.Small className="text-destructive">
+                  {graboError}
+                </Typography.Small>
+              )}
+            </div>
+
+            <div className="border-t pt-4">
+              <Typography.P className="font-medium">
+                {t("jsonImportTitle")}
+              </Typography.P>
+              <Typography.Small className="text-muted-foreground">
+                {t("jsonImportDescription")}
+              </Typography.Small>
+              <div className="mt-2 space-y-2">
+                <Textarea
+                  placeholder={t("enterJsonImportPayload")}
+                  value={facebookJsonImportPayload}
+                  onChange={(e) => setFacebookJsonImportPayload(e.target.value)}
+                  rows={10}
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleImportFromFacebookJson}
+                  disabled={
+                    isImportingFromJson || !facebookJsonImportPayload.trim()
+                  }
+                >
+                  {isImportingFromJson
+                    ? t("importingFromJson")
+                    : t("importFromJson")}
+                </Button>
+              </div>
+              {jsonImportError && (
+                <Typography.Small className="text-destructive">
+                  {jsonImportError}
+                </Typography.Small>
+              )}
+            </div>
           </div>
         )}
 

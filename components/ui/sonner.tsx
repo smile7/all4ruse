@@ -21,7 +21,7 @@ function Toaster({ ...props }: ToasterProps) {
           toast: cn(
             "group toast",
             "bg-background text-foreground border rounded-lg shadow-lg overflow-hidden",
-            "flex items-start gap-2 p-4 w-full"
+            "flex items-start gap-2 p-4 w-full",
           ),
           content: "leading-tight text-base pr-4 w-full",
           icon: "h-4 w-auto mx-0 *:mx-0",

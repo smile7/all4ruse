@@ -6,6 +6,18 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: "https",
+        hostname: "**.fbcdn.net",
+        port: "",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "imgrabo.com",
+        port: "",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
         hostname: "lohdrrezrtmcupuogytt.supabase.co",
         port: "",
         pathname: "/storage/v1/object/public/event-images/**",
