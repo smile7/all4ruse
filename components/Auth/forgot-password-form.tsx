@@ -35,9 +35,10 @@ export function ForgotPasswordForm({
     setError(null);
 
     try {
+      const siteUrl =
+        process.env.NEXT_PUBLIC_SITE_URL ?? window.location.origin;
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo:
-          "http://all4ruse.com/auth/confirm?next=/auth/update-password",
+        redirectTo: `${siteUrl}/auth/confirm?next=/auth/update-password`,
       });
       if (error) throw error;
       setSuccess(true);

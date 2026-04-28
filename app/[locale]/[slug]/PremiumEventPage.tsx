@@ -691,7 +691,7 @@ export function PremiumEventPage({
                           key={ticket.label}
                           href={ticketsUrl ?? eventUrl}
                           target="_blank"
-                          rel="noreferrer"
+                          rel="noopener"
                           className="group flex items-center justify-between gap-3 rounded-2xl border border-white/10 bg-background/70 px-4 py-3 transition hover:border-primary/35 hover:bg-primary/5"
                         >
                           <span className="text-sm font-medium text-foreground/80">
