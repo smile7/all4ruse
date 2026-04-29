@@ -43,6 +43,7 @@ import {
   useUpdateEvent,
 } from "@/hooks/query";
 import type { Event, EventUpdate, Host, Tag } from "@/lib/api";
+import { parseFacebookJsonImportPayload } from "@/lib/facebook-import";
 import { createEventSchema, type CreateEventSchemaType } from "@/lib/schema";
 import { createClient } from "@/lib/supabase/client";
 import type { GraboImportResult } from "@/lib/grabo";
@@ -61,222 +62,13 @@ type EventImageItem = {
 };
 
 const MAX_IMAGES = 10;
-const JSON_IMPORT_TIME_ZONE = "Europe/Sofia";
 const IMPORT_PILOT_USER_IDS = new Set([
   "288aec4c-e378-45cd-b73b-f52d22998b5b",
   "98b3619c-b0f2-4b15-91e9-0045cf0eac51",
 ]);
 
-type FacebookJsonImportLocation = {
-  name?: string | null;
-  streetAddress?: string | null;
-};
-
-type FacebookJsonImportTicketsInfo = {
-  buyUrl?: string | null;
-  price?: string | number | null;
-};
-
-type FacebookJsonImportOrganizer = {
-  name?: string | null;
-  url?: string | null;
-};
-
-type FacebookJsonImportItem = {
-  inputUrl?: string | null;
-  url?: string | null;
-  name?: string | null;
-  imageUrl?: string | null;
-  utcStartDate?: string | null;
-  utcEndDate?: string | null;
-  description?: string | null;
-  location?: FacebookJsonImportLocation | null;
-  ticketsInfo?: FacebookJsonImportTicketsInfo | null;
-  organizedBy?: string | null;
-  organizators?: FacebookJsonImportOrganizer[] | null;
-};
-
-type FacebookJsonImportResult = GraboImportResult & {
-  fbLink: string;
-};
-
 function normalizeTagToken(value: string): string {
   return value.trim().toUpperCase().replace(/\s+/g, "");
-}
-
-function toTrimmedString(value: unknown): string {
-  return typeof value === "string" ? value.trim() : "";
-}
-
-function escapeHtml(value: string): string {
-  return value
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/\"/g, "&quot;")
-    .replace(/'/g, "&#39;");
-}
-
-function convertPlainTextToHtml(value: string): string {
-  const normalized = value.replace(/\r\n?/g, "\n").trim();
-  if (!normalized) return "";
-
-  return normalized
-    .split(/\n{2,}/)
-    .map(
-      (paragraph) => `<p>${escapeHtml(paragraph).replace(/\n/g, "<br />")}</p>`,
-    )
-    .join("");
-}
-
-function unwrapJsonPayload(raw: string): string {
-  const trimmed = raw.trim();
-  const match = trimmed.match(/^```(?:json)?\s*([\s\S]*?)\s*```$/i);
-  return match?.[1]?.trim() ?? trimmed;
-}
-
-function selectFirstFacebookJsonImportItem(
-  value: unknown,
-): FacebookJsonImportItem | null {
-  if (Array.isArray(value)) {
-    const firstObject = value.find(
-      (item): item is Record<string, unknown> =>
-        typeof item === "object" && item !== null,
-    );
-
-    return firstObject ? (firstObject as FacebookJsonImportItem) : null;
-  }
-
-  return typeof value === "object" && value !== null
-    ? (value as FacebookJsonImportItem)
-    : null;
-}
-
-function formatIsoInTimeZone(
-  value: string,
-  timeZone: string,
-): { date: string; time: string } {
-  const parsed = new Date(value);
-  if (Number.isNaN(parsed.getTime())) {
-    return { date: "", time: "" };
-  }
-
-  return {
-    date: new Intl.DateTimeFormat("sv-SE", {
-      timeZone,
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-    }).format(parsed),
-    time: new Intl.DateTimeFormat("sv-SE", {
-      timeZone,
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: false,
-    }).format(parsed),
-  };
-}
-
-function normalizeOrganizedBy(value: string): string {
-  return value
-    .replace(/^Event by\s+/i, "")
-    .replace(/^Hosted by\s+/i, "")
-    .replace(/^Събитие от\s+/i, "")
-    .replace(/^Hosted\s+by\s+/i, "")
-    .trim();
-}
-
-function inferFacebookJsonTagSuggestions(
-  item: FacebookJsonImportItem,
-): string[] {
-  const haystack = [
-    toTrimmedString(item.name),
-    toTrimmedString(item.description),
-    toTrimmedString(item.location?.name),
-  ]
-    .join(" ")
-    .toLowerCase();
-
-  const suggestions = new Set<string>();
-
-  if (haystack.includes("концерт")) {
-    suggestions.add("CONCERT");
-  }
-
-  if (
-    haystack.includes("муз") ||
-    haystack.includes("песен") ||
-    haystack.includes("трио") ||
-    haystack.includes("пиано") ||
-    haystack.includes("джаз") ||
-    haystack.includes("пиаф")
-  ) {
-    suggestions.add("MUSIC");
-  }
-
-  if (haystack.includes("теат") || haystack.includes("спектак")) {
-    suggestions.add("THEATRE");
-  }
-
-  if (haystack.includes("комед")) {
-    suggestions.add("COMEDY");
-  }
-
-  if (haystack.includes("летен театър") || haystack.includes("на открито")) {
-    suggestions.add("OUTDOOR");
-  }
-
-  return Array.from(suggestions);
-}
-
-function parseFacebookJsonImport(raw: string): FacebookJsonImportResult {
-  const parsed = JSON.parse(unwrapJsonPayload(raw)) as unknown;
-  const item = selectFirstFacebookJsonImportItem(parsed);
-
-  if (!item) {
-    throw new Error("Missing event object in JSON payload.");
-  }
-
-  const start = item.utcStartDate
-    ? formatIsoInTimeZone(item.utcStartDate, JSON_IMPORT_TIME_ZONE)
-    : { date: "", time: "" };
-  const end = item.utcEndDate
-    ? formatIsoInTimeZone(item.utcEndDate, JSON_IMPORT_TIME_ZONE)
-    : { date: start.date, time: "" };
-
-  const firstOrganizer = item.organizators?.find((organizer) =>
-    Boolean(toTrimmedString(organizer?.name)),
-  );
-  const organizerName =
-    toTrimmedString(firstOrganizer?.name) ||
-    normalizeOrganizedBy(toTrimmedString(item.organizedBy));
-  const organizerLink = toTrimmedString(firstOrganizer?.url);
-  const coverImageUrl = toTrimmedString(item.imageUrl);
-  const priceValue = item.ticketsInfo?.price;
-  const price =
-    typeof priceValue === "number"
-      ? priceValue.toString()
-      : toTrimmedString(priceValue);
-
-  return {
-    title: toTrimmedString(item.name),
-    description: convertPlainTextToHtml(toTrimmedString(item.description)),
-    startDate: start.date,
-    endDate: end.date || start.date,
-    startTime: start.time,
-    endTime: end.time,
-    address: toTrimmedString(item.location?.streetAddress),
-    place: toTrimmedString(item.location?.name),
-    town: "",
-    organizers: organizerName
-      ? [{ name: organizerName, link: organizerLink }]
-      : [],
-    ticketsLink: toTrimmedString(item.ticketsInfo?.buyUrl),
-    fbLink: toTrimmedString(item.url) || toTrimmedString(item.inputUrl),
-    price,
-    coverImageUrl: coverImageUrl || null,
-    tagSuggestions: inferFacebookJsonTagSuggestions(item),
-  };
 }
 
 export function EventForm({ mode, event }: EventFormProps) {
@@ -295,7 +87,6 @@ export function EventForm({ mode, event }: EventFormProps) {
   const [graboImportUrl, setGraboImportUrl] = useState("");
   const [facebookJsonImportPayload, setFacebookJsonImportPayload] =
     useState("");
-  const [isConnectingFacebook, setIsConnectingFacebook] = useState(false);
   const [isImportingFromFacebook, setIsImportingFromFacebook] = useState(false);
   const [isImportingFromGrabo, setIsImportingFromGrabo] = useState(false);
   const [isImportingFromJson, setIsImportingFromJson] = useState(false);
@@ -421,30 +212,6 @@ export function EventForm({ mode, event }: EventFormProps) {
     [allTags],
   );
 
-  const handleConnectFacebook = useCallback(async () => {
-    setFacebookError(null);
-    setIsConnectingFacebook(true);
-    try {
-      const res = await fetch("/api/facebook-auth");
-      const body = await res.json().catch(() => null);
-
-      if (!res.ok || !body?.url) {
-        throw new Error(body?.error || t("connectFacebookError"));
-      }
-
-      window.location.href = body.url as string;
-    } catch (err) {
-      console.error(err);
-      const message =
-        err instanceof Error && err.message
-          ? err.message
-          : t("connectFacebookError");
-      setFacebookError(message);
-    } finally {
-      setIsConnectingFacebook(false);
-    }
-  }, [t]);
-
   const handleImportFromFacebook = useCallback(async () => {
     setFacebookError(null);
     const trimmed = fbImportUrl.trim();
@@ -455,7 +222,7 @@ export function EventForm({ mode, event }: EventFormProps) {
       const res = await fetch("/api/facebook-import", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url: trimmed, locale }),
+        body: JSON.stringify({ url: trimmed }),
       });
 
       const body = await res.json().catch(() => null);
@@ -464,18 +231,28 @@ export function EventForm({ mode, event }: EventFormProps) {
         throw new Error(body?.error || t("error"));
       }
 
+      const currentValues = form.getValues();
+      const importedTagIds = resolveImportedTagIds(body.tagSuggestions);
+
       form.reset({
-        ...form.getValues(),
-        title: body.title || form.getValues("title"),
-        description: body.description || form.getValues("description"),
-        startDate: body.startDate || form.getValues("startDate"),
-        endDate: body.endDate || form.getValues("endDate"),
-        startTime: body.startTime || form.getValues("startTime"),
-        endTime: body.endTime || form.getValues("endTime"),
-        address: body.address || form.getValues("address"),
-        place: body.place || form.getValues("place"),
-        town: body.town || form.getValues("town"),
-        fbLink: trimmed,
+        ...currentValues,
+        title: body.title || currentValues.title,
+        description: body.description || currentValues.description,
+        startDate: body.startDate || currentValues.startDate,
+        endDate: body.endDate || body.startDate || currentValues.endDate,
+        startTime: body.startTime || currentValues.startTime,
+        endTime: body.endTime || currentValues.endTime,
+        address: body.address || currentValues.address,
+        place: body.place || currentValues.place,
+        town: body.town || currentValues.town,
+        organizers:
+          Array.isArray(body.organizers) && body.organizers.length > 0
+            ? body.organizers
+            : currentValues.organizers,
+        ticketsLink: body.ticketsLink || currentValues.ticketsLink,
+        fbLink: body.fbLink || trimmed || currentValues.fbLink,
+        price: body.price || currentValues.price,
+        tags: importedTagIds.length > 0 ? importedTagIds : currentValues.tags,
       });
 
       if (body.coverImageUrl) {
@@ -495,7 +272,7 @@ export function EventForm({ mode, event }: EventFormProps) {
     } finally {
       setIsImportingFromFacebook(false);
     }
-  }, [fbImportUrl, form, locale, setImages, t]);
+  }, [fbImportUrl, form, resolveImportedTagIds, setImages, t]);
 
   const handleImportFromGrabo = useCallback(async () => {
     setGraboError(null);
@@ -571,7 +348,7 @@ export function EventForm({ mode, event }: EventFormProps) {
 
     setIsImportingFromJson(true);
     try {
-      const importedEvent = parseFacebookJsonImport(trimmed);
+      const importedEvent = parseFacebookJsonImportPayload(trimmed);
       const currentValues = form.getValues();
       const importedTagIds = resolveImportedTagIds(
         importedEvent.tagSuggestions,
@@ -985,37 +762,25 @@ export function EventForm({ mode, event }: EventFormProps) {
             <Typography.P className="font-medium">
               {t("facebookImportTitle")}
             </Typography.P>
-            <Typography.Small className="text-muted-foreground">
+            {/* <Typography.Small className="text-muted-foreground">
               {t("facebookImportDescription")}
-            </Typography.Small>
+            </Typography.Small> */}
             <div className="flex flex-col gap-2 md:flex-row md:items-center">
               <Input
                 placeholder={t("enterFbLink")}
                 value={fbImportUrl}
                 onChange={(e) => setFbImportUrl(e.target.value)}
               />
-              <div className="flex gap-2 md:ml-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={handleConnectFacebook}
-                  disabled={isConnectingFacebook}
-                >
-                  {isConnectingFacebook
-                    ? t("connectingFacebook")
-                    : t("connectFacebook")}
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={handleImportFromFacebook}
-                  disabled={isImportingFromFacebook}
-                >
-                  {isImportingFromFacebook
-                    ? t("importingFromFacebook")
-                    : t("importFromFacebook")}
-                </Button>
-              </div>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleImportFromFacebook}
+                disabled={isImportingFromFacebook || !fbImportUrl.trim()}
+              >
+                {isImportingFromFacebook
+                  ? t("importingFromFacebook")
+                  : t("importFromFacebook")}
+              </Button>
             </div>
             {facebookError && (
               <Typography.Small className="text-destructive">
@@ -1027,9 +792,9 @@ export function EventForm({ mode, event }: EventFormProps) {
               <Typography.P className="font-medium">
                 {t("graboImportTitle")}
               </Typography.P>
-              <Typography.Small className="text-muted-foreground">
+              {/* <Typography.Small className="text-muted-foreground">
                 {t("graboImportDescription")}
-              </Typography.Small>
+              </Typography.Small> */}
               <div className="mt-2 flex flex-col gap-2 md:flex-row md:items-center">
                 <Input
                   placeholder={t("enterGraboLink")}
@@ -1054,7 +819,7 @@ export function EventForm({ mode, event }: EventFormProps) {
               )}
             </div>
 
-            <div className="border-t pt-4">
+            {/* <div className="border-t pt-4">
               <Typography.P className="font-medium">
                 {t("jsonImportTitle")}
               </Typography.P>
@@ -1086,7 +851,7 @@ export function EventForm({ mode, event }: EventFormProps) {
                   {jsonImportError}
                 </Typography.Small>
               )}
-            </div>
+            </div> */}
           </div>
         )}
 

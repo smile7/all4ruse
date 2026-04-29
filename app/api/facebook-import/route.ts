@@ -1,25 +1,7 @@
 import { NextResponse } from "next/server";
 
+import { parseFacebookJsonImportData } from "@/lib/facebook-import";
 import { createClient } from "@/lib/supabase/server";
-
-type FacebookPlace = {
-  name?: string;
-  location?: {
-    street?: string;
-    city?: string;
-  };
-};
-
-type FacebookEventResponse = {
-  name?: string;
-  description?: string;
-  start_time?: string;
-  end_time?: string;
-  place?: FacebookPlace | null;
-  cover?: {
-    source?: string;
-  } | null;
-};
 
 export async function POST(request: Request) {
   try {
@@ -30,17 +12,13 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Missing url" }, { status: 400 });
     }
 
-    const match = url.match(/facebook\.com\/events\/(\d+)/);
-    const eventId = match?.[1];
-
-    if (!eventId) {
+    if (!/^https?:\/\/(?:www\.)?(?:facebook|fb)\.com\//i.test(url)) {
       return NextResponse.json(
-        { error: "Could not extract event ID from URL" },
+        { error: "Invalid Facebook event URL" },
         { status: 400 },
       );
     }
 
-    // Use per-user Facebook token stored in Supabase profile
     const supabase = await createClient();
     const {
       data: { user },
@@ -53,76 +31,63 @@ export async function POST(request: Request) {
       );
     }
 
-    const { data: profile, error: profileError } = await supabase
-      .from("profiles")
-      .select("fb")
-      .eq("id", user.id)
-      .maybeSingle();
+    const token = process.env.APIFY_TOKEN?.trim();
+    const actorId = process.env.APIFY_FACEBOOK_EVENTS_ACTOR_ID?.trim();
 
-    if (profileError) {
-      console.error(profileError);
+    if (!token || !actorId) {
       return NextResponse.json(
-        { error: "Failed to load profile for Facebook import" },
+        {
+          error:
+            "Facebook import is not configured. Set APIFY_TOKEN and APIFY_FACEBOOK_EVENTS_ACTOR_ID.",
+        },
         { status: 500 },
       );
     }
 
-    const token = (profile as { fb?: string | null } | null)?.fb;
-    if (!token) {
-      return NextResponse.json(
-        { error: "Facebook is not connected for this account." },
-        { status: 400 },
-      );
-    }
+    const apifyUrl = new URL(
+      `https://api.apify.com/v2/acts/${actorId}/run-sync-get-dataset-items`,
+    );
+    apifyUrl.searchParams.set("token", token);
 
-    const params = new URLSearchParams({
-      fields: "name,description,start_time,end_time,place,cover",
-      access_token: token,
+    const apifyRes = await fetch(apifyUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        startUrls: [url],
+        maxItems: 1,
+        resultsLimit: 1,
+      }),
+      cache: "no-store",
     });
 
-    const graphRes = await fetch(
-      `https://graph.facebook.com/v20.0/${eventId}?${params.toString()}`,
-    );
+    const apifyBody = (await apifyRes.json().catch(() => null)) as
+      | unknown
+      | { error?: { message?: string } };
 
-    const fbBody = (await graphRes
-      .json()
-      .catch(() => null)) as FacebookEventResponse | null;
-
-    if (!graphRes.ok || !fbBody) {
+    if (!apifyRes.ok || !apifyBody) {
+      const errorValue =
+        typeof apifyBody === "object" && apifyBody !== null
+          ? (apifyBody as { error?: unknown }).error
+          : null;
       const message =
-        (fbBody as any)?.error?.message || "Facebook API returned an error";
+        typeof errorValue === "object" &&
+        errorValue !== null &&
+        "message" in errorValue &&
+        typeof (errorValue as { message?: unknown }).message === "string"
+          ? (errorValue as { message: string }).message
+          : "Apify returned an error";
       return NextResponse.json({ error: message }, { status: 400 });
     }
 
-    const toDate = (iso?: string | null): string => {
-      if (!iso) return "";
-      const d = new Date(iso);
-      if (Number.isNaN(d.getTime())) return "";
-      return d.toISOString().slice(0, 10);
-    };
+    const items = Array.isArray(apifyBody) ? apifyBody : [];
+    if (items.length === 0) {
+      return NextResponse.json(
+        { error: "No event was returned by Apify." },
+        { status: 404 },
+      );
+    }
 
-    const toTime = (iso?: string | null): string => {
-      if (!iso) return "";
-      const d = new Date(iso);
-      if (Number.isNaN(d.getTime())) return "";
-      return d.toISOString().slice(11, 16);
-    };
-
-    const startDate = toDate(fbBody.start_time ?? null);
-    const endDate = toDate(fbBody.end_time ?? fbBody.start_time ?? null);
-
-    const normalized = {
-      title: fbBody.name ?? "",
-      description: fbBody.description ?? "",
-      startDate,
-      endDate,
-      startTime: toTime(fbBody.start_time ?? null),
-      endTime: toTime(fbBody.end_time ?? null),
-      address: fbBody.place?.location?.street ?? "",
-      place: fbBody.place?.name ?? "",
-      town: fbBody.place?.location?.city ?? "",
-      coverImageUrl: fbBody.cover?.source ?? null,
-    };
+    const normalized = parseFacebookJsonImportData(items[0]);
 
     return NextResponse.json(normalized);
   } catch (err) {

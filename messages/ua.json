@@ -123,7 +123,7 @@
     "unsavedChangesConfirm": "Вийти без збереження",
     "unsavedChangesCancel": "Залишитися на сторінці",
     "facebookImportTitle": "Імпорт з події Facebook",
-    "facebookImportDescription": "Підʼєднайте свій профіль у Facebook і вставте посилання на публічну подію, щоб ми автоматично заповнили поля.",
+    "facebookImportDescription": "Вставте посилання на подію Facebook, і ми запустимо налаштований actor Apify, щоб автоматично заповнити поля.",
     "connectFacebook": "Підʼєднати Facebook",
     "connectingFacebook": "Підʼєднання...",
     "importFromFacebook": "Імпортувати з посилання",

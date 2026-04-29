@@ -123,7 +123,7 @@
     "unsavedChangesConfirm": "Leave without saving",
     "unsavedChangesCancel": "Stay on this page",
     "facebookImportTitle": "Import from Facebook event",
-    "facebookImportDescription": "Connect your Facebook account and paste a link to a public event so we can auto-fill the fields.",
+    "facebookImportDescription": "Paste a Facebook event link and we will run the configured Apify actor to auto-fill the fields.",
     "connectFacebook": "Connect Facebook",
     "connectingFacebook": "Connecting...",
     "importFromFacebook": "Import from link",

@@ -123,7 +123,7 @@
     "unsavedChangesConfirm": "Părăsește fără a salva",
     "unsavedChangesCancel": "Rămâi pe această pagină",
     "facebookImportTitle": "Importă dintr-un eveniment Facebook",
-    "facebookImportDescription": "Conectează-ți contul de Facebook și lipește un link către un eveniment public ca să completăm automat câmpurile.",
+    "facebookImportDescription": "Lipește un link către un eveniment Facebook și vom rula actorul Apify configurat ca să completăm automat câmpurile.",
     "connectFacebook": "Conectează Facebook",
     "connectingFacebook": "Se conectează...",
     "importFromFacebook": "Importă din link",
