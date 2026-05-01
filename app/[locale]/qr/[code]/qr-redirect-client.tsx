@@ -19,7 +19,7 @@ export function QrRedirectClient({ locale, code }: QrRedirectClientProps) {
     const startRedirect = () => {
       timeoutId = window.setTimeout(() => {
         window.location.replace(`/${locale}`);
-      }, 3000);
+      }, 500);
     };
 
     if (document.readyState === "complete") {
