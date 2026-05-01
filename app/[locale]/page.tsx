@@ -4,7 +4,7 @@ import { Typography } from "@/components/Typography";
 import { getEvents } from "@/lib/api";
 import { createClient } from "@/lib/supabase/server";
 
-import { Events } from "./_components";
+import { Events, filterEventsByTime } from "./_components";
 import { AddEventDropdown } from "./_components/AddEventDropdown";
 
 export default async function EventsPage({
@@ -38,14 +38,7 @@ export default async function EventsPage({
     } as typeof event & { emailUser: string; emailDomain: string };
   });
 
-  // Count all upcoming active events for the summary counter
-  const today = new Date();
-  const todayStr = today.toISOString().slice(0, 10);
-  const { count: totalUpcoming } = await supabase
-    .from("events")
-    .select("id", { count: "exact", head: true })
-    .eq("isEventActive", true)
-    .gte("startDate", todayStr);
+  const totalUpcoming = filterEventsByTime(events, "upcoming").length;
   const {
     data: { user },
   } = await supabase.auth.getUser();
