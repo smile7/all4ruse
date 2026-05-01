@@ -274,5 +274,10 @@
     "contactHeadline": "Contact",
     "contactInfo": "Dacă vrei să propui o idee nouă, să oferi feedback sau pur și simplu să spui „Îmi place ce faci”, îmi poți scrie la:",
     "lookingForwardToHearingFromYou": "Abia aștept să aflu ce ți-ar plăcea să vezi mai mult în Ruse – atât pe site, cât și în oraș."
+  },
+  "QrRedirect": {
+    "cheers": "NOROC",
+    "redirectingHome": "Redirecționare către pagina principală...",
+    "trackingNote": "Acest traseu QR poate fi urmărit separat în Vercel Analytics."
   }
 }

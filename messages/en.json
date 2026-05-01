@@ -274,5 +274,10 @@
     "contactHeadline": "Contact",
     "contactInfo": "If you want to suggest a new idea, give criticism, or just say “Hi, I like what you are doing,” you can write to me at:",
     "lookingForwardToHearingFromYou": "I look forward to hearing what you would like to see more of in Ruse – both on the site and in the city."
+  },
+  "QrRedirect": {
+    "cheers": "CHEERS",
+    "redirectingHome": "Redirecting to the home page...",
+    "trackingNote": "This QR path can be tracked separately in Vercel Analytics."
   }
 }
