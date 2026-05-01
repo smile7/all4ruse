@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 import { useTranslations } from "next-intl";
 
@@ -12,29 +12,29 @@ type QrRedirectClientProps = {
 
 export function QrRedirectClient({ locale, code }: QrRedirectClientProps) {
   const t = useTranslations("QrRedirect");
+  const [isPageLoaded, setIsPageLoaded] = useState(false);
+  const [isImageReady, setIsImageReady] = useState(false);
 
   useEffect(() => {
-    let timeoutId: number | undefined;
-
-    const startRedirect = () => {
-      timeoutId = window.setTimeout(() => {
-        window.location.replace(`/${locale}`);
-      }, 500);
-    };
-
     if (document.readyState === "complete") {
-      startRedirect();
+      setIsPageLoaded(true);
     } else {
-      window.addEventListener("load", startRedirect, { once: true });
-    }
+      const handleLoad = () => setIsPageLoaded(true);
+      window.addEventListener("load", handleLoad, { once: true });
 
-    return () => {
-      window.removeEventListener("load", startRedirect);
-      if (timeoutId) {
-        window.clearTimeout(timeoutId);
-      }
-    };
-  }, [locale]);
+      return () => window.removeEventListener("load", handleLoad);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!isPageLoaded || !isImageReady) return;
+
+    const timeoutId = window.setTimeout(() => {
+      window.location.replace(`/${locale}`);
+    }, 500);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [isImageReady, isPageLoaded, locale]);
 
   return (
     <main className="mx-auto flex h-[100svh] w-full max-w-2xl items-start justify-center overflow-hidden px-4 pb-4 pt-3 sm:px-6">
@@ -44,6 +44,8 @@ export function QrRedirectClient({ locale, code }: QrRedirectClientProps) {
             src="/sponsors/wine.JPG"
             alt=""
             fill
+            onLoad={() => setIsImageReady(true)}
+            onError={() => setIsImageReady(true)}
             priority
             sizes="(max-width: 640px) 100vw, 42rem"
             className="object-cover"
