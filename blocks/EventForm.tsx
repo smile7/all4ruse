@@ -44,9 +44,10 @@ import {
 } from "@/hooks/query";
 import type { Event, EventUpdate, Host, Tag } from "@/lib/api";
 import { parseFacebookJsonImportPayload } from "@/lib/facebook-import";
+import type { GraboImportResult } from "@/lib/grabo";
+import type { RuseOnTheDanubeImportResult } from "@/lib/ruse-on-the-danube";
 import { createEventSchema, type CreateEventSchemaType } from "@/lib/schema";
 import { createClient } from "@/lib/supabase/client";
-import type { GraboImportResult } from "@/lib/grabo";
 import { slugify } from "@/lib/utils";
 
 type EventFormProps = {
@@ -85,13 +86,16 @@ export function EventForm({ mode, event }: EventFormProps) {
 
   const [fbImportUrl, setFbImportUrl] = useState("");
   const [graboImportUrl, setGraboImportUrl] = useState("");
+  const [ruseImportUrl, setRuseImportUrl] = useState("");
   const [facebookJsonImportPayload, setFacebookJsonImportPayload] =
     useState("");
   const [isImportingFromFacebook, setIsImportingFromFacebook] = useState(false);
   const [isImportingFromGrabo, setIsImportingFromGrabo] = useState(false);
+  const [isImportingFromRuse, setIsImportingFromRuse] = useState(false);
   const [isImportingFromJson, setIsImportingFromJson] = useState(false);
   const [facebookError, setFacebookError] = useState<string | null>(null);
   const [graboError, setGraboError] = useState<string | null>(null);
+  const [ruseError, setRuseError] = useState<string | null>(null);
   const [jsonImportError, setJsonImportError] = useState<string | null>(null);
 
   const [images, setImages] = useState<EventImageItem[]>(() => {
@@ -340,6 +344,74 @@ export function EventForm({ mode, event }: EventFormProps) {
       setIsImportingFromGrabo(false);
     }
   }, [form, graboImportUrl, resolveImportedTagIds, t]);
+
+  const handleImportFromRuse = useCallback(async () => {
+    setRuseError(null);
+    const trimmed = ruseImportUrl.trim();
+    if (!trimmed) return;
+
+    setIsImportingFromRuse(true);
+    try {
+      const res = await fetch("/api/ruse-on-the-danube-import", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url: trimmed }),
+      });
+
+      const body = (await res.json().catch(() => null)) as
+        | (RuseOnTheDanubeImportResult & { error?: never })
+        | { error?: string }
+        | null;
+
+      if (!res.ok || !body || ("error" in body && body.error)) {
+        throw new Error(body?.error || t("error"));
+      }
+
+      const importedEvent = body as RuseOnTheDanubeImportResult;
+      const currentValues = form.getValues();
+      const importedTagIds = resolveImportedTagIds(
+        importedEvent.tagSuggestions,
+      );
+
+      form.reset({
+        ...currentValues,
+        title: importedEvent.title || currentValues.title,
+        description: importedEvent.description || currentValues.description,
+        startDate: importedEvent.startDate || currentValues.startDate,
+        endDate: importedEvent.endDate || currentValues.endDate,
+        startTime: importedEvent.startTime || currentValues.startTime,
+        endTime: importedEvent.endTime || currentValues.endTime,
+        address: importedEvent.address || currentValues.address,
+        place: importedEvent.place || currentValues.place,
+        town: importedEvent.town || currentValues.town,
+        organizers:
+          importedEvent.organizers.length > 0
+            ? importedEvent.organizers
+            : currentValues.organizers,
+        ticketsLink: importedEvent.ticketsLink || currentValues.ticketsLink,
+        fbLink: importedEvent.fbLink || currentValues.fbLink,
+        price: importedEvent.price || currentValues.price,
+        tags: importedTagIds.length > 0 ? importedTagIds : currentValues.tags,
+      });
+
+      if (importedEvent.coverImageUrl) {
+        setImages([
+          {
+            id: "ruse-cover",
+            url: importedEvent.coverImageUrl,
+            isNew: false,
+          },
+        ]);
+      }
+    } catch (err) {
+      console.error(err);
+      const message =
+        err instanceof Error && err.message ? err.message : t("error");
+      setRuseError(message);
+    } finally {
+      setIsImportingFromRuse(false);
+    }
+  }, [form, resolveImportedTagIds, ruseImportUrl, t]);
 
   const handleImportFromFacebookJson = useCallback(async () => {
     setJsonImportError(null);
@@ -815,6 +887,34 @@ export function EventForm({ mode, event }: EventFormProps) {
               {graboError && (
                 <Typography.Small className="text-destructive">
                   {graboError}
+                </Typography.Small>
+              )}
+            </div>
+
+            <div className="border-t pt-4">
+              <Typography.P className="font-medium">
+                {t("ruseImportTitle")}
+              </Typography.P>
+              <div className="mt-2 flex flex-col gap-2 md:flex-row md:items-center">
+                <Input
+                  placeholder={t("enterRuseEventLink")}
+                  value={ruseImportUrl}
+                  onChange={(e) => setRuseImportUrl(e.target.value)}
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleImportFromRuse}
+                  disabled={isImportingFromRuse || !ruseImportUrl.trim()}
+                >
+                  {isImportingFromRuse
+                    ? t("importingFromRuse")
+                    : t("importFromRuse")}
+                </Button>
+              </div>
+              {ruseError && (
+                <Typography.Small className="text-destructive">
+                  {ruseError}
                 </Typography.Small>
               )}
             </div>

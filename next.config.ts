@@ -18,6 +18,12 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: "https",
+        hostname: "ruseonthedanube.com",
+        port: "",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
         hostname: "lohdrrezrtmcupuogytt.supabase.co",
         port: "",
         pathname: "/storage/v1/object/public/event-images/**",
