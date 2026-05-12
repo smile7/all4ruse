@@ -37,7 +37,7 @@
     "bulgarian": "Български",
     "menuEvents": "Предстоящи Събития",
     "menuPastEvents": "Минали Събития",
-    "menuCurrentEvents": "Текущи Събития",
+    "menuCurrentEvents": "Събития в момента",
     "menuWhyAll4Ruse": "Защо all4ruse?",
     "menuWhyAll4RuseTitle": "За нас",
     "host": "Организатор",
@@ -59,6 +59,7 @@
     "duplicate": "Дублирай",
     "today": "Днес",
     "tomorrow": "Утре",
+    "goHomePage": "Към началната страница",
     "createNewEvent": "Създай ново събитие",
     "duplicateExistingEvent": "Дублирай съществуващо събитие"
   },
@@ -273,5 +274,10 @@
     "contactHeadline": "Контакт",
     "contactInfo": "Ако искаш да предложиш нова идея, да дадеш критика или просто да кажеш „Здрасти, харесва ми, че го правиш“, можеш да ми пишеш на:",
     "lookingForwardToHearingFromYou": "Ще се радвам да ми разкажеш какво би искал да виждаш повече в Русе – и в сайта, и в града."
+  },
+  "QrRedirect": {
+    "cheers": "НАЗДРАВЕ",
+    "redirectingHome": "Пренасочване към началната страница...",
+    "trackingNote": "Този QR път може да се проследява отделно във Vercel Analytics."
   }
 }

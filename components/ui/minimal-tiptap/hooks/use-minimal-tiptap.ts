@@ -223,6 +223,8 @@ export const useMinimalTiptapEditor = ({
     [output, onBlur],
   );
 
+  const editorRef = React.useRef<Editor | null>(null);
+
   const editor = useEditor({
     immediatelyRender: false,
     extensions: createExtensions({ placeholder }),
@@ -233,12 +235,37 @@ export const useMinimalTiptapEditor = ({
         autocapitalize: "off",
         class: cn("focus:outline-hidden", editorClassName),
       },
+      handlePaste: (_view, event) => {
+        const html = event.clipboardData?.getData("text/html");
+        if (!html || !/<img/i.test(html)) return false;
+
+        const domDoc = new DOMParser().parseFromString(html, "text/html");
+        let modified = false;
+
+        domDoc.querySelectorAll("img").forEach((img) => {
+          const emoji = img.getAttribute("alt");
+          if (emoji) {
+            img.replaceWith(document.createTextNode(emoji));
+            modified = true;
+          }
+        });
+
+        if (!modified) return false;
+
+        editorRef.current?.commands.insertContent(domDoc.body.innerHTML);
+        return true;
+      },
     },
     onUpdate: ({ editor }) => handleUpdate(editor),
     onCreate: ({ editor }) => handleCreate(editor),
     onBlur: ({ editor }) => handleBlur(editor),
     ...props,
   });
+
+  React.useEffect(() => {
+    editorRef.current = editor;
+  }, [editor]);
+
   return editor;
 };
 

@@ -21,37 +21,95 @@ import {
 } from "@/lib/utils";
 
 import { EventTimeFilter } from "./FilterByTime";
+import { SponsorPreviewOverlay } from "./SponsorPreviewOverlay";
 import type { EventTagsMap } from "@/hooks/useEventTagsMap";
 import { useTranslatedTitles } from "./useTranslatedTitles";
 import { ChevronLeftIcon, ChevronRightIcon, UserIcon } from "lucide-react";
 
-type SponsorAd = {
-  alt: string;
+type SponsorAction =
+  | { type: "link"; href: string }
+  | { type: "preview" }
+  | { type: "none" };
+
+type SponsorConfig = {
+  token: string;
   imageSrc: string;
-  href?: string;
+  alt: string;
+  ariaLabel: string;
+  insertAfter: number;
+  cardVariant: "compact" | "image-only";
+  cardImageClassName: string;
+  previewImageClassName?: string;
+  action: SponsorAction;
 };
 
-const SPONSOR_ADS: Record<string, SponsorAd> = {
+const SPONSOR_IMAGE_ONLY_FILLER_CLASS = "min-h-[8.5rem]";
+
+// Add new hidden sponsors here. Use action.type "link", "preview", or "none".
+const SPONSORS: Record<string, SponsorConfig> = {
   decathlon: {
-    alt: "Decathlon",
+    token: "decathlon",
     imageSrc: "/sponsors/decathlon.png",
-    href: "https://www.decathlon.bg",
+    alt: "Decathlon",
+    ariaLabel: "Спонсор: Decathlon",
+    insertAfter: 5,
+    cardVariant: "compact",
+    cardImageClassName: "w-full object-cover",
+    action: {
+      type: "link",
+      href: "https://www.decathlon.bg",
+    },
   },
   "mall-ruse": {
-    alt: "Mall Ruse",
+    token: "mall-ruse",
     imageSrc: "/sponsors/mallRousse.png",
+    alt: "Mall Ruse",
+    ariaLabel: "Спонсор: Mall Ruse",
+    insertAfter: 5,
+    cardVariant: "compact",
+    cardImageClassName: "w-full object-cover",
+    action: {
+      type: "none",
+    },
   },
   "mall-rousse": {
-    alt: "Mall Ruse",
+    token: "mall-rousse",
     imageSrc: "/sponsors/mallRousse.png",
+    alt: "Mall Ruse",
+    ariaLabel: "Спонсор: Mall Ruse",
+    insertAfter: 5,
+    cardVariant: "compact",
+    cardImageClassName: "w-full object-cover",
+    action: {
+      type: "none",
+    },
   },
   mallRousse: {
-    alt: "Mall Ruse",
+    token: "mallRousse",
     imageSrc: "/sponsors/mallRousse.png",
+    alt: "Mall Ruse",
+    ariaLabel: "Спонсор: Mall Ruse",
+    insertAfter: 5,
+    cardVariant: "compact",
+    cardImageClassName: "w-full object-cover",
+    action: {
+      type: "none",
+    },
+  },
+  chiflika: {
+    token: "chiflika",
+    imageSrc: "/sponsors/chiflika.jpg",
+    alt: "Chiflika",
+    ariaLabel: "Спонсор: Chiflika",
+    insertAfter: 6,
+    cardVariant: "image-only",
+    cardImageClassName: "object-contain",
+    previewImageClassName: "rounded-md object-contain",
+    action: {
+      type: "preview",
+    },
   },
 };
-
-const AD_INSERT_AFTER = 5;
 
 export function EventsGrid({
   events,
@@ -70,7 +128,12 @@ export function EventsGrid({
   const locale = useLocale();
   const { data: allTags = [] } = useTags();
   const searchParams = useSearchParams();
-  const sponsorAd = SPONSOR_ADS[searchParams.get("ad") ?? ""];
+  const sponsorToken = searchParams.get("ad");
+  const [previewSponsor, setPreviewSponsor] = useState<SponsorConfig | null>(
+    null,
+  );
+  const closeSponsorPreview = () => setPreviewSponsor(null);
+  const activeSponsor = sponsorToken ? (SPONSORS[sponsorToken] ?? null) : null;
   const translatedTitles: { [key: number]: string } = useTranslatedTitles(
     events,
     locale,
@@ -119,54 +182,81 @@ export function EventsGrid({
     (event) => !event.isEventPremium,
   );
 
-  const renderAdCard = () => {
-    if (!sponsorAd) {
-      return null;
-    }
-
-    const adCardContent = (
-      <AspectRatio ratio={16 / 11}>
-        <div className="absolute inset-0 overflow-hidden rounded-xl">
-          <div className="absolute inset-0 transform-gpu will-change-transform transition-transform duration-500 ease-out group-hover:scale-[1.05]">
+  const renderSponsorCard = (sponsor: SponsorConfig) => {
+    const cardContent =
+      sponsor.cardVariant === "image-only" ? (
+        <Card className="relative flex h-full flex-col overflow-hidden border-4 border-border/60 p-0 transition-all duration-300 hover:border-secondary hover:shadow-lg">
+          <div className="absolute inset-0 overflow-hidden bg-background">
             <Image
-              src={sponsorAd.imageSrc}
-              alt={sponsorAd.alt}
+              src={sponsor.imageSrc}
+              alt={sponsor.alt}
               fill
               sizes="28rem"
-              className="w-full object-cover"
+              className={sponsor.cardImageClassName}
               draggable={false}
             />
           </div>
-          <div className="pointer-events-none absolute inset-0 z-10 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
-          {/* <span className="absolute top-4 right-4 z-20 rounded-full bg-black/40 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white backdrop-blur-sm">
-            Спонсор
-          </span> */}
-        </div>
-      </AspectRatio>
-    );
+          <AspectRatio ratio={16 / 11}>
+            <div aria-hidden="true" />
+          </AspectRatio>
+          <CardContent className="flex flex-1 p-0" aria-hidden="true">
+            <div className={`${SPONSOR_IMAGE_ONLY_FILLER_CLASS} w-full`} />
+          </CardContent>
+        </Card>
+      ) : (
+        <AspectRatio ratio={16 / 11}>
+          <div className="absolute inset-0 overflow-hidden rounded-xl">
+            <div className="absolute inset-0 transform-gpu will-change-transform transition-transform duration-500 ease-out group-hover:scale-[1.05]">
+              <Image
+                src={sponsor.imageSrc}
+                alt={sponsor.alt}
+                fill
+                sizes="28rem"
+                className={sponsor.cardImageClassName}
+                draggable={false}
+              />
+            </div>
+            <div className="pointer-events-none absolute inset-0 z-10 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+          </div>
+        </AspectRatio>
+      );
 
-    if (sponsorAd.href) {
+    if (sponsor.action.type === "preview") {
+      return (
+        <button
+          key={`sponsor-ad-${sponsor.token}`}
+          type="button"
+          className="group block w-full cursor-zoom-in text-left"
+          aria-label={sponsor.ariaLabel}
+          onClick={() => setPreviewSponsor(sponsor)}
+        >
+          {cardContent}
+        </button>
+      );
+    }
+
+    if (sponsor.action.type === "link") {
       return (
         <a
-          key="sponsor-ad"
-          href={sponsorAd.href}
+          key={`sponsor-ad-${sponsor.token}`}
+          href={sponsor.action.href}
           target="_blank"
           rel="noopener noreferrer"
           className="group block"
-          aria-label={`Спонсор: ${sponsorAd.alt}`}
+          aria-label={sponsor.ariaLabel}
         >
-          {adCardContent}
+          {cardContent}
         </a>
       );
     }
 
     return (
       <div
-        key="sponsor-ad"
+        key={`sponsor-ad-${sponsor.token}`}
         className="group block"
-        aria-label={`Спонсор: ${sponsorAd.alt}`}
+        aria-label={sponsor.ariaLabel}
       >
-        {adCardContent}
+        {cardContent}
       </div>
     );
   };
@@ -474,16 +564,16 @@ export function EventsGrid({
     let renderedEvents = 0;
     let lastFutureMonthKey: string | null = null;
 
-    const pushAdIfNeeded = () => {
-      if (sponsorAd && renderedEvents === AD_INSERT_AFTER) {
-        items.push(renderAdCard());
+    const pushSponsorIfNeeded = () => {
+      if (activeSponsor && renderedEvents === activeSponsor.insertAfter) {
+        items.push(renderSponsorCard(activeSponsor));
       }
     };
 
     const pushEvent = (event: Event) => {
       items.push(renderEventCard(event));
       renderedEvents += 1;
-      pushAdIfNeeded();
+      pushSponsorIfNeeded();
     };
 
     for (const event of premiumEvents) {
@@ -511,18 +601,40 @@ export function EventsGrid({
 
     return items;
   }, [
+    activeSponsor,
     currentMonthKey,
     nonPremiumEvents,
     premiumEvents,
-    sponsorAd,
     translatedTitles,
     locale,
     isEditMode,
     eventTags,
-    allTags,
+    tagsById,
     timeFilter,
     t,
   ]);
+
+  const sponsorPreview = previewSponsor ? (
+    <SponsorPreviewOverlay
+      sponsor={previewSponsor}
+      onClose={closeSponsorPreview}
+    />
+  ) : null;
+
+  useEffect(() => {
+    if (!previewSponsor) {
+      return;
+    }
+
+    const handleEsc = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        closeSponsorPreview();
+      }
+    };
+
+    document.addEventListener("keydown", handleEsc);
+    return () => document.removeEventListener("keydown", handleEsc);
+  }, [previewSponsor]);
 
   if (sortedEvents.length === 0) {
     return (
@@ -569,59 +681,72 @@ export function EventsGrid({
     };
 
     return (
-      <div className="relative" aria-label="Събития">
-        <div
-          ref={scrollRef}
-          className="flex gap-4 overflow-x-auto pb-2 snap-x snap-mandatory"
-        >
-          {sortedEvents.map((event) => (
-            <div key={event.id} className="snap-start shrink-0 w-72 max-w-full">
-              {renderEventCard(event)}
-            </div>
-          ))}
-        </div>
+      <>
+        <div className="relative" aria-label="Събития">
+          <div
+            ref={scrollRef}
+            className="flex gap-4 overflow-x-auto pb-2 snap-x snap-mandatory"
+          >
+            {sortedEvents.map((event) => (
+              <div
+                key={event.id}
+                className="snap-start shrink-0 w-72 max-w-full"
+              >
+                {renderEventCard(event)}
+              </div>
+            ))}
+          </div>
 
-        <div className="pointer-events-none absolute inset-y-0 left-0 right-0 hidden md:flex items-center justify-between">
-          <button
-            type="button"
-            className="pointer-events-auto ml-2 rounded-full bg-background/90 shadow-md border border-border p-2 disabled:opacity-30"
-            onClick={() => scrollByAmount("left")}
-            disabled={!canScrollLeft}
-            aria-label="Scroll left"
-          >
-            <ChevronLeftIcon className="size-7 cursor-pointer" />
-          </button>
-          <button
-            type="button"
-            className="pointer-events-auto mr-2 rounded-full bg-background/90 shadow-md border border-border p-2 disabled:opacity-30"
-            onClick={() => scrollByAmount("right")}
-            disabled={!canScrollRight}
-            aria-label="Scroll right"
-          >
-            <ChevronRightIcon className="size-7 cursor-pointer" />
-          </button>
+          <div className="pointer-events-none absolute inset-y-0 left-0 right-0 hidden md:flex items-center justify-between">
+            <button
+              type="button"
+              className="pointer-events-auto ml-2 rounded-full bg-background/90 shadow-md border border-border p-2 disabled:opacity-30"
+              onClick={() => scrollByAmount("left")}
+              disabled={!canScrollLeft}
+              aria-label="Scroll left"
+            >
+              <ChevronLeftIcon className="size-7 cursor-pointer" />
+            </button>
+            <button
+              type="button"
+              className="pointer-events-auto mr-2 rounded-full bg-background/90 shadow-md border border-border p-2 disabled:opacity-30"
+              onClick={() => scrollByAmount("right")}
+              disabled={!canScrollRight}
+              aria-label="Scroll right"
+            >
+              <ChevronRightIcon className="size-7 cursor-pointer" />
+            </button>
+          </div>
         </div>
-      </div>
+        {sponsorPreview}
+      </>
     );
   }
 
   return (
-    <div className="flex flex-col gap-8" aria-label="Събития">
-      {shouldGroupByMonth ? (
-        <div className="grid gap-6 [grid-template-columns:repeat(auto-fill,minmax(min(100%,18rem),1fr))]">
-          {groupedGridItems}
-        </div>
-      ) : (
-        <div className="grid gap-6 [grid-template-columns:repeat(auto-fill,minmax(min(100%,18rem),1fr))]">
-          {sponsorAd && sortedEvents.length >= AD_INSERT_AFTER
-            ? [
-                ...sortedEvents.slice(0, AD_INSERT_AFTER).map(renderEventCard),
-                renderAdCard(),
-                ...sortedEvents.slice(AD_INSERT_AFTER).map(renderEventCard),
-              ]
-            : sortedEvents.map(renderEventCard)}
-        </div>
-      )}
-    </div>
+    <>
+      <div className="flex flex-col gap-8" aria-label="Събития">
+        {shouldGroupByMonth ? (
+          <div className="grid gap-6 [grid-template-columns:repeat(auto-fill,minmax(min(100%,18rem),1fr))]">
+            {groupedGridItems}
+          </div>
+        ) : (
+          <div className="grid gap-6 [grid-template-columns:repeat(auto-fill,minmax(min(100%,18rem),1fr))]">
+            {activeSponsor && sortedEvents.length >= activeSponsor.insertAfter
+              ? [
+                  ...sortedEvents
+                    .slice(0, activeSponsor.insertAfter)
+                    .map(renderEventCard),
+                  renderSponsorCard(activeSponsor),
+                  ...sortedEvents
+                    .slice(activeSponsor.insertAfter)
+                    .map(renderEventCard),
+                ]
+              : sortedEvents.map(renderEventCard)}
+          </div>
+        )}
+      </div>
+      {sponsorPreview}
+    </>
   );
 }

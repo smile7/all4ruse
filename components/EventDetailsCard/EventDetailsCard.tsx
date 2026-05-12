@@ -31,7 +31,7 @@ function OrganizersList({ organizers }: { organizers: Host[] }) {
             <a
               href={org.link}
               target="_blank"
-              rel="noopener noreferrer"
+              rel="noopener"
               className="text-primary underline"
             >
               {org.name}
@@ -146,7 +146,7 @@ export function EventDetailsCard({ event }: { event: Event }) {
               <a
                 href={event.fbLink}
                 target="_blank"
-                rel="noopener noreferrer"
+                rel="noopener"
                 className="text-primary underline"
               >
                 {t("facebook")}
@@ -160,7 +160,7 @@ export function EventDetailsCard({ event }: { event: Event }) {
               <a
                 href={event.ticketsLink}
                 target="_blank"
-                rel="noopener noreferrer"
+                rel="noopener"
                 className="text-primary underline"
               >
                 {t("tickets")}

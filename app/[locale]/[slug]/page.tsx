@@ -11,13 +11,16 @@ import { Typography } from "@/components/Typography";
 import { Button, Card, CardContent, CardTitle } from "@/components/ui";
 import { TAG_LABELS_BG } from "@/constants";
 import { routing } from "@/i18n/routing";
+import {
+  PremiumEventPage,
+  PREMIUM_EVENT_ID,
+} from "@/app/[locale]/[slug]/PremiumEventPage";
 import { getEventBySlug, type Event, type Tag } from "@/lib/api";
 import { createClient } from "@/lib/supabase/server";
 import { getEventTemporalStatus } from "../_components/FilterByTime";
 import { EventsGrid } from "../_components";
 import { CalendarDaysIcon } from "lucide-react";
 
-import "@/components/ui/minimal-tiptap/styles/index.css";
 import EventDescriptionWrapper from "@/components/EventDescriptionWrapper";
 import { translateText } from "@/lib/translateText";
 import { ScrollToTopOnMount } from "@/components/ScrollToTopOnMount";
@@ -175,10 +178,11 @@ export default async function EventPage(props: {
 
   const isPast = getEventTemporalStatus(event) === "past";
   const isFree = (event.price ?? "").trim() === "0";
+  const isPremiumEventPage = event.id === PREMIUM_EVENT_ID;
 
   let translatedTitle = event.title;
   let translatedDescription = event.description;
-  if (locale !== "bg") {
+  if (locale !== "bg" && !isPremiumEventPage) {
     try {
       translatedTitle = await translateText(event.title, locale);
       translatedDescription = await translateText(event.description, locale);
@@ -305,6 +309,35 @@ export default async function EventPage(props: {
       availability: "https://schema.org/InStock",
     },
   };
+
+  if (isPremiumEventPage) {
+    return (
+      <PremiumEventPage
+        event={event}
+        publicEvent={publicEvent}
+        slug={slug}
+        locale={locale}
+        translatedTitle={translatedTitle}
+        isPast={isPast}
+        isFree={isFree}
+        tags={tags}
+        images={images}
+        relatedEvents={relatedEvents}
+        eventUrl={eventUrl}
+        googleCalendarUrl={googleCalendarUrl}
+        jsonLd={jsonLd}
+        labels={{
+          goHome: tHome("goHomePage"),
+          premiumEvent: tHome("premiumEvent"),
+          pastEvent: tHome("pastEvent"),
+          freeEvent: tHome("freeEvent"),
+          more: tHome("more"),
+          events: tHome("events"),
+          gallery: t("gallery"),
+        }}
+      />
+    );
+  }
 
   return (
     <div className="flex flex-col gap-6">
