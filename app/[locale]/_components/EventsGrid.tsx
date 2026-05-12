@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { track } from "@vercel/analytics/react";
 import Image from "next/image";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
@@ -33,6 +34,8 @@ type SponsorAction =
 
 type SponsorConfig = {
   token: string;
+  sponsorId: string;
+  designId: string;
   imageSrc: string;
   alt: string;
   ariaLabel: string;
@@ -49,6 +52,8 @@ const SPONSOR_IMAGE_ONLY_FILLER_CLASS = "min-h-[8.5rem]";
 const SPONSORS: Record<string, SponsorConfig> = {
   decathlon: {
     token: "decathlon",
+    sponsorId: "decathlon",
+    designId: "compact-image-v1",
     imageSrc: "/sponsors/decathlon.png",
     alt: "Decathlon",
     ariaLabel: "Спонсор: Decathlon",
@@ -62,6 +67,8 @@ const SPONSORS: Record<string, SponsorConfig> = {
   },
   "mall-ruse": {
     token: "mall-ruse",
+    sponsorId: "mall-ruse",
+    designId: "compact-image-v1",
     imageSrc: "/sponsors/mallRousse.png",
     alt: "Mall Ruse",
     ariaLabel: "Спонсор: Mall Ruse",
@@ -74,6 +81,8 @@ const SPONSORS: Record<string, SponsorConfig> = {
   },
   "mall-rousse": {
     token: "mall-rousse",
+    sponsorId: "mall-ruse",
+    designId: "compact-image-v1",
     imageSrc: "/sponsors/mallRousse.png",
     alt: "Mall Ruse",
     ariaLabel: "Спонсор: Mall Ruse",
@@ -86,6 +95,8 @@ const SPONSORS: Record<string, SponsorConfig> = {
   },
   mallRousse: {
     token: "mallRousse",
+    sponsorId: "mall-ruse",
+    designId: "compact-image-v1",
     imageSrc: "/sponsors/mallRousse.png",
     alt: "Mall Ruse",
     ariaLabel: "Спонсор: Mall Ruse",
@@ -98,6 +109,8 @@ const SPONSORS: Record<string, SponsorConfig> = {
   },
   chiflika: {
     token: "chiflika",
+    sponsorId: "chiflika",
+    designId: "image-only-preview-v1",
     imageSrc: "/sponsors/chiflika.jpg",
     alt: "Chiflika",
     ariaLabel: "Спонсор: Chiflika",
@@ -182,6 +195,17 @@ export function EventsGrid({
     (event) => !event.isEventPremium,
   );
 
+  const trackSponsorClick = (sponsor: SponsorConfig) => {
+    track("Sponsor Click", {
+      sponsor: sponsor.sponsorId,
+      design: sponsor.designId,
+      token: sponsor.token,
+      destination: sponsor.action.type === "link" ? sponsor.action.href : null,
+      locale,
+      placement: "events-grid",
+    });
+  };
+
   const renderSponsorCard = (sponsor: SponsorConfig) => {
     const cardContent =
       sponsor.cardVariant === "image-only" ? (
@@ -244,6 +268,7 @@ export function EventsGrid({
           rel="noopener noreferrer"
           className="group block"
           aria-label={sponsor.ariaLabel}
+          onClick={() => trackSponsorClick(sponsor)}
         >
           {cardContent}
         </a>
@@ -635,6 +660,21 @@ export function EventsGrid({
     document.addEventListener("keydown", handleEsc);
     return () => document.removeEventListener("keydown", handleEsc);
   }, [previewSponsor]);
+
+  useEffect(() => {
+    if (!activeSponsor) {
+      return;
+    }
+
+    track("Sponsor Impression", {
+      sponsor: activeSponsor.sponsorId,
+      design: activeSponsor.designId,
+      token: activeSponsor.token,
+      action: activeSponsor.action.type,
+      locale,
+      placement: "events-grid",
+    });
+  }, [activeSponsor, locale]);
 
   if (sortedEvents.length === 0) {
     return (
