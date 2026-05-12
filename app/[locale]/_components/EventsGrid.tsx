@@ -26,29 +26,33 @@ import type { EventTagsMap } from "@/hooks/useEventTagsMap";
 import { useTranslatedTitles } from "./useTranslatedTitles";
 import { ChevronLeftIcon, ChevronRightIcon, UserIcon } from "lucide-react";
 
-type SponsorAction = { type: "link"; href: string } | { type: "preview" };
+type SponsorAction =
+  | { type: "link"; href: string }
+  | { type: "preview" }
+  | { type: "none" };
 
 type SponsorConfig = {
   token: string;
   imageSrc: string;
   alt: string;
   ariaLabel: string;
+  insertAfter: number;
   cardVariant: "compact" | "image-only";
   cardImageClassName: string;
   previewImageClassName?: string;
   action: SponsorAction;
 };
 
-const SPONSOR_INSERT_AFTER = 6;
 const SPONSOR_IMAGE_ONLY_FILLER_CLASS = "min-h-[8.5rem]";
 
-// Add new hidden sponsors here. Use action.type "link" or "preview".
+// Add new hidden sponsors here. Use action.type "link", "preview", or "none".
 const SPONSORS: Record<string, SponsorConfig> = {
   decathlon: {
     token: "decathlon",
     imageSrc: "/sponsors/decathlon.png",
     alt: "Decathlon",
     ariaLabel: "Спонсор: Decathlon",
+    insertAfter: 5,
     cardVariant: "compact",
     cardImageClassName: "w-full object-cover",
     action: {
@@ -56,11 +60,48 @@ const SPONSORS: Record<string, SponsorConfig> = {
       href: "https://www.decathlon.bg",
     },
   },
+  "mall-ruse": {
+    token: "mall-ruse",
+    imageSrc: "/sponsors/mallRousse.png",
+    alt: "Mall Ruse",
+    ariaLabel: "Спонсор: Mall Ruse",
+    insertAfter: 5,
+    cardVariant: "compact",
+    cardImageClassName: "w-full object-cover",
+    action: {
+      type: "none",
+    },
+  },
+  "mall-rousse": {
+    token: "mall-rousse",
+    imageSrc: "/sponsors/mallRousse.png",
+    alt: "Mall Ruse",
+    ariaLabel: "Спонсор: Mall Ruse",
+    insertAfter: 5,
+    cardVariant: "compact",
+    cardImageClassName: "w-full object-cover",
+    action: {
+      type: "none",
+    },
+  },
+  mallRousse: {
+    token: "mallRousse",
+    imageSrc: "/sponsors/mallRousse.png",
+    alt: "Mall Ruse",
+    ariaLabel: "Спонсор: Mall Ruse",
+    insertAfter: 5,
+    cardVariant: "compact",
+    cardImageClassName: "w-full object-cover",
+    action: {
+      type: "none",
+    },
+  },
   chiflika: {
     token: "chiflika",
     imageSrc: "/sponsors/chiflika.jpg",
     alt: "Chiflika",
     ariaLabel: "Спонсор: Chiflika",
+    insertAfter: 6,
     cardVariant: "image-only",
     cardImageClassName: "object-contain",
     previewImageClassName: "rounded-md object-contain",
@@ -185,7 +226,7 @@ export function EventsGrid({
         <button
           key={`sponsor-ad-${sponsor.token}`}
           type="button"
-          className="group block cursor-zoom-in text-left"
+          className="group block w-full cursor-zoom-in text-left"
           aria-label={sponsor.ariaLabel}
           onClick={() => setPreviewSponsor(sponsor)}
         >
@@ -194,17 +235,29 @@ export function EventsGrid({
       );
     }
 
+    if (sponsor.action.type === "link") {
+      return (
+        <a
+          key={`sponsor-ad-${sponsor.token}`}
+          href={sponsor.action.href}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="group block"
+          aria-label={sponsor.ariaLabel}
+        >
+          {cardContent}
+        </a>
+      );
+    }
+
     return (
-      <a
+      <div
         key={`sponsor-ad-${sponsor.token}`}
-        href={sponsor.action.href}
-        target="_blank"
-        rel="noopener noreferrer"
         className="group block"
         aria-label={sponsor.ariaLabel}
       >
         {cardContent}
-      </a>
+      </div>
     );
   };
 
@@ -511,8 +564,8 @@ export function EventsGrid({
     let renderedEvents = 0;
     let lastFutureMonthKey: string | null = null;
 
-    const pushAdIfNeeded = () => {
-      if (activeSponsor && renderedEvents === SPONSOR_INSERT_AFTER) {
+    const pushSponsorIfNeeded = () => {
+      if (activeSponsor && renderedEvents === activeSponsor.insertAfter) {
         items.push(renderSponsorCard(activeSponsor));
       }
     };
@@ -520,7 +573,7 @@ export function EventsGrid({
     const pushEvent = (event: Event) => {
       items.push(renderEventCard(event));
       renderedEvents += 1;
-      pushAdIfNeeded();
+      pushSponsorIfNeeded();
     };
 
     for (const event of premiumEvents) {
@@ -556,7 +609,7 @@ export function EventsGrid({
     locale,
     isEditMode,
     eventTags,
-    allTags,
+    tagsById,
     timeFilter,
     t,
   ]);
@@ -679,14 +732,14 @@ export function EventsGrid({
           </div>
         ) : (
           <div className="grid gap-6 [grid-template-columns:repeat(auto-fill,minmax(min(100%,18rem),1fr))]">
-            {activeSponsor && sortedEvents.length >= SPONSOR_INSERT_AFTER
+            {activeSponsor && sortedEvents.length >= activeSponsor.insertAfter
               ? [
                   ...sortedEvents
-                    .slice(0, SPONSOR_INSERT_AFTER)
+                    .slice(0, activeSponsor.insertAfter)
                     .map(renderEventCard),
                   renderSponsorCard(activeSponsor),
                   ...sortedEvents
-                    .slice(SPONSOR_INSERT_AFTER)
+                    .slice(activeSponsor.insertAfter)
                     .map(renderEventCard),
                 ]
               : sortedEvents.map(renderEventCard)}

@@ -39,7 +39,7 @@ export function getEventTemporalStatus(
   reference: Date = new Date(),
 ): EventTimeFilter {
   const { startUTC, endUTC } = getEventUtcRange(event);
-  return resolveStatus(startUTC, endUTC, reference);
+  return resolveEventStatus(event, startUTC, endUTC, reference);
 }
 
 export function getEventUtcRange(event: Event): {
@@ -70,11 +70,24 @@ export function getEventUtcRange(event: Event): {
 function buildEventMeta(event: Event, reference: Date): EventMeta | null {
   try {
     const { startUTC, endUTC } = getEventUtcRange(event);
-    const status = resolveStatus(startUTC, endUTC, reference);
+    const status = resolveEventStatus(event, startUTC, endUTC, reference);
     return { event, startUTC, endUTC, status };
   } catch {
     return null;
   }
+}
+
+function resolveEventStatus(
+  event: Event,
+  startUTC: Date,
+  endUTC: Date,
+  reference: Date,
+): EventTimeFilter {
+  if (event.isEventPremium) {
+    return reference.getTime() > endUTC.getTime() ? "past" : "upcoming";
+  }
+
+  return resolveStatus(startUTC, endUTC, reference);
 }
 
 function resolveStatus(
