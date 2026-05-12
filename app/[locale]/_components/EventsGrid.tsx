@@ -25,8 +25,32 @@ import type { EventTagsMap } from "@/hooks/useEventTagsMap";
 import { useTranslatedTitles } from "./useTranslatedTitles";
 import { ChevronLeftIcon, ChevronRightIcon, UserIcon } from "lucide-react";
 
-const AD_PREVIEW_TOKEN = "decathlon";
-const AD_DECATHLON_URL = "https://www.decathlon.bg";
+type SponsorAd = {
+  alt: string;
+  imageSrc: string;
+  href?: string;
+};
+
+const SPONSOR_ADS: Record<string, SponsorAd> = {
+  decathlon: {
+    alt: "Decathlon",
+    imageSrc: "/sponsors/decathlon.png",
+    href: "https://www.decathlon.bg",
+  },
+  "mall-ruse": {
+    alt: "Mall Ruse",
+    imageSrc: "/sponsors/mallRousse.png",
+  },
+  "mall-rousse": {
+    alt: "Mall Ruse",
+    imageSrc: "/sponsors/mallRousse.png",
+  },
+  mallRousse: {
+    alt: "Mall Ruse",
+    imageSrc: "/sponsors/mallRousse.png",
+  },
+};
+
 const AD_INSERT_AFTER = 5;
 
 export function EventsGrid({
@@ -46,7 +70,7 @@ export function EventsGrid({
   const locale = useLocale();
   const { data: allTags = [] } = useTags();
   const searchParams = useSearchParams();
-  const showAd = searchParams.get("ad") === AD_PREVIEW_TOKEN;
+  const sponsorAd = SPONSOR_ADS[searchParams.get("ad") ?? ""];
   const translatedTitles: { [key: number]: string } = useTranslatedTitles(
     events,
     locale,
@@ -95,21 +119,18 @@ export function EventsGrid({
     (event) => !event.isEventPremium,
   );
 
-  const renderAdCard = () => (
-    <a
-      key="sponsor-ad"
-      href={AD_DECATHLON_URL}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="group block"
-      aria-label="Спонсор: Decathlon"
-    >
+  const renderAdCard = () => {
+    if (!sponsorAd) {
+      return null;
+    }
+
+    const adCardContent = (
       <AspectRatio ratio={16 / 11}>
         <div className="absolute inset-0 overflow-hidden rounded-xl">
           <div className="absolute inset-0 transform-gpu will-change-transform transition-transform duration-500 ease-out group-hover:scale-[1.05]">
             <Image
-              src="/sponsors/decathlon.png"
-              alt="Decathlon"
+              src={sponsorAd.imageSrc}
+              alt={sponsorAd.alt}
               fill
               sizes="28rem"
               className="w-full object-cover"
@@ -122,8 +143,33 @@ export function EventsGrid({
           </span> */}
         </div>
       </AspectRatio>
-    </a>
-  );
+    );
+
+    if (sponsorAd.href) {
+      return (
+        <a
+          key="sponsor-ad"
+          href={sponsorAd.href}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="group block"
+          aria-label={`Спонсор: ${sponsorAd.alt}`}
+        >
+          {adCardContent}
+        </a>
+      );
+    }
+
+    return (
+      <div
+        key="sponsor-ad"
+        className="group block"
+        aria-label={`Спонсор: ${sponsorAd.alt}`}
+      >
+        {adCardContent}
+      </div>
+    );
+  };
 
   let monthLocale: string;
   if (locale === "bg") {
@@ -429,7 +475,7 @@ export function EventsGrid({
     let lastFutureMonthKey: string | null = null;
 
     const pushAdIfNeeded = () => {
-      if (showAd && renderedEvents === AD_INSERT_AFTER) {
+      if (sponsorAd && renderedEvents === AD_INSERT_AFTER) {
         items.push(renderAdCard());
       }
     };
@@ -468,7 +514,7 @@ export function EventsGrid({
     currentMonthKey,
     nonPremiumEvents,
     premiumEvents,
-    showAd,
+    sponsorAd,
     translatedTitles,
     locale,
     isEditMode,
@@ -567,7 +613,7 @@ export function EventsGrid({
         </div>
       ) : (
         <div className="grid gap-6 [grid-template-columns:repeat(auto-fill,minmax(min(100%,18rem),1fr))]">
-          {showAd && sortedEvents.length >= AD_INSERT_AFTER
+          {sponsorAd && sortedEvents.length >= AD_INSERT_AFTER
             ? [
                 ...sortedEvents.slice(0, AD_INSERT_AFTER).map(renderEventCard),
                 renderAdCard(),
