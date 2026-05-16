@@ -20,6 +20,7 @@ import {
   Button,
   Card,
   CardContent,
+  Checkbox,
   ErrorAlert,
   Form,
   FormControl,
@@ -42,6 +43,7 @@ import {
   useTags,
   useUpdateEvent,
 } from "@/hooks/query";
+import type { AiEventDraft } from "@/lib/ai-event-draft";
 import type { Event, EventUpdate, Host, Tag } from "@/lib/api";
 import { parseFacebookJsonImportPayload } from "@/lib/facebook-import";
 import type { GraboImportResult } from "@/lib/grabo";
@@ -72,6 +74,11 @@ function normalizeTagToken(value: string): string {
   return value.trim().toUpperCase().replace(/\s+/g, "");
 }
 
+function formatTagLabel(tag: Tag, locale: string) {
+  const base = (tag.title ?? "").toUpperCase();
+  return locale === "bg" ? (TAG_LABELS_BG[base] ?? base) : base;
+}
+
 export function EventForm({ mode, event }: EventFormProps) {
   const t = useTranslations("CreateEvent");
   const locale = useLocale();
@@ -93,10 +100,14 @@ export function EventForm({ mode, event }: EventFormProps) {
   const [isImportingFromGrabo, setIsImportingFromGrabo] = useState(false);
   const [isImportingFromRuse, setIsImportingFromRuse] = useState(false);
   const [isImportingFromJson, setIsImportingFromJson] = useState(false);
+  const [aiDraftPrompt, setAiDraftPrompt] = useState("");
+  const [isGeneratingAiDraft, setIsGeneratingAiDraft] = useState(false);
+  const [generateAiDescription, setGenerateAiDescription] = useState(true);
   const [facebookError, setFacebookError] = useState<string | null>(null);
   const [graboError, setGraboError] = useState<string | null>(null);
   const [ruseError, setRuseError] = useState<string | null>(null);
   const [jsonImportError, setJsonImportError] = useState<string | null>(null);
+  const [aiDraftError, setAiDraftError] = useState<string | null>(null);
 
   const [images, setImages] = useState<EventImageItem[]>(() => {
     if (!event) return [];
@@ -469,6 +480,93 @@ export function EventForm({ mode, event }: EventFormProps) {
       setIsImportingFromJson(false);
     }
   }, [facebookJsonImportPayload, form, resolveImportedTagIds, t]);
+
+  const handleImportFromAiDraft = useCallback(async () => {
+    setAiDraftError(null);
+    const trimmed = aiDraftPrompt.trim();
+    if (!trimmed) return;
+
+    setIsGeneratingAiDraft(true);
+    try {
+      const availableTags = Array.from(
+        new Set(
+          allTags.flatMap((tag) => {
+            const labels = [tag.title ?? "", formatTagLabel(tag, locale)];
+            return labels
+              .map((label) => label.trim())
+              .filter((label) => label !== "");
+          }),
+        ),
+      );
+
+      const res = await fetch("/api/ai-event-draft", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          prompt: trimmed,
+          generateDescription: generateAiDescription,
+          locale,
+          availableTags,
+        }),
+      });
+
+      const body = (await res.json().catch(() => null)) as
+        | (AiEventDraft & { error?: never })
+        | { error?: string }
+        | null;
+
+      if (!res.ok || !body || ("error" in body && body.error)) {
+        throw new Error(body?.error || t("error"));
+      }
+
+      const importedEvent = body as AiEventDraft;
+      const currentValues = form.getValues();
+      const importedTagIds = resolveImportedTagIds(
+        importedEvent.tagSuggestions,
+      );
+
+      form.reset({
+        ...currentValues,
+        title: importedEvent.title || currentValues.title,
+        description: importedEvent.description || currentValues.description,
+        startDate: importedEvent.startDate || currentValues.startDate,
+        endDate:
+          importedEvent.endDate ||
+          importedEvent.startDate ||
+          currentValues.endDate,
+        startTime: importedEvent.startTime || currentValues.startTime,
+        endTime: importedEvent.endTime || currentValues.endTime,
+        address: importedEvent.address || currentValues.address,
+        place: importedEvent.place || currentValues.place,
+        town: importedEvent.town || currentValues.town,
+        organizers:
+          importedEvent.organizers.length > 0
+            ? importedEvent.organizers
+            : currentValues.organizers,
+        ticketsLink: importedEvent.ticketsLink || currentValues.ticketsLink,
+        fbLink: importedEvent.fbLink || currentValues.fbLink,
+        email: importedEvent.email || currentValues.email,
+        price: importedEvent.price || currentValues.price,
+        phoneNumber: importedEvent.phoneNumber || currentValues.phoneNumber,
+        tags: importedTagIds.length > 0 ? importedTagIds : currentValues.tags,
+      });
+    } catch (err) {
+      console.error(err);
+      const message =
+        err instanceof Error && err.message ? err.message : t("error");
+      setAiDraftError(message);
+    } finally {
+      setIsGeneratingAiDraft(false);
+    }
+  }, [
+    aiDraftPrompt,
+    allTags,
+    form,
+    generateAiDescription,
+    locale,
+    resolveImportedTagIds,
+    t,
+  ]);
 
   const syncFormImagesFromState = useCallback(() => {
     const newFiles = images
@@ -955,6 +1053,66 @@ export function EventForm({ mode, event }: EventFormProps) {
           </div>
         )}
 
+        <div className="space-y-2 rounded-md border p-4">
+          <Typography.P className="font-medium">
+            {t("aiPrefillTitle")}
+          </Typography.P>
+          <Typography.Small className="text-muted-foreground">
+            {t("aiPrefillDescription")}
+          </Typography.Small>
+          <div className="mt-2 space-y-3">
+            <Textarea
+              placeholder={t("enterAiPrefillPrompt")}
+              value={aiDraftPrompt}
+              onChange={(e) => setAiDraftPrompt(e.target.value)}
+              rows={8}
+            />
+
+            <label
+              htmlFor="ai-generate-description"
+              className="flex items-start gap-3 rounded-md border p-3"
+            >
+              <Checkbox
+                id="ai-generate-description"
+                checked={generateAiDescription}
+                onCheckedChange={(checked) =>
+                  setGenerateAiDescription(checked === true)
+                }
+              />
+              <div className="space-y-1">
+                <Typography.Small className="font-medium text-foreground">
+                  {t("aiGenerateDescriptionLabel")}
+                </Typography.Small>
+                <Typography.Small className="text-muted-foreground">
+                  {t("aiGenerateDescriptionHint")}
+                </Typography.Small>
+              </div>
+            </label>
+
+            <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+              <Typography.Small className="text-muted-foreground">
+                {t("aiReviewNotice")}
+              </Typography.Small>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleImportFromAiDraft}
+                disabled={isGeneratingAiDraft || !aiDraftPrompt.trim()}
+              >
+                {isGeneratingAiDraft
+                  ? t("aiGeneratingDraft")
+                  : t("aiPrefillButton")}
+              </Button>
+            </div>
+
+            {aiDraftError && (
+              <Typography.Small className="text-destructive">
+                {aiDraftError}
+              </Typography.Small>
+            )}
+          </div>
+        </div>
+
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit as any)}
@@ -1057,13 +1215,6 @@ export function EventForm({ mode, event }: EventFormProps) {
                       (tag) => !selectedIds.includes(tag.id),
                     );
 
-                    const formatLabel = (tag: Tag) => {
-                      const base = (tag.title ?? "").toUpperCase();
-                      return locale === "bg"
-                        ? (TAG_LABELS_BG[base] ?? base)
-                        : base;
-                    };
-
                     return (
                       <>
                         {availableTags.length > 0 ? (
@@ -1106,7 +1257,7 @@ export function EventForm({ mode, event }: EventFormProps) {
                                     className="flex w-full items-center justify-between rounded-md px-2 py-1 text-sm hover:bg-accent hover:text-accent-foreground hover:cursor-pointer"
                                   >
                                     <span className="truncate">
-                                      # {formatLabel(tag)}
+                                      # {formatTagLabel(tag, locale)}
                                     </span>
                                   </button>
                                 ))}
@@ -1134,7 +1285,7 @@ export function EventForm({ mode, event }: EventFormProps) {
                                 }
                                 className="inline-flex items-center gap-2 rounded-full border border-primary bg-primary px-3 py-1 text-xs font-semibold uppercase tracking-wide text-primary-foreground shadow-sm hover:bg-primary/90 hover:cursor-pointer transition-colors"
                               >
-                                <span># {formatLabel(tag)}</span>
+                                <span># {formatTagLabel(tag, locale)}</span>
                                 <span className="text-xs" aria-hidden="true">
                                   ×
                                 </span>
