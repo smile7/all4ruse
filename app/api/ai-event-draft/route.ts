@@ -36,11 +36,13 @@ function buildPrompt({
   generateDescription,
   locale,
   availableTags,
+  hasImage,
 }: {
   prompt: string;
   generateDescription: boolean;
   locale: string;
   availableTags: string[];
+  hasImage: boolean;
 }) {
   const languageName = getLanguageName(locale);
   const today = new Date().toISOString().slice(0, 10);
@@ -50,6 +52,9 @@ function buildPrompt({
     "You extract event draft data for an event creation form.",
     `Today is ${today}.`,
     `Write title and description in ${languageName}.`,
+    hasImage
+      ? "An event poster, flyer, or screenshot may be attached. Extract only facts that are clearly visible in the image."
+      : null,
     "Use only facts that are explicitly present or strongly implied in the user's text.",
     "If a field is missing or unclear, return an empty string or an empty array.",
     "Do not invent images or image URLs.",
@@ -60,12 +65,23 @@ function buildPrompt({
     "Return organizers as an array of objects with name and link.",
     `Use only tags from this list: ${tagList}. If none match, return [].`,
     generateDescription
-      ? "Generate a short plain-text event description in 1 to 3 paragraphs. Do not use markdown or HTML."
+      ? [
+          "Generate a short plain-text event description in 1 to 3 paragraphs.",
+          "Write like a careful local event editor, not like ad copy.",
+          "Keep the tone natural, specific, and grounded in the provided facts.",
+          "Prefer concrete details over generic filler.",
+          "Vary sentence length and structure so the text feels naturally written.",
+          "Avoid keyword stuffing, cliches, exaggerated claims, and generic AI-style phrases such as 'don't miss', 'something for everyone', 'immerse yourself', or 'join us for an unforgettable experience'.",
+          "If the source details are limited, keep the description brief instead of padding it.",
+          "Do not use markdown or HTML.",
+        ].join(" ")
       : "Set description to an empty string.",
     "Return JSON only with these keys: title, description, address, place, town, startDate, startTime, endDate, endTime, organizers, ticketsLink, fbLink, email, price, phoneNumber, tagSuggestions.",
-    "User input:",
-    prompt,
-  ].join("\n");
+    prompt === "" ? "User input: none" : "User input:",
+    prompt === "" ? null : prompt,
+  ]
+    .filter(Boolean)
+    .join("\n");
 }
 
 export async function POST(request: Request) {
@@ -102,6 +118,30 @@ export async function POST(request: Request) {
     }
 
     const payload = parsedBody.data;
+    const contents = [
+      {
+        role: "user",
+        parts: [
+          {
+            text: buildPrompt({
+              ...payload,
+              hasImage: Boolean(payload.image),
+            }),
+          },
+          ...(payload.image
+            ? [
+                {
+                  inlineData: {
+                    mimeType: payload.image.mimeType,
+                    data: payload.image.data,
+                  },
+                },
+              ]
+            : []),
+        ],
+      },
+    ];
+
     const response = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/${DEFAULT_MODEL}:generateContent?key=${apiKey}`,
       {
@@ -118,16 +158,7 @@ export async function POST(request: Request) {
               },
             ],
           },
-          contents: [
-            {
-              role: "user",
-              parts: [
-                {
-                  text: buildPrompt(payload),
-                },
-              ],
-            },
-          ],
+          contents,
           generationConfig: {
             temperature: 0.2,
             responseMimeType: "application/json",

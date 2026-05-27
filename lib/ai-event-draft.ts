@@ -2,11 +2,28 @@ import { z } from "zod";
 
 const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 const TIME_PATTERN = /^([01]\d|2[0-3]):[0-5]\d$/;
+const IMAGE_MIME_TYPES = [
+  "image/png",
+  "image/jpeg",
+  "image/webp",
+  "image/gif",
+] as const;
 
 const freeText = z
   .string()
   .catch("")
   .transform((value) => value.trim());
+
+const promptText = z
+  .string()
+  .max(4000)
+  .catch("")
+  .transform((value) => value.trim());
+
+const aiEventDraftImageSchema = z.object({
+  mimeType: z.enum(IMAGE_MIME_TYPES),
+  data: z.string().trim().min(1).max(6_000_000),
+});
 
 function normalizeDate(value: string) {
   return DATE_PATTERN.test(value) ? value : "";
@@ -16,12 +33,32 @@ function normalizeTime(value: string) {
   return TIME_PATTERN.test(value) ? value : "";
 }
 
-export const aiEventDraftRequestSchema = z.object({
-  prompt: z.string().trim().min(10).max(4000),
-  generateDescription: z.boolean().default(false),
-  locale: z.string().trim().min(2).max(5).default("bg"),
-  availableTags: z.array(freeText).catch([]),
-});
+export const aiEventDraftRequestSchema = z
+  .object({
+    prompt: promptText,
+    generateDescription: z.boolean().default(false),
+    locale: z.string().trim().min(2).max(5).default("bg"),
+    availableTags: z.array(freeText).catch([]),
+    image: aiEventDraftImageSchema.optional(),
+  })
+  .superRefine((value, ctx) => {
+    if (value.prompt === "" && !value.image) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["prompt"],
+        message: "Provide text or an image.",
+      });
+      return;
+    }
+
+    if (!value.image && value.prompt.length < 10) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["prompt"],
+        message: "Prompt is too short.",
+      });
+    }
+  });
 
 export const aiEventDraftSchema = z
   .object({

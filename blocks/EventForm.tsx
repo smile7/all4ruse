@@ -1,6 +1,12 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type ChangeEvent,
+} from "react";
 import { useDropzone } from "react-dropzone";
 import { useFieldArray, useForm, useFormContext } from "react-hook-form";
 import { ChevronDownIcon, Trash2Icon } from "lucide-react";
@@ -47,6 +53,7 @@ import type { AiEventDraft } from "@/lib/ai-event-draft";
 import type { Event, EventUpdate, Host, Tag } from "@/lib/api";
 import { parseFacebookJsonImportPayload } from "@/lib/facebook-import";
 import type { GraboImportResult } from "@/lib/grabo";
+import { compressImageToWebp } from "@/lib/imageCompression";
 import type { RuseOnTheDanubeImportResult } from "@/lib/ruse-on-the-danube";
 import { createEventSchema, type CreateEventSchemaType } from "@/lib/schema";
 import { createClient } from "@/lib/supabase/client";
@@ -65,10 +72,55 @@ type EventImageItem = {
 };
 
 const MAX_IMAGES = 10;
+const MAX_IMAGE_BYTES = 2 * 1024 * 1024;
+const IMAGE_ACCEPT = {
+  "image/png": [],
+  "image/jpeg": [],
+  "image/webp": [],
+  "image/gif": [],
+} as const;
+const IMAGE_MIME_TYPES = Object.keys(IMAGE_ACCEPT);
 const IMPORT_PILOT_USER_IDS = new Set([
   "288aec4c-e378-45cd-b73b-f52d22998b5b",
   "98b3619c-b0f2-4b15-91e9-0045cf0eac51",
 ]);
+
+async function readFileAsBase64(file: File) {
+  return new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      if (typeof reader.result !== "string") {
+        reject(new Error("Failed to read image for AI draft."));
+        return;
+      }
+
+      const commaIndex = reader.result.indexOf(",");
+      resolve(
+        commaIndex >= 0 ? reader.result.slice(commaIndex + 1) : reader.result,
+      );
+    };
+
+    reader.onerror = () => {
+      reject(new Error("Failed to read image for AI draft."));
+    };
+
+    reader.readAsDataURL(file);
+  });
+}
+
+async function serializeAiDraftImage(file: File) {
+  const compressed = await compressImageToWebp(file, {
+    maxWidth: 1600,
+    maxHeight: 1600,
+    quality: 0.72,
+  });
+
+  return {
+    mimeType: compressed.type || file.type,
+    data: await readFileAsBase64(compressed),
+  };
+}
 
 function normalizeTagToken(value: string): string {
   return value.trim().toUpperCase().replace(/\s+/g, "");
@@ -101,6 +153,7 @@ export function EventForm({ mode, event }: EventFormProps) {
   const [isImportingFromRuse, setIsImportingFromRuse] = useState(false);
   const [isImportingFromJson, setIsImportingFromJson] = useState(false);
   const [aiDraftPrompt, setAiDraftPrompt] = useState("");
+  const [aiDraftImage, setAiDraftImage] = useState<File | null>(null);
   const [isGeneratingAiDraft, setIsGeneratingAiDraft] = useState(false);
   const [generateAiDescription, setGenerateAiDescription] = useState(true);
   const [facebookError, setFacebookError] = useState<string | null>(null);
@@ -201,8 +254,11 @@ export function EventForm({ mode, event }: EventFormProps) {
     resolver: zodResolver(createEventSchema(t)) as any,
     defaultValues,
   });
+  const aiDraftImageInputRef = useRef<HTMLInputElement | null>(null);
 
   const isImportPilotUser = userId ? IMPORT_PILOT_USER_IDS.has(userId) : false;
+  const canGenerateAiDraft =
+    aiDraftPrompt.trim() !== "" || aiDraftImage !== null;
 
   const resolveImportedTagIds = useCallback(
     (suggestions: string[] | undefined) => {
@@ -225,6 +281,91 @@ export function EventForm({ mode, event }: EventFormProps) {
         .map((tag) => tag.id);
     },
     [allTags],
+  );
+
+  const clearAiDraftImage = useCallback(() => {
+    setAiDraftImage(null);
+
+    if (aiDraftImageInputRef.current) {
+      aiDraftImageInputRef.current.value = "";
+    }
+  }, []);
+
+  const handleAiDraftImageChange = useCallback(
+    (event: ChangeEvent<HTMLInputElement>) => {
+      setAiDraftError(null);
+
+      const file = event.target.files?.[0];
+
+      if (!file) {
+        setAiDraftImage(null);
+        return;
+      }
+
+      if (!IMAGE_MIME_TYPES.includes(file.type)) {
+        clearAiDraftImage();
+        setAiDraftError(t("aiPrefillImageTypeError"));
+        return;
+      }
+
+      if (file.size > MAX_IMAGE_BYTES) {
+        clearAiDraftImage();
+        setAiDraftError(t("aiPrefillImageSizeError"));
+        return;
+      }
+
+      setAiDraftImage(file);
+    },
+    [clearAiDraftImage, t],
+  );
+
+  const addAiDraftImageToForm = useCallback(
+    (file: File) => {
+      setImages((prev) => {
+        const alreadyAdded = prev.some(
+          (item) =>
+            item.isNew &&
+            item.file &&
+            item.file.name === file.name &&
+            item.file.size === file.size &&
+            item.file.lastModified === file.lastModified,
+        );
+
+        if (alreadyAdded) {
+          return prev;
+        }
+
+        if (prev.length >= MAX_IMAGES) {
+          setImagesLimitExceeded(true);
+          return prev;
+        }
+
+        const next: EventImageItem[] = [
+          ...prev,
+          {
+            id: `ai-draft-${Date.now()}`,
+            url: URL.createObjectURL(file),
+            file,
+            isNew: true,
+          },
+        ].slice(0, MAX_IMAGES);
+
+        const newFiles = next
+          .filter((item) => item.isNew && item.file)
+          .map((item) => item.file as File);
+
+        form.setValue("images", newFiles);
+
+        if (!form.getValues("image") && newFiles[0]) {
+          form.setValue("image", newFiles[0]);
+        }
+
+        setImagesLimitExceeded(false);
+
+        return next;
+      });
+    },
+    [form],
   );
 
   const handleImportFromFacebook = useCallback(async () => {
@@ -484,7 +625,11 @@ export function EventForm({ mode, event }: EventFormProps) {
   const handleImportFromAiDraft = useCallback(async () => {
     setAiDraftError(null);
     const trimmed = aiDraftPrompt.trim();
-    if (!trimmed) return;
+
+    if (!trimmed && !aiDraftImage) {
+      setAiDraftError(t("aiPrefillInputRequired"));
+      return;
+    }
 
     setIsGeneratingAiDraft(true);
     try {
@@ -498,6 +643,9 @@ export function EventForm({ mode, event }: EventFormProps) {
           }),
         ),
       );
+      const image = aiDraftImage
+        ? await serializeAiDraftImage(aiDraftImage)
+        : undefined;
 
       const res = await fetch("/api/ai-event-draft", {
         method: "POST",
@@ -507,6 +655,7 @@ export function EventForm({ mode, event }: EventFormProps) {
           generateDescription: generateAiDescription,
           locale,
           availableTags,
+          image,
         }),
       });
 
@@ -550,6 +699,10 @@ export function EventForm({ mode, event }: EventFormProps) {
         phoneNumber: importedEvent.phoneNumber || currentValues.phoneNumber,
         tags: importedTagIds.length > 0 ? importedTagIds : currentValues.tags,
       });
+
+      if (aiDraftImage) {
+        addAiDraftImageToForm(aiDraftImage);
+      }
     } catch (err) {
       console.error(err);
       const message =
@@ -559,6 +712,8 @@ export function EventForm({ mode, event }: EventFormProps) {
       setIsGeneratingAiDraft(false);
     }
   }, [
+    addAiDraftImageToForm,
+    aiDraftImage,
     aiDraftPrompt,
     allTags,
     form,
@@ -697,13 +852,8 @@ export function EventForm({ mode, event }: EventFormProps) {
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
-    accept: {
-      "image/png": [],
-      "image/jpeg": [],
-      "image/webp": [],
-      "image/gif": [],
-    },
-    maxSize: 2 * 1024 * 1024, // 2MB
+    accept: IMAGE_ACCEPT,
+    maxSize: MAX_IMAGE_BYTES,
     multiple: true,
   });
 
@@ -1068,6 +1218,42 @@ export function EventForm({ mode, event }: EventFormProps) {
               rows={8}
             />
 
+            <div className="space-y-2 rounded-md border border-dashed p-3">
+              <div className="space-y-1">
+                <Typography.Small className="font-medium text-foreground">
+                  {t("aiPrefillImageLabel")}
+                </Typography.Small>
+                <Typography.Small className="text-muted-foreground">
+                  {t("aiPrefillImageHint")}
+                </Typography.Small>
+              </div>
+
+              <input
+                ref={aiDraftImageInputRef}
+                id="ai-prefill-image"
+                type="file"
+                accept={IMAGE_MIME_TYPES.join(",")}
+                onChange={handleAiDraftImageChange}
+                className="block w-full text-sm file:mr-4 file:rounded-md file:border-0 file:bg-secondary file:px-3 file:py-2 file:text-sm file:font-medium"
+              />
+
+              {aiDraftImage && (
+                <div className="flex flex-col gap-2 rounded-md bg-muted/50 p-3 md:flex-row md:items-center md:justify-between">
+                  <Typography.Small className="text-foreground">
+                    {t("aiPrefillImageSelected", { name: aiDraftImage.name })}
+                  </Typography.Small>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    onClick={clearAiDraftImage}
+                    className="self-start md:self-auto"
+                  >
+                    {t("aiPrefillRemoveImage")}
+                  </Button>
+                </div>
+              )}
+            </div>
+
             <label
               htmlFor="ai-generate-description"
               className="flex items-start gap-3 rounded-md border p-3"
@@ -1097,7 +1283,7 @@ export function EventForm({ mode, event }: EventFormProps) {
                 type="button"
                 variant="outline"
                 onClick={handleImportFromAiDraft}
-                disabled={isGeneratingAiDraft || !aiDraftPrompt.trim()}
+                disabled={isGeneratingAiDraft || !canGenerateAiDraft}
               >
                 {isGeneratingAiDraft
                   ? t("aiGeneratingDraft")
