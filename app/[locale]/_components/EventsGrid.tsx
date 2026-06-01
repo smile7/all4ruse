@@ -21,7 +21,11 @@ import {
   normalizeSupabaseImageUrl,
 } from "@/lib/utils";
 
-import { EventTimeFilter } from "./FilterByTime";
+import {
+  EventTimeFilter,
+  getUpcomingStartedElapsedLabel,
+  isEventLiveInUpcoming,
+} from "./FilterByTime";
 import { SponsorPreviewOverlay } from "./SponsorPreviewOverlay";
 import type { EventTagsMap } from "@/hooks/useEventTagsMap";
 import { useTranslatedTitles } from "./useTranslatedTitles";
@@ -355,6 +359,12 @@ export function EventsGrid({
       }
     }
     const imageSrc = normalizeSupabaseImageUrl(e.image || FALLBACK_IMAGE);
+    const isLiveUpcoming =
+      timeFilter === "upcoming" ? isEventLiveInUpcoming(e) : false;
+    const recentlyStartedLabel =
+      isLiveUpcoming && locale === "bg"
+        ? getUpcomingStartedElapsedLabel(e)
+        : null;
 
     const rawOrganizers = (e as any).organizers;
     const organizersArray: any[] = Array.isArray(rawOrganizers)
@@ -462,28 +472,45 @@ export function EventsGrid({
                   <div className="flex items-baseline gap-1 leading-none h-[0.5rem]">
                     <span
                       className={`text-lg ${
-                        isToday || isTomorrow ? "opacity-0 select-none" : ""
+                        isLiveUpcoming || isToday || isTomorrow
+                          ? "opacity-0 select-none"
+                          : ""
                       }`}
                     >
                       {day ?? "00"}
                     </span>
-                    {!isToday && !isTomorrow && (
+                    {!isLiveUpcoming && !isToday && !isTomorrow && (
                       <span className="text-[11px]">{month}</span>
                     )}
                   </div>
                   <span className="text-[11px] leading-tight flex items-center justify-center">
-                    {isToday
-                      ? t("today")
-                      : isTomorrow
-                        ? t("tomorrow")
-                        : "\u00A0"}
+                    {isLiveUpcoming ? (
+                      <span className="inline-flex items-center gap-1 uppercase font-semibold tracking-wide">
+                        <span className="inline-block h-2 w-2 rounded-full bg-green-500" />
+                        live
+                      </span>
+                    ) : isToday ? (
+                      t("today")
+                    ) : isTomorrow ? (
+                      t("tomorrow")
+                    ) : (
+                      "\u00A0"
+                    )}
                   </span>
-                  {e.startTime && (
-                    <div className="flex flex-col items-center rounded-xl bg-gray-400 z-10 px-2 py-1 mt-1.5 font-semibold text-primary-foreground shadow-md min-w-[2.5rem] border-2 border-white">
-                      <span className="text-xs tracking-wide">
-                        {formatTimeTZ(e.startTime)}
+                  {recentlyStartedLabel ? (
+                    <div className="flex flex-col items-center rounded-xl bg-gray-400 z-10 px-2 py-1 mt-1.5 font-semibold text-primary-foreground shadow-md min-w-[2.5rem] border-2 border-white max-w-[8.5rem]">
+                      <span className="text-[10px] tracking-wide text-center leading-tight">
+                        {recentlyStartedLabel}
                       </span>
                     </div>
+                  ) : (
+                    e.startTime && (
+                      <div className="flex flex-col items-center rounded-xl bg-gray-400 z-10 px-2 py-1 mt-1.5 font-semibold text-primary-foreground shadow-md min-w-[2.5rem] border-2 border-white">
+                        <span className="text-xs tracking-wide">
+                          {formatTimeTZ(e.startTime)}
+                        </span>
+                      </div>
+                    )
                   )}
                 </div>
               </div>

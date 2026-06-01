@@ -3,6 +3,7 @@ import type { Event } from "@/lib/api";
 export type EventTimeFilter = "past" | "current" | "upcoming";
 
 const DEFAULT_TIME = "00:00:00";
+const RECENTLY_STARTED_UPCOMING_MAX_MS = 12 * 60 * 60 * 1000;
 
 type EventMeta = {
   event: Event;
@@ -67,6 +68,54 @@ export function getEventUtcRange(event: Event): {
   return { startUTC, endUTC };
 }
 
+export function getUpcomingStartedElapsedLabel(
+  event: Event,
+  reference: Date = new Date(),
+): string | null {
+  if (!isEventLiveInUpcoming(event, reference)) {
+    return null;
+  }
+
+  const { startUTC, endUTC } = getEventUtcRange(event);
+  const now = reference.getTime();
+  const start = startUTC.getTime();
+
+  const totalMinutes = Math.max(1, Math.floor((now - start) / (60 * 1000)));
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+
+  if (hours === 0) {
+    return `ПРЕДИ ${totalMinutes} ${minutesWord(totalMinutes)}`;
+  }
+
+  if (minutes === 0) {
+    return `ПРЕДИ ${hours} ${hoursWord(hours)}`;
+  }
+
+  return `ПРЕДИ ${hours} ${hoursWord(hours)} ${minutes} ${minutesWord(minutes)}`;
+}
+
+export function isEventLiveInUpcoming(
+  event: Event,
+  reference: Date = new Date(),
+): boolean {
+  const { startUTC, endUTC } = getEventUtcRange(event);
+  const now = reference.getTime();
+  const start = startUTC.getTime();
+  const end = endUTC.getTime();
+
+  if (now < start || now > end) {
+    return false;
+  }
+
+  const holdInUpcomingUntil = Math.min(
+    end,
+    start + RECENTLY_STARTED_UPCOMING_MAX_MS,
+  );
+
+  return now <= holdInUpcomingUntil;
+}
+
 function buildEventMeta(event: Event, reference: Date): EventMeta | null {
   try {
     const { startUTC, endUTC } = getEventUtcRange(event);
@@ -96,8 +145,19 @@ function resolveStatus(
   reference: Date,
 ): EventTimeFilter {
   const now = reference.getTime();
-  if (startUTC.getTime() > now) return "upcoming";
-  if (endUTC.getTime() < now) return "past";
+  const start = startUTC.getTime();
+  const end = endUTC.getTime();
+
+  if (start > now) return "upcoming";
+  if (end < now) return "past";
+
+  // Keep newly started events in upcoming for up to 12 hours or until they end.
+  const holdInUpcomingUntil = Math.min(
+    end,
+    start + RECENTLY_STARTED_UPCOMING_MAX_MS,
+  );
+
+  if (now <= holdInUpcomingUntil) return "upcoming";
   return "current";
 }
 
@@ -140,4 +200,12 @@ function normalizeTimeString(timeStr?: string | null): string {
 
 function pad2(num: number): string {
   return num.toString().padStart(2, "0");
+}
+
+function hoursWord(value: number): string {
+  return value === 1 ? "час" : "часа";
+}
+
+function minutesWord(value: number): string {
+  return value === 1 ? "минута" : "минути";
 }
