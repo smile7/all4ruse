@@ -4,6 +4,7 @@ export type EventTimeFilter = "past" | "current" | "upcoming";
 
 const DEFAULT_TIME = "00:00:00";
 const RECENTLY_STARTED_UPCOMING_MAX_MS = 12 * 60 * 60 * 1000;
+const NO_END_TIME_FALLBACK_MS = 90 * 60 * 1000;
 
 type EventMeta = {
   event: Event;
@@ -55,11 +56,11 @@ export function getEventUtcRange(event: Event): {
     ) ??
     new Date(0);
 
-  let endUTC =
-    toUTCDate(
-      event.endDate ?? event.startDate,
-      event.endTime ?? event.startTime,
-    ) ?? startUTC;
+  const hasEndTime = Boolean(event.endTime?.trim());
+
+  let endUTC = hasEndTime
+    ? (toUTCDate(event.endDate ?? event.startDate, event.endTime) ?? startUTC)
+    : new Date(startUTC.getTime() + NO_END_TIME_FALLBACK_MS);
 
   if (endUTC.getTime() < startUTC.getTime()) {
     endUTC = new Date(startUTC);
