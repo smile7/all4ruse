@@ -18,7 +18,7 @@ import {
   cn,
   formatShortDate,
   formatTimeTZ,
-  normalizeSupabaseImageUrl,
+  getEventImageUrl,
 } from "@/lib/utils";
 
 import {
@@ -358,7 +358,7 @@ export function EventsGrid({
         isTomorrow = true;
       }
     }
-    const imageSrc = normalizeSupabaseImageUrl(e.image || FALLBACK_IMAGE);
+    const imageSrc = getEventImageUrl(e.image) || FALLBACK_IMAGE;
     const isLiveUpcoming =
       timeFilter === "upcoming" ? isEventLiveInUpcoming(e) : false;
     const recentlyStartedLabel =

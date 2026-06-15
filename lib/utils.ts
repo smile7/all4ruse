@@ -4,7 +4,12 @@ import { bg } from "date-fns/locale";
 import { twMerge } from "tailwind-merge";
 import { slugify as transliterate } from "transliteration";
 
-import { BREAKPOINTS, EMPTY_DISPLAY, ScreenSize } from "@/constants";
+import {
+  BREAKPOINTS,
+  EMPTY_DISPLAY,
+  EVENTS_BUCKET,
+  ScreenSize,
+} from "@/constants";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -172,4 +177,36 @@ export function normalizeSupabaseImageUrl(url: string): string {
   } catch {
     return url;
   }
+}
+
+export function getEventImageUrl(url?: string | null): string {
+  if (!url) return "";
+
+  const normalized = normalizeSupabaseImageUrl(url.trim());
+  if (!normalized) return "";
+
+  if (
+    normalized.startsWith("http://") ||
+    normalized.startsWith("https://") ||
+    normalized.startsWith("data:") ||
+    normalized.startsWith("blob:")
+  ) {
+    return normalized;
+  }
+
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/+$/, "");
+  if (!supabaseUrl) {
+    return normalized;
+  }
+
+  const normalizedPath = normalized.replace(/^\/+/, "");
+  if (normalizedPath.startsWith("storage/v1/object/public/")) {
+    return `${supabaseUrl}/${normalizedPath}`;
+  }
+
+  if (normalizedPath.startsWith(`${EVENTS_BUCKET}/`)) {
+    return `${supabaseUrl}/storage/v1/object/public/${normalizedPath}`;
+  }
+
+  return `${supabaseUrl}/storage/v1/object/public/${EVENTS_BUCKET}/${normalizedPath}`;
 }
