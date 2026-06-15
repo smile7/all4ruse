@@ -4,7 +4,7 @@ import lgThumbnail from "lightgallery/plugins/thumbnail";
 import lgZoom from "lightgallery/plugins/zoom";
 import LightGallery from "lightgallery/react";
 import Image from "next/image";
-import { normalizeSupabaseImageUrl } from "@/lib/utils";
+import { getEventImageUrl } from "@/lib/utils";
 
 import "lightgallery/css/lightgallery.css";
 import "lightgallery/css/lg-zoom.css";
@@ -30,7 +30,7 @@ export function ImagesGallery({
       mobileSettings={{ controls: true, showCloseIcon: true }}
     >
       {images.map((url, idx) => {
-        const imageUrl = normalizeSupabaseImageUrl(url);
+        const imageUrl = getEventImageUrl(url);
 
         return (
           <a

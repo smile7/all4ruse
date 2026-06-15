@@ -24,6 +24,7 @@ import { CalendarDaysIcon } from "lucide-react";
 import EventDescriptionWrapper from "@/components/EventDescriptionWrapper";
 import { translateText } from "@/lib/translateText";
 import { ScrollToTopOnMount } from "@/components/ScrollToTopOnMount";
+import { getEventImageUrl } from "@/lib/utils";
 
 const DEFAULT_CALENDAR_TIMEZONE = "Europe/Sofia";
 
@@ -50,9 +51,7 @@ export async function generateMetadata({
   const description =
     event.description?.replace(/<[^>]+>/g, " ").slice(0, 160) ||
     "Събитие в Русе в All4Ruse.";
-  const imageUrl = event.image
-    ? new URL(event.image, siteUrl).toString()
-    : undefined;
+  const imageUrl = getEventImageUrl(event.image) || undefined;
 
   const languages = Object.fromEntries(
     routing.locales.map((loc) => [loc, `${siteUrl}/${loc}/${slug}`]),
@@ -175,6 +174,10 @@ export default async function EventPage(props: {
   const images: string[] = Array.isArray(event.images)
     ? event.images.filter((x): x is string => typeof x === "string")
     : [];
+  const eventImageUrl = getEventImageUrl(event.image);
+  const galleryImageUrls = images
+    .map((image) => getEventImageUrl(image))
+    .filter(Boolean);
 
   const isPast = getEventTemporalStatus(event) === "past";
   const isFree = (event.price ?? "").trim() === "0";
@@ -285,7 +288,9 @@ export default async function EventPage(props: {
       event.description?.replace(/<[^>]+>/g, " ") ||
       undefined,
     url: eventUrl,
-    image: event.image || (images.length > 0 ? images[0] : undefined),
+    image:
+      eventImageUrl ||
+      (galleryImageUrls.length > 0 ? galleryImageUrls[0] : undefined),
     startDate: `${event.startDate}T${(event.startTime ?? "00:00").slice(0, 5)}:00`,
     endDate: `${event.endDate}T${(event.endTime ?? "00:00").slice(0, 5)}:00`,
     eventStatus: isPast
@@ -346,9 +351,9 @@ export default async function EventPage(props: {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <ScrollToTopOnMount />
-      {event.image && (
+      {eventImageUrl && (
         <EventHeroImage
-          src={event.image}
+          src={eventImageUrl}
           alt={translatedTitle}
           isPast={isPast}
         />
@@ -452,13 +457,13 @@ export default async function EventPage(props: {
         </CardContent>
       </Card>
 
-      {images.length > 0 && (
+      {galleryImageUrls.length > 0 && (
         <Card className="space-y-4 p-6">
           <CardTitle>
             <Typography.H2>{t("gallery")}</Typography.H2>
           </CardTitle>
           <CardContent className="p-0">
-            <ImagesGallery images={images} title={event.title} />
+            <ImagesGallery images={galleryImageUrls} title={event.title} />
           </CardContent>
         </Card>
       )}
