@@ -6,10 +6,6 @@ import LightGallery from "lightgallery/react";
 import Image from "next/image";
 import { getEventImageUrl } from "@/lib/utils";
 
-import "lightgallery/css/lightgallery.css";
-import "lightgallery/css/lg-zoom.css";
-import "lightgallery/css/lg-thumbnail.css";
-
 export function ImagesGallery({
   images,
   title,
